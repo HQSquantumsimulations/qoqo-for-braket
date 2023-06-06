@@ -10,5 +10,5 @@ jobs:
   publish_documentation:
     uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_publish_documentation_pure_python_sphinx.yml@main
     with: 
-      python_folder: "qoqo_braket"
+      python_folder: "."
     secrets: inherit
