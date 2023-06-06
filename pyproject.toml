@@ -32,6 +32,15 @@ dev = [
     'mypy',
     'black'
 ]
+docs = [
+    "sphinx >= 2.1",
+    "nbsphinx",
+    "pygments",
+    "recommonmark",
+    "myst_parser",
+    "sphinx_rtd_theme",
+    "tomli"
+]
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
