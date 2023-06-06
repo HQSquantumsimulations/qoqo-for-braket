@@ -4,7 +4,6 @@
 """Provides the BraketBackend class."""
 
 from typing import Tuple, Dict, List, Any, Optional, Union
-import json
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
@@ -14,7 +13,6 @@ from qoqo_braket.interface import (
     oqc_verbatim_interface,
 )
 
-from qoqo_braket import QueuedCircuitRun
 from qoqo_braket.post_processing import _post_process_circuit_result
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
@@ -49,7 +47,7 @@ class BraketBackend:
         aws_session: Optional[AwsSession] = None,
         verbatim_mode: bool = False,
     ) -> None:
-        """Initialise the QueuedCircuitRun class.
+        """Initialise the BraketBackend class.
 
         Args:
             device: Optional ARN of the Braket device to use. If none is provided, the
