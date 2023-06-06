@@ -11,4 +11,5 @@ jobs:
     uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_publish_documentation_pure_python_sphinx.yml@main
     with: 
       python_folder: "."
+      docs_folder: "./docs"
     secrets: inherit
