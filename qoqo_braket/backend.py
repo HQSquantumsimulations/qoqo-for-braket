@@ -109,7 +109,9 @@ class BraketBackend:
             The instanciated device (either an AwsDevice or a LocalSimulator)
 
         Raises:
-            ValueError: Device specified isn't allowed
+            ValueError: Device specified isn't allowed. You can allow it by calling the
+                        `allow_use_actual_hardware` function, but please be aware that
+                        this may incur significant monetary charges.
         """
         if self.device.startswith("local:") or self.device in LOCAL_SIMULATORS_LIST:
             device = LocalSimulator(self.device)
@@ -120,7 +122,11 @@ class BraketBackend:
                 # allow list simulator devices of AWS e.g. state vector simulator
                 device = AwsDevice(self.device)
             else:
-                raise ValueError("Device specified isn't allowed")
+                raise ValueError(
+                    "Device specified isn't allowed. You can allow it by calling the "
+                    + "`allow_use_actual_hardware` function, but please be aware that "
+                    + "this may incur significant monetary charges."
+                )
         return device
 
     # runs a circuit internally and can be used to produce sync and async results
@@ -132,7 +138,7 @@ class BraketBackend:
 
         The default number of shots for the simulation is 100.
         Any kind of Measurement instruction only works as intended if
-        it are the last instructions in the Circuit.
+        it is the last instruction in the Circuit.
         Currently only one simulation is performed, meaning different measurements on different
         registers are not supported.
 
@@ -208,7 +214,7 @@ class BraketBackend:
 
         The default number of shots for the simulation is 100.
         Any kind of Measurement instruction only works as intended if
-        it are the last instructions in the Circuit.
+        it is the last instruction in the Circuit.
         Currently only one simulation is performed, meaning different measurements on different
         registers are not supported.
 

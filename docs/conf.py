@@ -20,6 +20,7 @@
 
 # set __version__
 import tomli
+
 main_version = tomli.load(open("../pyproject.toml", "rb"))["project"]["version"]
 # -- General configuration ------------------------------------------------
 
