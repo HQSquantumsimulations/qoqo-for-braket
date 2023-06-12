@@ -1,0 +1,67 @@
+[project]
+name = "qoqo-braket"
+version = "0.1.0"
+license = {file="LICENSE"}
+authors = [
+    {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
+]
+maintainers = [
+    {name="Kirsten Bark", email="kirsten.bark@quantumsimulations.de"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "qoqo>=1.4",
+    "qoqo_qasm>=0.7.4",
+    "amazon-braket-sdk"
+]
+
+[project.optional-dependencies]
+tests = [
+  'pytest-cov',
+  'pytest'
+]
+dev = [
+    'flake8',
+    'flake8-bandit',
+    'flake8-bugbear',
+    'flake8-pyproject',
+    'flake8-pydocstyle',
+    'darglint',
+    'bandit',
+    'mypy',
+    'black'
+]
+docs = [
+    "sphinx >= 2.1",
+    "nbsphinx",
+    "pygments",
+    "recommonmark",
+    "myst_parser",
+    "sphinx_rtd_theme",
+    "tomli"
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.flake8]
+max-line-length = 100
+ignore = ['D400', 'D401', 'W503', 'ANN101', 'ANN102', 'ANN002', 'ANN003', 'ANN401', 'S403', 'S404', 'S301']
+exclude = ['.git', '__pycache__', 'doc/conf.py', 'old', 'build', 'dist', 'test_*']
+docstring-convention = "google"
+per-file-ignores = [
+    '__init__.py:F401',
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+pretty = true
+follow_imports = "silent"
+
+[tool.bandit]
+
+[tool.black]
+line-length = 99
+target-version = ['py39', 'py310', 'py311']
