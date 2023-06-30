@@ -1,6 +1,6 @@
 # Copyright © 2023 HQS Quantum Simulations GmbH. All Rights Reserved.
 """Test running local operation with qasm backend."""
-from qoqo_braket import BraketBackend
+from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
 from braket.aws.aws_session import AwsSession
