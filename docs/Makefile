@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = qoqo_braket
+SPHINXPROJ    = qoqo_for_braket
 SOURCEDIR     = .
 BUILDDIR      = _build
 

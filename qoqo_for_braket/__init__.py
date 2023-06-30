@@ -2,5 +2,5 @@
 # License details given in distributed LICENSE file.
 
 """Qoqo interface to the AWS braket service."""
-from qoqo_braket import post_processing
-from qoqo_braket.backend import BraketBackend
+from qoqo_for_braket import post_processing
+from qoqo_for_braket.backend import BraketBackend
