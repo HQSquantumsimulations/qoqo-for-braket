@@ -1,7 +1,7 @@
-﻿qoqo\_braket
-============
+﻿qoqo\_for\_braket
+=================
 
-.. automodule:: qoqo_braket
+.. automodule:: qoqo_for_braket
 
    
    

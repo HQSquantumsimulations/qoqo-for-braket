@@ -1,4 +1,4 @@
-Welcome to qoqo-braket's documentation!
+Welcome to qoqo-for-braket's documentation!
 ======================================
 A braket backend for the qoqo quantum computing toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
 

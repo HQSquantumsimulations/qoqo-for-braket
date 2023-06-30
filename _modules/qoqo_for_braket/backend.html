@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_braket.backend &mdash; qoqo_braket 0.1.0 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.1.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            qoqo_braket
+            qoqo_for_braket
           </a>
               <div class="version">
                 0.1.0
@@ -45,7 +45,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">qoqo braket documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">qoqo for braket documentation</a></li>
 </ul>
 
         </div>
@@ -54,7 +54,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">qoqo_braket</a>
+          <a href="../../index.html">qoqo_for_braket</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -63,7 +63,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">qoqo_braket.backend</li>
+      <li class="breadcrumb-item active">qoqo_for_braket.backend</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,7 +72,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for qoqo_braket.backend</h1><div class="highlight"><pre>
+  <h1>Source code for qoqo_for_braket.backend</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright © 2023 HQS Quantum Simulations GmbH. All Rights Reserved.</span>
 <span class="c1"># License details given in distributed LICENSE file.</span>
 
@@ -82,13 +82,13 @@
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span>
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
 <span class="kn">import</span> <span class="nn">qoqo_qasm</span>
-<span class="kn">from</span> <span class="nn">qoqo_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">rigetti_verbatim_interface</span><span class="p">,</span>
     <span class="n">ionq_verbatim_interface</span><span class="p">,</span>
     <span class="n">oqc_verbatim_interface</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span> <span class="nn">qoqo_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
 <span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span>
 <span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
 <span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
@@ -103,7 +103,7 @@
 <span class="p">]</span>
 
 
-<div class="viewcode-block" id="BraketBackend"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend">[docs]</a><span class="k">class</span> <span class="nc">BraketBackend</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend">[docs]</a><span class="k">class</span> <span class="nc">BraketBackend</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Qoqo backend execution qoqo objects on AWS braket.</span>
 
 <span class="sd">    Args:</span>
@@ -116,7 +116,7 @@
 <span class="sd">                       recompilation by devices</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BraketBackend.__init__"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="BraketBackend.__init__"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">aws_session</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AwsSession</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -141,27 +141,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span></div>
 
-<div class="viewcode-block" id="BraketBackend.allow_use_actual_hardware"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.allow_use_actual_hardware">[docs]</a>    <span class="k">def</span> <span class="nf">allow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.allow_use_actual_hardware"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.allow_use_actual_hardware">[docs]</a>    <span class="k">def</span> <span class="nf">allow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow the use of actual hardware - will cost money.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BraketBackend.disallow_use_actual_hardware"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.disallow_use_actual_hardware">[docs]</a>    <span class="k">def</span> <span class="nf">disallow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.disallow_use_actual_hardware"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.disallow_use_actual_hardware">[docs]</a>    <span class="k">def</span> <span class="nf">disallow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Disallow the use of actual hardware.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="BraketBackend.force_rigetti_verbatim"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.force_rigetti_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_rigetti_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.force_rigetti_verbatim"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_rigetti_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_rigetti_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of rigetti verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_rigetti_verbatim</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BraketBackend.force_ionq_verbatim"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.force_ionq_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_ionq_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.force_ionq_verbatim"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_ionq_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_ionq_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of ionq verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_ionq_verbatim</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BraketBackend.force_oqc_verbatim"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.force_oqc_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_oqc_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.force_oqc_verbatim"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_oqc_verbatim">[docs]</a>    <span class="k">def</span> <span class="nf">force_oqc_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of oqc verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_oqc_verbatim</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="BraketBackend.change_max_shots"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.change_max_shots">[docs]</a>    <span class="k">def</span> <span class="nf">change_max_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.change_max_shots"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.change_max_shots">[docs]</a>    <span class="k">def</span> <span class="nf">change_max_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the maximum number of shots allowed.</span>
 
 <span class="sd">        Args:</span>
@@ -169,7 +169,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="n">shots</span></div>
 
-<div class="viewcode-block" id="BraketBackend.change_max_circuit_length"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.change_max_circuit_length">[docs]</a>    <span class="k">def</span> <span class="nf">change_max_circuit_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BraketBackend.change_max_circuit_length"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.change_max_circuit_length">[docs]</a>    <span class="k">def</span> <span class="nf">change_max_circuit_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the maximum circuit length allowed.</span>
 
 <span class="sd">        Args:</span>
@@ -205,7 +205,7 @@
         <span class="k">return</span> <span class="n">device</span>
 
     <span class="c1"># runs a circuit internally and can be used to produce sync and async results</span>
-<div class="viewcode-block" id="BraketBackend._run_circuit"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend._run_circuit">[docs]</a>    <span class="k">def</span> <span class="nf">_run_circuit</span><span class="p">(</span>
+<div class="viewcode-block" id="BraketBackend._run_circuit"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._run_circuit">[docs]</a>    <span class="k">def</span> <span class="nf">_run_circuit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -278,7 +278,7 @@
             <span class="p">{</span><span class="s2">&quot;readout_name&quot;</span><span class="p">:</span> <span class="n">readout</span><span class="p">},</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BraketBackend.run_circuit"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.run_circuit">[docs]</a>    <span class="k">def</span> <span class="nf">run_circuit</span><span class="p">(</span>
+<div class="viewcode-block" id="BraketBackend.run_circuit"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_circuit">[docs]</a>    <span class="k">def</span> <span class="nf">run_circuit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
@@ -305,7 +305,7 @@
         <span class="n">results</span> <span class="o">=</span> <span class="n">quantum_task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">_post_process_circuit_result</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BraketBackend.run_measurement_registers"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.run_measurement_registers">[docs]</a>    <span class="k">def</span> <span class="nf">run_measurement_registers</span><span class="p">(</span>
+<div class="viewcode-block" id="BraketBackend.run_measurement_registers"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_registers">[docs]</a>    <span class="k">def</span> <span class="nf">run_measurement_registers</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
@@ -349,7 +349,7 @@
             <span class="n">output_complex_register_dict</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BraketBackend.run_measurement"><a class="viewcode-back" href="../../generated/qoqo_braket.html#qoqo_braket.BraketBackend.run_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">run_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<div class="viewcode-block" id="BraketBackend.run_measurement"><a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement">[docs]</a>    <span class="k">def</span> <span class="nf">run_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a circuit with the AWS Braket backend.</span>
 
 <span class="sd">        Args:</span>
