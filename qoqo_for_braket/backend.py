@@ -16,13 +16,13 @@ from typing import Tuple, Dict, List, Any, Optional, Union
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
-from qoqo_braket.interface import (
+from qoqo_for_braket.interface import (
     rigetti_verbatim_interface,
     ionq_verbatim_interface,
     oqc_verbatim_interface,
 )
 
-from qoqo_braket.post_processing import _post_process_circuit_result
+from qoqo_for_braket.post_processing import _post_process_circuit_result
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
 from braket.ir import openqasm

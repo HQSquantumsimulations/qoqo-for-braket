@@ -89,7 +89,7 @@ source_suffix = {
 master_doc = "index"
 
 # General information about the project.
-project = "qoqo_braket"
+project = "qoqo_for_braket"
 copyright = "2019-2023, HQS Quantum Simulations GmbH"
 author = "The qoqo developers"
 
@@ -186,8 +186,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "qoqo_braket.tex",
-        "qoqo_braket Documentation",
+        "qoqo_for_braket.tex",
+        "qoqo_for_braket Documentation",
         "HQS Quantum Simulations GmbH",
         "manual",
     ),
@@ -198,7 +198,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "qoqo_braket", "qoqo_braket Documentation", [author], 1)]
+man_pages = [(master_doc, "qoqo_for_braket", "qoqo_for_braket Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -209,10 +209,10 @@ man_pages = [(master_doc, "qoqo_braket", "qoqo_braket Documentation", [author], 
 texinfo_documents = [
     (
         master_doc,
-        "qoqo_braket",
-        "qoqo_braket Documentation",
+        "qoqo_for_braket",
+        "qoqo_for_braket Documentation",
         author,
-        "qoqo_braket",
+        "qoqo_for_braket",
         "AWS Braket backend for qoqo quantum computing toolkit.",
         "Miscellaneous",
     ),

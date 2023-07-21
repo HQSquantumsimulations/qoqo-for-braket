@@ -1,6 +1,6 @@
 <img src="qoqo_Logo_vertical_color.png" alt="qoqo logo" width="300" />
 
-# qoqo-braket
+# qoqo-for-braket
 A braket backend for the qoqo quantum computing toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
 
 ## General Notes

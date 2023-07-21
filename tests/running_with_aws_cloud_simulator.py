@@ -10,7 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
-from qoqo_braket import BraketBackend
+from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
 from braket.aws.aws_session import AwsSession

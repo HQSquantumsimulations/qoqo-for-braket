@@ -1,9 +1,9 @@
-qoqo braket documentation
+qoqo for braket documentation
 ========================
 
 .. autosummary::
     :toctree: generated/
 
-    qoqo_braket
+    qoqo_for_braket
 
 

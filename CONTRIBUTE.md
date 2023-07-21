@@ -17,5 +17,5 @@ Please fill and sign the CLA found at *url* and send it to info@quantumsimulatio
 ## Code Guidelines for Rust
 
 1. Testing: We use `pytest ./tests`. We require that all previous tests pass and that your provide proper tests with your contribution.
-2. Linting: We use `flake8 ./qoqo_braket`, `mypy ./qoqo_braket` to lint all Python code.
+2. Linting: We use `flake8 ./qoqo_for_braket`, `mypy ./qoqo_for_braket` to lint all Python code.
 3. Formatting: We check formatting with flake8 in Python code.
