@@ -13,8 +13,9 @@
 
 from braket.circuits import Circuit
 import qoqo
-from qoqo_calculator_pyo3 import CalculatorFloat
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
+if TYPE_CHECKING:
+    from qoqo_calculator_pyo3 import CalculatorFloat
 
 ALLOWED_OPERATIONS = ["PragmaRepeatedMeasurement", "PragmaSetNumberOfMeasurements", "MeasureQubit"]
 
