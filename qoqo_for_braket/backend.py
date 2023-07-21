@@ -257,9 +257,9 @@ class BraketBackend:
                   Dict[str, List[List[complex]]]]
         """
         constant_circuit = measurement.constant_circuit()
-        output_bit_register_dict: Dict[str, List[List[bool]]] = dict()
-        output_float_register_dict: Dict[str, List[List[float]]] = dict()
-        output_complex_register_dict: Dict[str, List[List[complex]]] = dict()
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
 
         for circuit in measurement.circuits():
             if constant_circuit is None:

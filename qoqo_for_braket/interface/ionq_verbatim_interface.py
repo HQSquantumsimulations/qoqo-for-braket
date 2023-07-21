@@ -37,7 +37,7 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
     Raises:
         RuntimeError: Unsupported operation for IonQ verbatim interface.
     """
-    qubit_phase: Dict[int, CalculatorFloat] = dict()
+    qubit_phase: Dict[int, CalculatorFloat] = {}
     braket_circuit = Circuit()
     for op in circuit:
         if op.hqslang() == "RotateZ":
