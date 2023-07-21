@@ -22,11 +22,7 @@ tests = [
   'pytest'
 ]
 dev = [
-    'flake8',
-    'flake8-bandit',
-    'flake8-bugbear',
-    'flake8-pyproject',
-    'flake8-pydocstyle',
+    'ruff',
     'darglint',
     'bandit',
     'mypy',
