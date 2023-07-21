@@ -14,6 +14,7 @@
 from braket.circuits import Circuit
 import qoqo
 from typing import TYPE_CHECKING, Dict
+
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
 
