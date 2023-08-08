@@ -1,0 +1,9 @@
+[book]
+authors = ["HQS Quantum Simulations", "Kirsten Bark", "Nicolas Vogt", "Matteo Lodi"]
+language = "en"
+multilingual = false
+src = "src"
+title = "HQS qoqo_for_braket, qoqo_for_braket_devices and roqoqo_for_braket_devices User Documentation"
+
+[output.html]
+mathjax-support = true
