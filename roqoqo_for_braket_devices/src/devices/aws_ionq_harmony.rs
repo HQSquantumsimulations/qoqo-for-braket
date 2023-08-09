@@ -10,6 +10,7 @@
 // express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+use itertools::Itertools;
 use std::collections::HashMap;
 
 use roqoqo::{devices::QoqoDevice, RoqoqoError};
@@ -442,14 +443,10 @@ impl QoqoDevice for IonQHarmonyDevice {
     ///                           the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
-        let mut edges: Vec<(usize, usize)> = Vec::new();
-        for i in 0..self.number_qubits {
-            for j in 0..self.number_qubits {
-                if i != j {
-                    edges.push((i, j));
-                }
-            }
-        }
+        let edges: Vec<(usize, usize)> = (0..self.number_qubits)
+            .combinations(2)
+            .map(|x| (x[0], x[1]))
+            .collect();
         edges
     }
 }
