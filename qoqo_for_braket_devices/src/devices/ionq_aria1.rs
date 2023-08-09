@@ -19,7 +19,7 @@ use bincode::deserialize;
 
 use qoqo::devices::GenericDeviceWrapper;
 use roqoqo::devices::QoqoDevice;
-use roqoqo_for_braket_devices::{IonQAria1Device, AWSDevice};
+use roqoqo_for_braket_devices::{AWSDevice, IonQAria1Device};
 
 /// AWS IonQ Aria1 device
 ///

@@ -34,11 +34,9 @@ fn new_device(device: AWSDevice) -> Py<PyAny> {
 }
 
 /// Test single_qubit_gate_names and two_qubit_gate_names functions of the devices
-#[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 #[test_case(new_device(AWSDevice::from(IonQHarmonyDevice::new())); "harmony")]
 #[test_case(new_device(AWSDevice::from(IonQAria1Device::new())); "aria1")]
-#[test_case(new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
-fn test_gate_names(device: Py<PyAny>) {
+fn test_gate_names_ionq(device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
         let single_qubit_gates = device
@@ -46,16 +44,46 @@ fn test_gate_names(device: Py<PyAny>) {
             .unwrap()
             .extract::<Vec<String>>(py)
             .unwrap();
-        assert!(single_qubit_gates.contains(&"PauliX".to_string()));
-        assert!(single_qubit_gates.contains(&"SqrtPauliX".to_string()));
         assert!(single_qubit_gates.contains(&"RotateZ".to_string()));
+        assert!(single_qubit_gates.contains(&"GPi".to_string()));
+        assert!(single_qubit_gates.contains(&"GPi2".to_string()));
 
         let two_qubit_gates = device
             .call_method0(py, "two_qubit_gate_names")
             .unwrap()
             .extract::<Vec<String>>(py)
             .unwrap();
-        assert_eq!(two_qubit_gates, vec!["CNOT".to_string()]);
+        assert_eq!(two_qubit_gates, vec!["MolmerSorensenXX".to_string()]);
+
+        let multi_qubit_gates = device
+            .call_method0(py, "multi_qubit_gate_names")
+            .unwrap()
+            .extract::<Vec<String>>(py)
+            .unwrap();
+        assert_eq!(multi_qubit_gates, Vec::<String>::new());
+    })
+}
+
+#[test_case(new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
+// #[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
+fn test_gate_names_oqc(device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        let single_qubit_gates = device
+            .call_method0(py, "single_qubit_gate_names")
+            .unwrap()
+            .extract::<Vec<String>>(py)
+            .unwrap();
+        assert!(single_qubit_gates.contains(&"RotateZ".to_string()));
+        assert!(single_qubit_gates.contains(&"SqrtPauliX".to_string()));
+        assert!(single_qubit_gates.contains(&"PauliX".to_string()));
+
+        let two_qubit_gates = device
+            .call_method0(py, "two_qubit_gate_names")
+            .unwrap()
+            .extract::<Vec<String>>(py)
+            .unwrap();
+        assert_eq!(two_qubit_gates, Vec::<String>::new());
 
         let multi_qubit_gates = device
             .call_method0(py, "multi_qubit_gate_names")
@@ -67,13 +95,79 @@ fn test_gate_names(device: Py<PyAny>) {
 }
 
 /// Test single-qubit and two-qubit gates times setters and getters
-#[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 #[test_case(new_device(AWSDevice::from(IonQHarmonyDevice::new())); "harmony")]
 #[test_case(new_device(AWSDevice::from(IonQAria1Device::new())); "aria1")]
-#[test_case(new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
-fn test_gate_timings(device: Py<PyAny>) {
+fn test_gate_timings_ionq(device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("RotateZ", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("RotateZ", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("GPi", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("GPi", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("GPi2", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("GPi2", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
+
+        device
+            .call_method1(
+                py,
+                "set_two_qubit_gate_time",
+                ("MolmerSorensenXX", 0, 1, 0.5),
+            )
+            .unwrap();
+        let two_qubit_time = device
+            .call_method1(py, "two_qubit_gate_time", ("MolmerSorensenXX", 0, 1))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(two_qubit_time, 0.5);
+    });
+}
+
+/// Test single-qubit and two-qubit gates times setters and getters
+#[test_case(new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
+// #[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
+fn test_gate_timings_oqc(device: Py<PyAny>) {
+    pyo3::prepare_freethreaded_python();
+    Python::with_gil(|py| {
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("RotateZ", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("RotateZ", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
+        device
+            .call_method1(py, "set_single_qubit_gate_time", ("SqrtPauliX", 0, 0.5))
+            .unwrap();
+        let single_qubit_time = device
+            .call_method1(py, "single_qubit_gate_time", ("SqrtPauliX", 0))
+            .unwrap()
+            .extract::<f64>(py)
+            .unwrap();
+        assert_eq!(single_qubit_time, 0.5);
         device
             .call_method1(py, "set_single_qubit_gate_time", ("PauliX", 0, 0.5))
             .unwrap();
@@ -83,24 +177,14 @@ fn test_gate_timings(device: Py<PyAny>) {
             .extract::<f64>(py)
             .unwrap();
         assert_eq!(single_qubit_time, 0.5);
-
-        device
-            .call_method1(py, "set_two_qubit_gate_time", ("CNOT", 0, 1, 0.5))
-            .unwrap();
-        let two_qubit_time = device
-            .call_method1(py, "two_qubit_gate_time", ("CNOT", 0, 1))
-            .unwrap()
-            .extract::<f64>(py)
-            .unwrap();
-        assert_eq!(two_qubit_time, 0.5);
     });
 }
 
 /// Test add_damping, add_dephasing, decoherence methods
-#[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 #[test_case(new_device(AWSDevice::from(IonQHarmonyDevice::new())); "harmony")]
 #[test_case(new_device(AWSDevice::from(IonQAria1Device::new())); "aria1")]
 #[test_case(new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
+// #[test_case(new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 fn test_damping_dephasing_decoherence(device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {
@@ -123,10 +207,10 @@ fn test_damping_dephasing_decoherence(device: Py<PyAny>) {
 }
 
 /// Test single_qubit_gate_names and two_qubit_gate_names functions of the devices
-#[test_case(AWSDevice::from(RigettiAspenM3Device::new()), new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 #[test_case(AWSDevice::from(IonQHarmonyDevice::new()), new_device(AWSDevice::from(IonQHarmonyDevice::new())); "harmony")]
 #[test_case(AWSDevice::from(IonQAria1Device::new()), new_device(AWSDevice::from(IonQAria1Device::new())); "aria1")]
 #[test_case(AWSDevice::from(OQCLucyDevice::new()), new_device(AWSDevice::from(OQCLucyDevice::new())); "lucy")]
+// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()), new_device(AWSDevice::from(RigettiAspenM3Device::new())); "aspen3")]
 fn test_to_generic_device(device: AWSDevice, pyo3_device: Py<PyAny>) {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| {

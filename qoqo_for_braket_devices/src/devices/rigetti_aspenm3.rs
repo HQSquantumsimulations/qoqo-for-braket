@@ -340,7 +340,10 @@ impl RigettiAspenM3DeviceWrapper {
                 let get_bytes = input.call_method0("to_bincode")?;
                 let bytes = get_bytes.extract::<Vec<u8>>()?;
                 deserialize(&bytes[..]).map_err(|err| {
-                    PyValueError::new_err(format!("Cannot treat input as RigettiAspenM3Device: {}", err))
+                    PyValueError::new_err(format!(
+                        "Cannot treat input as RigettiAspenM3Device: {}",
+                        err
+                    ))
                 })
             }
         })
