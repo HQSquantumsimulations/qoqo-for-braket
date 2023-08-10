@@ -18,4 +18,3 @@
 """
 
 from .qoqo_for_braket_devices import *
-from .device_property import set_for_braket_noise_information

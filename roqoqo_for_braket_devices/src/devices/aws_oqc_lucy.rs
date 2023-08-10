@@ -408,12 +408,7 @@ impl QoqoDevice for OQCLucyDevice {
     /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
     ///
     fn longest_chains(&self) -> Vec<Vec<usize>> {
-        vec![
-            vec![0, 1, 3, 5, 6],
-            vec![0, 1, 3, 5, 4],
-            vec![2, 1, 3, 5, 4],
-            vec![2, 1, 3, 5, 6],
-        ]
+        vec![vec![0, 1, 2, 3, 4, 5, 6, 7]]
     }
 
     /// Return a list of longest closed linear chains through the device.
@@ -429,7 +424,7 @@ impl QoqoDevice for OQCLucyDevice {
     /// * `Vec<Vec<usize>>` - A list of the longest chains given by vectors of qubits in the chain.
     ///
     fn longest_closed_chains(&self) -> Vec<Vec<usize>> {
-        vec![vec![0, 1]]
+        vec![vec![0, 1, 2, 3, 4, 5, 6, 7]]
     }
 
     /// Returns the list of pairs of qubits linked with a native two-qubit-gate in the device.
@@ -450,6 +445,6 @@ impl QoqoDevice for OQCLucyDevice {
     /// A list (Vec) of pairs of qubits linked with a native two-qubit-gate in the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
-        vec![(0, 1), (1, 2), (1, 3), (3, 5), (4, 5), (5, 6)]
+        vec![(0, 1), (0, 7), (1, 2), (2, 3), (7, 6), (4, 3), (4, 5), (6, 5)]
     }
 }

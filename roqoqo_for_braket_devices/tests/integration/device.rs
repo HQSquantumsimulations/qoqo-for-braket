@@ -18,7 +18,7 @@ use test_case::test_case;
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]
 #[test_case(AWSDevice::from(IonQHarmonyDevice::new()); "IonQHarmonyDevice")]
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_default(device: AWSDevice) {
     match device {
         AWSDevice::OQCLucyDevice(x) => assert_eq!(x, OQCLucyDevice::default()),
@@ -31,7 +31,7 @@ fn test_default(device: AWSDevice) {
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]
 #[test_case(AWSDevice::from(IonQHarmonyDevice::new()); "IonQHarmonyDevice")]
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_from(device: AWSDevice) {
     match device {
         AWSDevice::OQCLucyDevice(x) => _ = AWSDevice::from(&x),
@@ -44,7 +44,7 @@ fn test_from(device: AWSDevice) {
 #[test_case(AWSDevice::from(IonQAria1Device::new()), "arn:aws:braket:us-east-1::device/qpu/ionq/Aria-1"; "IonQAria1Device")]
 #[test_case(AWSDevice::from(IonQHarmonyDevice::new()), "arn:aws:braket:us-east-1::device/qpu/ionq/Harmony"; "IonQHarmonyDevice")]
 #[test_case(AWSDevice::from(OQCLucyDevice::new()), "arn:aws:braket:eu-west-2::device/qpu/oqc/Lucy"; "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()), "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3"; "RigettiAspenM3Device")]
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()), "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3"; "RigettiAspenM3Device")]
 fn test_device_name(device: AWSDevice, name: &str) {
     assert_eq!(device.name(), name);
 }
@@ -58,11 +58,16 @@ fn test_single_qubit_gate_time_ionq(device: AWSDevice) {
 }
 
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_single_qubit_gate_time_oqc(device: AWSDevice) {
     assert_eq!(device.single_qubit_gate_time("RotateZ", &0), 1.0.into());
     assert_eq!(device.single_qubit_gate_time("SqrtPauliX", &0), 1.0.into());
     assert_eq!(device.single_qubit_gate_time("PauliX", &0), 1.0.into());
+}
+
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+fn test_single_qubit_gate_time_rigetti(device: AWSDevice) {
+    assert_eq!(device.single_qubit_gate_time("RotateX", &0), 1.0.into());
+    assert_eq!(device.single_qubit_gate_time("RotateZ", &0), 1.0.into());
 }
 
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]
@@ -89,7 +94,6 @@ fn test_set_single_qubit_gate_time_ionq(mut device: AWSDevice) {
 }
 
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_set_single_qubit_gate_time_oqc(mut device: AWSDevice) {
     assert!(device.set_single_qubit_gate_time("RotateZ", 0, 0.5).is_ok());
     assert_eq!(device.single_qubit_gate_time("RotateZ", &0).unwrap(), 0.5);
@@ -121,6 +125,34 @@ fn test_set_single_qubit_gate_time_oqc(mut device: AWSDevice) {
         .is_err());
 }
 
+
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+fn test_set_single_qubit_gate_time_rigetti(mut device: AWSDevice) {
+    assert!(device.set_single_qubit_gate_time("RotateZ", 0, 0.5).is_ok());
+    assert_eq!(device.single_qubit_gate_time("RotateZ", &0).unwrap(), 0.5);
+    assert!(device.set_single_qubit_gate_time("RotateZ", 0, 0.2).is_ok());
+    assert_eq!(device.single_qubit_gate_time("RotateZ", &0).unwrap(), 0.2);
+
+    assert!(device
+        .set_single_qubit_gate_time("RotateX", 0, 0.5)
+        .is_ok());
+    assert_eq!(
+        device.single_qubit_gate_time("RotateX", &0).unwrap(),
+        0.5
+    );
+    assert!(device
+        .set_single_qubit_gate_time("RotateX", 0, 0.2)
+        .is_ok());
+    assert_eq!(
+        device.single_qubit_gate_time("RotateX", &0).unwrap(),
+        0.2
+    );
+
+    assert!(device
+        .set_single_qubit_gate_time("PauliZ", 89, 0.0)
+        .is_err());
+}
+
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]
 #[test_case(AWSDevice::from(IonQHarmonyDevice::new()); "IonQHarmonyDevice")]
 fn test_single_qubit_gate_names_ionq(device: AWSDevice) {
@@ -131,7 +163,6 @@ fn test_single_qubit_gate_names_ionq(device: AWSDevice) {
 }
 
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_single_qubit_gate_names_oqc(device: AWSDevice) {
     assert_eq!(
         device.single_qubit_gate_names(),
@@ -139,6 +170,17 @@ fn test_single_qubit_gate_names_oqc(device: AWSDevice) {
             "RotateZ".to_string(),
             "SqrtPauliX".to_string(),
             "PauliX".to_string(),
+        ]
+    );
+}
+
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+fn test_single_qubit_gate_names_rigetti(device: AWSDevice) {
+    assert_eq!(
+        device.single_qubit_gate_names(),
+        vec![
+            "RotateZ".to_string(),
+            "RotateX".to_string(),
         ]
     );
 }
@@ -153,9 +195,15 @@ fn test_two_qubit_gate_time_ionq(device: AWSDevice) {
 }
 
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
-// #[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
 fn test_two_qubit_gate_time_oqc(device: AWSDevice) {
     assert_eq!(device.two_qubit_gate_time("MolmerSorensenXX", &0, &1), None);
+}
+
+#[test_case(AWSDevice::from(RigettiAspenM3Device::new()); "RigettiAspenM3Device")]
+fn test_two_qubit_gate_time_rigetti(device: AWSDevice) {
+    assert_eq!(device.two_qubit_gate_time("ControlledPauliZ", &0, &1), None);
+    assert_eq!(device.two_qubit_gate_time("ControlledPhaseShift", &0, &1), None);
+    assert_eq!(device.two_qubit_gate_time("XY", &0, &1), None);
 }
 
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]
@@ -188,9 +236,6 @@ fn test_set_two_qubit_gate_time_ionq(mut device: AWSDevice) {
     assert!(device
         .set_two_qubit_gate_time("MolmerSorensenXX", 30, 3, 0.4)
         .is_err());
-
-    // // Unconnected qubits
-    // assert!(device.set_two_qubit_gate_time("MolmerSorensenXX", 0, 4, 0.8).is_err());
 }
 
 #[test_case(AWSDevice::from(OQCLucyDevice::new()); "OQCLucyDevice")]
@@ -204,8 +249,8 @@ fn test_set_two_qubit_gate_time_oqc(mut device: AWSDevice) {
         .set_two_qubit_gate_time("MolmerSorensenXX", 30, 3, 0.4)
         .is_err());
 
-    // // Unconnected qubits
-    // assert!(device.set_two_qubit_gate_time("MolmerSorensenXX", 0, 4, 0.8).is_err());
+    // Unconnected qubits
+    assert!(device.set_two_qubit_gate_time("MolmerSorensenXX", 0, 4, 0.8).is_err());
 }
 
 #[test_case(AWSDevice::from(IonQAria1Device::new()); "IonQAria1Device")]

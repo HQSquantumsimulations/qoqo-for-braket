@@ -27,4 +27,4 @@ qoqo_for_braket_devices itself is also provided under the Apache-2.0 license.
 
 This software is still in the beta stage. Functions and documentation are not yet complete and breaking changes can occur.
 
-If you find unexpected behaviour please open a github issue. You can also run the pytests in qoqo_for_braket_devices/python_tests/ locally.
+If you find unexpected behaviour please open a github issue.
