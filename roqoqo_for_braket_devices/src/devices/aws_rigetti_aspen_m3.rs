@@ -456,13 +456,13 @@ impl QoqoDevice for RigettiAspenM3Device {
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         let mut edges: Vec<(usize, usize)> = Vec::new();
-        let number_octogons = 8;
+        let number_octogons = 10;
+        let qubits_per_octogon = 8;
         for octogon in 0..number_octogons {
             let factor = octogon * 8;
-            for qubit in 0..(number_octogons - 1) {
+            for qubit in 0..(qubits_per_octogon - 1) {
                 edges.push((qubit + factor, qubit + 1 + factor));
             }
-            edges.push((factor, self.number_qubits - 1 + factor))
         }
         edges.append(&mut vec![
             (0, 43),

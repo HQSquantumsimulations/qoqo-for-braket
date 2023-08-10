@@ -190,7 +190,6 @@ impl AWSDevice {
                 }
             }
         }
-        // for gate in self.multi_qubit_gate_names() {} // - skipped here as none of the devies have multi-qubit gates
 
         // Decoherence rates
         for qubit in 0..self.number_qubits() {

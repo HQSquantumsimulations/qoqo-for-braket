@@ -313,7 +313,7 @@ impl QoqoDevice for OQCLucyDevice {
     /// * `Vec<String>` - The list of gate names.
     ///
     fn two_qubit_gate_names(&self) -> Vec<String> {
-        vec![]
+        vec!["EchoCrossResonance".to_string()]
     }
 
     /// Returns the gate time of a three qubit operation if the three qubit operation is available on device.
@@ -445,6 +445,15 @@ impl QoqoDevice for OQCLucyDevice {
     /// A list (Vec) of pairs of qubits linked with a native two-qubit-gate in the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
-        vec![(0, 1), (0, 7), (1, 2), (2, 3), (7, 6), (4, 3), (4, 5), (6, 5)]
+        vec![
+            (0, 1),
+            (0, 7),
+            (1, 2),
+            (2, 3),
+            (6, 7),
+            (3, 4),
+            (4, 5),
+            (5, 6),
+        ]
     }
 }
