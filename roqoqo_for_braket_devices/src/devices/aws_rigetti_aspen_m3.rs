@@ -463,6 +463,7 @@ impl QoqoDevice for RigettiAspenM3Device {
             for qubit in 0..(qubits_per_octogon - 1) {
                 edges.push((qubit + factor, qubit + 1 + factor));
             }
+            edges.push((factor, 7 + factor));
         }
         edges.append(&mut vec![
             (0, 43),
@@ -475,6 +476,22 @@ impl QoqoDevice for RigettiAspenM3Device {
             (31, 68),
             (32, 75),
             (39, 76),
+            (1, 14),
+            (2, 13),
+            (9, 22),
+            (10, 21),
+            (17, 30),
+            (18, 29),
+            (25, 38),
+            (26, 37),
+            (41, 54),
+            (42, 53),
+            (49, 62),
+            (50, 61),
+            (57, 70),
+            (58, 69),
+            (65, 78),
+            (66, 77),
         ]);
         edges
     }
