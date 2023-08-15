@@ -309,8 +309,13 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-
-    def run_circuit_queued(self, circuit: Circuit) -> QueuedCircuitRun:
+    def run_circuit_queued(
+        self, circuit: Circuit
+    ) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
         """Run a Circuit on a AWS backend and return a queued Job Result.
 
         The default number of shots for the simulation is 100.
@@ -327,9 +332,15 @@ class BraketBackend:
         """
         (quantum_task, metadata) = self._run_circuit(circuit)
 
-        queued = QueuedCircuitRun(quantum_task, metadata)
+        queued = QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
-        return queued
+        i = 0
+        while queued.poll_result() is None:
+            i += 1
+            if i > 50:
+                raise RuntimeError("Timed out waiting for job to complete")
+
+        return queued.poll_result()
 
     def queued_from_json(self, string: str) -> QueuedCircuitRun:
         """Get a queued result from a json string.

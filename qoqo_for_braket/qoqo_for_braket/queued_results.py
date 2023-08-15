@@ -9,6 +9,7 @@ from braket.tasks import QuantumTask
 import json
 from qoqo_for_braket.post_processing import _post_process_circuit_result
 from braket.aws.aws_session import AwsSession
+from braket.aws.aws_quantum_task import AwsQuantumTask
 from braket.schema_common import BraketSchemaBase
 from braket.tasks import GateModelQuantumTaskResult
 from braket.tracking.tracking_events import _TaskCompletionEvent
@@ -34,7 +35,8 @@ class QueuedCircuitRun:
             ]
         ] = None
         self.session = session
-        self.metadata = metadata
+        self.internal_metadata = metadata
+        self.aws_metadata = self._task.metadata()
         if isinstance(self._task, LocalQuantumTask):
             results = self._task.result()
             processed_results = _post_process_circuit_result(results, self.metadata)
@@ -49,7 +51,7 @@ class QueuedCircuitRun:
         if isinstance(self._task, LocalQuantumTask):
             results = self._results
             json_dict = {type: "QueuedLocalCircuitRun", "arn": None, "results": results}
-        if isinstance(self._task, QuantumTask):
+        if isinstance(self._task, AwsQuantumTask):
             json_dict = {
                 type: "QueuedAWSCircuitRun",
                 "arn": self._task.id(),
@@ -60,12 +62,10 @@ class QueuedCircuitRun:
 
     def poll_result(
         self,
-    ) -> Optional[
-        Tuple[
-            Dict[str, List[List[bool]]],
-            Dict[str, List[List[float]]],
-            Dict[str, List[List[complex]]],
-        ]
+    ) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
     ]:
         """Poll the result until it's no longer pending.
 
@@ -80,18 +80,24 @@ class QueuedCircuitRun:
         if self._results is not None:
             return self._results
         else:
-            if isinstance(self._task, QuantumTask):
+            if isinstance(self._task, AwsQuantumTask):
                 state = self._task.state()
                 if state == "COMPLETED":
                     result_string = self.session.retrieve_s3_object_body(
-                        self.metadata["outputS3Bucket"],
-                        self.metadata["outputS3Directory"] + f"/{self._task.RESULTS_FILENAME}"
+                        self.aws_metadata["outputS3Bucket"],
+                        self.aws_metadata["outputS3Directory"] + f"/{self._task.RESULTS_FILENAME}",
                     )
                     schema_result = BraketSchemaBase.parse_raw_schema(result_string)
                     formatted_result = GateModelQuantumTaskResult.from_object(schema_result)
-                    task_event = {"arn": self._task.id, "status": state, "execution_duration": None}
+                    task_event = {
+                        "arn": self._task.id,
+                        "status": state,
+                        "execution_duration": None,
+                    }
                     broadcast_event(_TaskCompletionEvent(**task_event))
-                    processed_results = _post_process_circuit_result(formatted_result, self.metadata)
+                    processed_results = _post_process_circuit_result(
+                        formatted_result, self.internal_metadata
+                    )
                     self._results = processed_results
                 elif state == "FAILED":
                     raise RuntimeError("")
