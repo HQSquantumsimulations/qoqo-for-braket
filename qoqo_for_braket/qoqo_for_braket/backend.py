@@ -13,6 +13,7 @@
 """Provides the BraketBackend class."""
 
 from typing import Tuple, Dict, List, Any, Optional, Union
+import json
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
@@ -23,6 +24,7 @@ from qoqo_for_braket.interface import (
 )
 
 from qoqo_for_braket.post_processing import _post_process_circuit_result
+from qoqo_for_braket.queued_results import QueuedCircuitRun
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
@@ -306,6 +308,48 @@ class BraketBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+
+    def run_circuit_queued(self, circuit: Circuit) -> QueuedCircuitRun:
+        """Run a Circuit on a AWS backend and return a queued Job Result.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuit (Circuit): the Circuit to simulate.
+
+        Returns:
+            QueuedCircuitRun
+        """
+        (quantum_task, metadata) = self._run_circuit(circuit)
+
+        queued = QueuedCircuitRun(quantum_task, metadata)
+
+        return queued
+
+    def queued_from_json(self, string: str) -> QueuedCircuitRun:
+        """Get a queued result from a json string.
+
+        Args:
+            string (str): the json string to get the queued result from.
+
+        Returns:
+            QueuedCircuitRun
+
+        Raises:
+            ValueError: AwsSession has not been specified
+        """
+        return_dict = json.loads(string)
+        if return_dict["type"] == "QueuedAWSCircuitRun":
+            if self.aws_session is not None:
+                task = self.aws_session.get_quantum_task(arn=return_dict["arn"])
+            else:
+                raise ValueError("AwsSession has not been specified")
+        return task
 
 
 qoqo_to_rigetti = {
