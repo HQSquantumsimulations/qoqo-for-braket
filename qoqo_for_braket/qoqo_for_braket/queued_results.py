@@ -27,6 +27,7 @@ class QueuedCircuitRun:
         """Initialise the QueuedCircuitRun class.
 
         Args:
+            session: Braket AwsSession to use
             task: Braket QuantumTask to query
             metadata: Additional information about the circuit
         """
