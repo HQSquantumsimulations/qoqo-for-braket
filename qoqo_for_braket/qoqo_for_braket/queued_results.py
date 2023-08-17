@@ -91,7 +91,7 @@ class QueuedCircuitRun:
         """
         json_dict = json.loads(string)
         if json_dict["type"] == "QueuedLocalCircuitRun":
-            session = AwsSession()
+            session = None
             task = None
         elif json_dict["type"] == "QueuedAWSCircuitRun":
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
