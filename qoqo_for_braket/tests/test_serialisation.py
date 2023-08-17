@@ -40,7 +40,7 @@ def test_serialisation() -> None:
     assert deserialised._results[2] == queued._results[2]
     assert deserialised._results[0].keys() == queued._results[0].keys()
     assert (
-        deserialised._results[0]["ro"].all() == queued._results[0]["ro"].all()
+        deserialised._results[0]["ro"] == queued._results[0]["ro"]
     ).all()
 
 
