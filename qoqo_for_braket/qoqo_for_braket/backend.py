@@ -170,17 +170,11 @@ class BraketBackend:
             ]
             for item in sublist
         ]
-        measure_qubit_vector: List[ops.Operation] = circuit.filter_by_tag(
-            "MeasureQubit"
-        )
+        measure_qubit_vector: List[ops.Operation] = circuit.filter_by_tag("MeasureQubit")
         if len(measurement_vector) > 1:
-            raise ValueError(
-                "Circuit contains multiple ways to set the number of measurements"
-            )
+            raise ValueError("Circuit contains multiple ways to set the number of measurements")
 
-        shots = (
-            measurement_vector[0].number_measurements() if measurement_vector else 100
-        )
+        shots = measurement_vector[0].number_measurements() if measurement_vector else 100
         if measurement_vector:
             readout = measurement_vector[0].readout()
         elif measure_qubit_vector:

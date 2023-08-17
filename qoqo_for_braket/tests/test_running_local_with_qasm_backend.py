@@ -92,9 +92,7 @@ def test_measurement(operations: List[Any]):
 
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    input = PauliZProductInput(
-        number_qubits=len(involved_qubits), use_flipped_measurement=True
-    )
+    input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
 
     measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=input)
 
