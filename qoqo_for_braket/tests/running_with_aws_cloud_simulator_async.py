@@ -38,7 +38,14 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-(bit_res, _, _) = backend.run_circuit_queued(circuit)
+queued = backend.run_circuit_queued(circuit)
+i = 0
+while queued.poll_result() is None:
+    i += 1
+    if i > 50:
+        raise RuntimeError("Timed out waiting for job to complete")
+(bit_res, _, _) = queued.poll_result()
+
 assert "ro" in bit_res.keys()
 registers = bit_res["ro"]
 
