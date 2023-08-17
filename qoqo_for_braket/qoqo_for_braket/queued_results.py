@@ -60,7 +60,10 @@ class QueuedCircuitRun:
         if self._results is not None:
             results = {}
             for key, value in self._results[0].items():
-                results[key] = value.tolist()
+                if isinstance(value, np.ndarray):
+                    results[key] = value.tolist()
+                else:
+                    results[key] = value
         if isinstance(self._task, LocalQuantumTask):
             json_dict = {
                 "type": "QueuedLocalCircuitRun",
@@ -100,10 +103,7 @@ class QueuedCircuitRun:
 
         instance = QueuedCircuitRun(session=session, task=task, metadata=json_dict["metadata"])
         if json_dict["results"] is not None:
-            results = {}
-            for key, value in json_dict["results"].items():
-                results[key] = np.array(value)
-            instance._results = (results, {}, {})
+            instance._results = (json_dict["results"], {}, {})
 
         return instance
 
