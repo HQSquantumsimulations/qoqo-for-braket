@@ -14,7 +14,11 @@
 from braket.circuits import Circuit
 import qoqo
 
-ALLOWED_OPERATIONS = ["PragmaRepeatedMeasurement", "PragmaSetNumberOfMeasurements", "MeasureQubit"]
+ALLOWED_OPERATIONS = [
+    "PragmaRepeatedMeasurement",
+    "PragmaSetNumberOfMeasurements",
+    "MeasureQubit",
+]
 
 
 def call_circuit(circuit: qoqo.Circuit) -> Circuit:

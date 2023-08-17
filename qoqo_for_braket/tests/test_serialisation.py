@@ -39,7 +39,9 @@ def test_serialisation() -> None:
     assert deserialised._results[1] == queued._results[1]
     assert deserialised._results[2] == queued._results[2]
     assert deserialised._results[0].keys() == queued._results[0].keys()
-    assert (deserialised._results[0]["ro"].all() == queued._results[0]["ro"].all()).all()
+    assert (
+        deserialised._results[0]["ro"].all() == queued._results[0]["ro"].all()
+    ).all()
 
 
 @pytest.mark.skip()
@@ -79,7 +81,9 @@ def test_serialisation_async() -> None:
     assert deserialised._results[1] == queued._results[1]
     assert deserialised._results[2] == queued._results[2]
     assert deserialised._results[0].keys() == queued._results[0].keys()
-    assert (deserialised._results[0]["ro"].all() == queued._results[0]["ro"].all()).all()
+    assert (
+        deserialised._results[0]["ro"].all() == queued._results[0]["ro"].all()
+    ).all()
 
 
 if __name__ == "__main__":

@@ -18,7 +18,11 @@ from typing import TYPE_CHECKING, Dict
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
 
-ALLOWED_OPERATIONS = ["PragmaRepeatedMeasurement", "PragmaSetNumberOfMeasurements", "MeasureQubit"]
+ALLOWED_OPERATIONS = [
+    "PragmaRepeatedMeasurement",
+    "PragmaSetNumberOfMeasurements",
+    "MeasureQubit",
+]
 
 
 def call_circuit(circuit: qoqo.Circuit) -> Circuit:
@@ -45,9 +49,13 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
         if op.hqslang() == "RotateZ":
             qubit_phase[op.qubit()] = qubit_phase.get(op.qubit(), 0.0) + op.theta()
         elif op.hqslang() == "GPi":
-            braket_circuit.gpi(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi(
+                op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0)
+            )
         elif op.hqslang() == "GPi2":
-            braket_circuit.gpi2(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi2(
+                op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0)
+            )
         elif op.hqslang() == "MolmerSorensenXX":
             braket_circuit.ms(
                 op.control(),

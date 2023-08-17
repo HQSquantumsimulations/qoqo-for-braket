@@ -47,7 +47,9 @@ class QueuedCircuitRun:
             self.aws_metadata = None
         if isinstance(self._task, LocalQuantumTask):
             results = self._task.result()
-            processed_results = _post_process_circuit_result(results, self.internal_metadata)
+            processed_results = _post_process_circuit_result(
+                results, self.internal_metadata
+            )
             self._results = processed_results
 
     def to_json(self) -> str:
@@ -101,7 +103,9 @@ class QueuedCircuitRun:
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
             task = AwsQuantumTask(json_dict["arn"])
 
-        instance = QueuedCircuitRun(session=session, task=task, metadata=json_dict["metadata"])
+        instance = QueuedCircuitRun(
+            session=session, task=task, metadata=json_dict["metadata"]
+        )
         if json_dict["results"] is not None:
             instance._results = (json_dict["results"], {}, {})
 
@@ -134,10 +138,13 @@ class QueuedCircuitRun:
                 if state == "COMPLETED":
                     result_string = self.session.retrieve_s3_object_body(
                         self.aws_metadata["outputS3Bucket"],
-                        self.aws_metadata["outputS3Directory"] + f"/{self._task.RESULTS_FILENAME}",
+                        self.aws_metadata["outputS3Directory"]
+                        + f"/{self._task.RESULTS_FILENAME}",
                     )
                     schema_result = BraketSchemaBase.parse_raw_schema(result_string)
-                    formatted_result = GateModelQuantumTaskResult.from_object(schema_result)
+                    formatted_result = GateModelQuantumTaskResult.from_object(
+                        schema_result
+                    )
                     task_event = {
                         "arn": self._task.id,
                         "status": state,
