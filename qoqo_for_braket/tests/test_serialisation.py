@@ -30,9 +30,7 @@ def test_serialisation() -> None:
     circuit += ops.MeasureQubit(2, "ro", 2)
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
-    aws_session = AwsSession()
     backend = BraketBackend(
-        aws_session=aws_session,
         device=None,
     )
     queued = backend.run_circuit_queued(circuit)
