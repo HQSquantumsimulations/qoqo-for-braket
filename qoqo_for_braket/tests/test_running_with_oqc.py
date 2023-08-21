@@ -52,6 +52,7 @@ def test_oqc_all_gates() -> None:
     backend.force_oqc_verbatim()
 
     oqc_circuit = Circuit()
+    oqc_circuit += ops.DefinitionBit("ro", 4, True)
     oqc_circuit += ops.RotateZ(0, np.pi)
     oqc_circuit += ops.RotateZ(3, np.pi)
     oqc_circuit += ops.SqrtPauliX(1)

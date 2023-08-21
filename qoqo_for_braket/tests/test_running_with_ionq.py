@@ -52,6 +52,7 @@ def test_ionq_all_gates() -> None:
     backend.force_ionq_verbatim()
 
     ionq_circuit = Circuit()
+    ionq_circuit += ops.DefinitionBit("ro", 4, True)
     ionq_circuit += ops.GPi(0, np.pi)
     ionq_circuit += ops.RotateZ(0, np.pi)
     ionq_circuit += ops.GPi2(1, np.pi)

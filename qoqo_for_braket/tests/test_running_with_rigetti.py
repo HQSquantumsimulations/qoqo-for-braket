@@ -51,6 +51,7 @@ def test_rigetti_all_gates() -> None:
     backend.force_rigetti_verbatim()
 
     rigetti_circuit = Circuit()
+    rigetti_circuit += ops.DefinitionBit("ro", 4, True)
     rigetti_circuit += ops.RotateX(0, 1.0)
     rigetti_circuit += ops.RotateZ(1, 1.0)
     rigetti_circuit += ops.ControlledPauliZ(2, 3)
