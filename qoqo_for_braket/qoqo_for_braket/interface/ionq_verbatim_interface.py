@@ -22,7 +22,7 @@ ALLOWED_OPERATIONS = [
     "PragmaRepeatedMeasurement",
     "PragmaSetNumberOfMeasurements",
     "MeasureQubit",
-    "DefinitionBit"
+    "DefinitionBit",
 ]
 
 
