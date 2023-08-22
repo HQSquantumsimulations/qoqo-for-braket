@@ -1,7 +1,7 @@
 # Copyright © 2023 HQS Quantum Simulations GmbH. All Rights Reserved.
 # License details given in distributed LICENSE file.
 
-"""Provides the BraketBackend class."""
+"""Provides the QueuedCircuitRun class for async runs."""
 
 from typing import Any, Dict, Optional, List, Tuple
 from braket.tasks.local_quantum_task import LocalQuantumTask
