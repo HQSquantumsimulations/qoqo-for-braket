@@ -18,7 +18,12 @@ from typing import TYPE_CHECKING, Dict
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
 
-ALLOWED_OPERATIONS = ["PragmaRepeatedMeasurement", "PragmaSetNumberOfMeasurements", "MeasureQubit"]
+ALLOWED_OPERATIONS = [
+    "PragmaRepeatedMeasurement",
+    "PragmaSetNumberOfMeasurements",
+    "MeasureQubit",
+    "DefinitionBit",
+]
 
 
 def call_circuit(circuit: qoqo.Circuit) -> Circuit:

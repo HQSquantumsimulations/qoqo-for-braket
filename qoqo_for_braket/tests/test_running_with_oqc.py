@@ -15,12 +15,13 @@ from qoqo import Circuit
 from qoqo import operations as ops
 import pytest
 import sys
+import numpy as np
 
 
-def test_rigetti_error() -> None:
-    """Test running with Rigetti, fails OperationNotInBackend."""
+def test_oqc_error() -> None:
+    """Test running with OQC, fails OperationNotInBackend."""
     backend = BraketBackend(verbatim_mode=True)
-    backend.force_rigetti_verbatim()
+    backend.force_oqc_verbatim()
 
     # OperationNotInBackend
     circuit = Circuit()
@@ -30,9 +31,9 @@ def test_rigetti_error() -> None:
 
     # Too many operations
     circuit = Circuit()
-    circuit += ops.RotateZ(1, 1.0)
-    circuit += ops.ControlledPauliZ(2, 3)
-    circuit += ops.ControlledPhaseShift(3, 1, 1.0)
+    circuit += ops.RotateZ(3, np.pi)
+    circuit += ops.SqrtPauliX(1)
+    circuit += ops.PauliX(2)
     with pytest.raises(ValueError):
         backend.change_max_circuit_length(2)
         backend.run_circuit(circuit)
@@ -45,28 +46,28 @@ def test_rigetti_error() -> None:
         backend.run_circuit(circuit)
 
 
-def test_rigetti_all_gates() -> None:
-    """Test running with Rigetti."""
+def test_oqc_all_gates() -> None:
+    """Test running with OQC."""
     backend = BraketBackend(verbatim_mode=True)
-    backend.force_rigetti_verbatim()
+    backend.force_oqc_verbatim()
 
-    rigetti_circuit = Circuit()
-    rigetti_circuit += ops.RotateX(0, 1.0)
-    rigetti_circuit += ops.RotateZ(1, 1.0)
-    rigetti_circuit += ops.ControlledPauliZ(2, 3)
-    rigetti_circuit += ops.ControlledPhaseShift(3, 1, 1.0)
-    rigetti_circuit += ops.XY(0, 2, 1.0)
-    rigetti_circuit += ops.MeasureQubit(0, "ro", 0)
-    rigetti_circuit += ops.MeasureQubit(1, "ro", 1)
-    rigetti_circuit += ops.MeasureQubit(2, "ro", 2)
-    rigetti_circuit += ops.MeasureQubit(3, "ro", 3)
-    rigetti_circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
-    (rigetti_bit_res, _, _) = backend.run_circuit(rigetti_circuit)
-    assert "ro" in rigetti_bit_res.keys()
-    rigetti_registers = rigetti_bit_res["ro"]
-    assert rigetti_registers.shape == (10, 4)
-    for rigetti_measurement in rigetti_registers:
-        for qubit in rigetti_measurement:
+    oqc_circuit = Circuit()
+    oqc_circuit += ops.DefinitionBit("ro", 4, True)
+    oqc_circuit += ops.RotateZ(0, np.pi)
+    oqc_circuit += ops.RotateZ(3, np.pi)
+    oqc_circuit += ops.SqrtPauliX(1)
+    oqc_circuit += ops.PauliX(2)
+    oqc_circuit += ops.MeasureQubit(0, "ro", 0)
+    oqc_circuit += ops.MeasureQubit(1, "ro", 1)
+    oqc_circuit += ops.MeasureQubit(2, "ro", 2)
+    oqc_circuit += ops.MeasureQubit(3, "ro", 3)
+    oqc_circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
+    (oqc_bit_res, _, _) = backend.run_circuit(oqc_circuit)
+    assert "ro" in oqc_bit_res.keys()
+    oqc_registers = oqc_bit_res["ro"]
+    assert oqc_registers.shape == (10, 4)
+    for oqc_measurement in oqc_registers:
+        for qubit in oqc_measurement:
             assert qubit == 1 or qubit == 0
 
 

@@ -1,0 +1,28 @@
+[package]
+name = "roqoqo_for_braket_devices"
+version = "0.2.0"
+authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
+license = "Apache-2.0"
+edition = "2021"
+categories = ["science", "simulation"]
+readme = "README.md"
+repository = "https://github.com/HQSquantumsimulations/qoqo_for_braket"
+description = "AWS's Braket devices interface for roqoqo rust quantum computing toolkit"
+include = ["src*", "LICENSE", "README.md"]
+
+[lib]
+name = "roqoqo_for_braket_devices"
+path = "src/lib.rs"
+doctest = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+roqoqo = {version = "1.5", features = ["unstable_qoqo_devices"]}
+ndarray = "0.15"
+itertools = "0.11"
+serde = {version = "1.0", features = ["derive"]}
+serde_json = "1.0"
+
+[dev-dependencies]
+test-case = "3.0"

@@ -13,6 +13,7 @@
 """Provides the BraketBackend class."""
 
 from typing import Tuple, Dict, List, Any, Optional, Union
+import json
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
@@ -23,6 +24,7 @@ from qoqo_for_braket.interface import (
 )
 
 from qoqo_for_braket.post_processing import _post_process_circuit_result
+from qoqo_for_braket.queued_results import QueuedCircuitRun
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
@@ -180,6 +182,9 @@ class BraketBackend:
         else:
             readout = "ro"
 
+        if self.device == "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3":
+            circuit = circuit.remap_qubits(qoqo_to_rigetti)
+
         if not self.verbatim_mode:
             qasm_backend = qoqo_qasm.QasmBackend("q", "3.0Braket")
             qasm_string = qasm_backend.circuit_to_qasm_str(circuit)
@@ -303,3 +308,125 @@ class BraketBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+    def run_circuit_queued(self, circuit: Circuit) -> QueuedCircuitRun:
+        """Run a Circuit on a AWS backend and return a queued Job Result.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuit (Circuit): the Circuit to simulate.
+
+        Returns:
+            QueuedCircuitRun
+        """
+        (quantum_task, metadata) = self._run_circuit(circuit)
+        return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
+
+    def queued_from_json(self, string: str) -> QueuedCircuitRun:
+        """Get a queued result from a json string.
+
+        Args:
+            string (str): the json string to get the queued result from.
+
+        Returns:
+            QueuedCircuitRun
+
+        Raises:
+            ValueError: AwsSession has not been specified
+        """
+        return_dict = json.loads(string)
+        if return_dict["type"] == "QueuedAWSCircuitRun":
+            if self.aws_session is not None:
+                task = self.aws_session.get_quantum_task(arn=return_dict["arn"])
+            else:
+                raise ValueError("AwsSession has not been specified")
+        return task
+
+
+qoqo_to_rigetti = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 10,
+    9: 11,
+    10: 12,
+    11: 13,
+    12: 14,
+    13: 15,
+    14: 16,
+    15: 17,
+    16: 20,
+    17: 21,
+    18: 22,
+    19: 23,
+    20: 24,
+    21: 25,
+    22: 26,
+    23: 27,
+    24: 30,
+    25: 31,
+    26: 32,
+    27: 33,
+    28: 34,
+    29: 35,
+    30: 36,
+    31: 37,
+    32: 40,
+    33: 41,
+    34: 42,
+    35: 43,
+    36: 44,
+    37: 45,
+    38: 46,
+    39: 47,
+    40: 100,
+    41: 101,
+    42: 102,
+    43: 103,
+    44: 104,
+    45: 105,
+    46: 106,
+    47: 107,
+    48: 110,
+    49: 111,
+    50: 112,
+    51: 113,
+    52: 114,
+    53: 115,
+    54: 116,
+    55: 117,
+    56: 120,
+    57: 121,
+    58: 122,
+    59: 123,
+    60: 124,
+    61: 125,
+    62: 126,
+    63: 127,
+    64: 130,
+    65: 131,
+    66: 132,
+    67: 133,
+    68: 134,
+    69: 135,
+    70: 136,
+    71: 137,
+    72: 140,
+    73: 141,
+    74: 142,
+    75: 143,
+    76: 144,
+    77: 145,
+    78: 146,
+    79: 147,
+}

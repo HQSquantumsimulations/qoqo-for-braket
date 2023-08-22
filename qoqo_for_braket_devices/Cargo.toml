@@ -1,0 +1,46 @@
+[package]
+name = "qoqo_for_braket_devices"
+version = "0.2.0"
+authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
+license = "Apache-2.0"
+edition = "2021"
+categories = ["science", "simulation"]
+readme = "README.md"
+repository = "https://github.com/HQSquantumsimulations/qoqo_for_braket"
+description = "AWS's Braket devices interface for qoqo python quantum computing toolkit"
+include = ["src*", "LICENSE", "README.md"]
+
+[lib]
+name = "qoqo_for_braket_devices"
+path = "src/lib.rs"
+doctest = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+qoqo = { version = "1.5", default-features=false}
+roqoqo = "1.5"
+qoqo-macros = "1.5"
+
+ndarray = "0.15"
+bincode = "1.3"
+numpy = "0.19"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+roqoqo_for_braket_devices = { path="../roqoqo_for_braket_devices", version="0.2" }
+
+[dev-dependencies]
+test-case = "3.0"
+
+[dependencies.pyo3]
+version = "0.19"
+features = ["num-complex"]
+
+[build-dependencies]
+pyo3-build-config = "0.19"
+
+[features]
+extension-module = ["pyo3/extension-module"]
+default = ["extension-module"]

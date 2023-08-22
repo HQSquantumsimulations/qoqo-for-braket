@@ -16,7 +16,9 @@ from typing import Dict, List, Tuple, Any
 def _post_process_circuit_result(
     results: Any, metadata: Dict[Any, Any]
 ) -> Tuple[
-    Dict[str, List[List[bool]]], Dict[str, List[List[float]]], Dict[str, List[List[complex]]]
+    Dict[str, List[List[bool]]],
+    Dict[str, List[List[float]]],
+    Dict[str, List[List[complex]]],
 ]:
     """Post processes the result returned from an AWSQuantumTask.
 
