@@ -327,6 +327,53 @@ class BraketBackend:
         (quantum_task, metadata) = self._run_circuit(circuit)
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
+    def run_measurement_queued(self, measurement: Any) -> Optional[Dict[str, float]]:
+        """Run a Circuit on a AWS backend and return a queued Job Result.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuit (Circuit): the Circuit to simulate.
+
+        Returns:
+            QueuedCircuitRun
+        """
+        constant_circuit = measurement.constant_circuit()
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+
+        for circuit in measurement.circuits():
+            if constant_circuit is None:
+                run_circuit = circuit
+            else:
+                run_circuit = constant_circuit + circuit
+
+            queued = self.run_circuit_queued(run_circuit)
+            i = 0
+            while queued.poll_result() is None:
+                i += 1
+                if i > 50:
+                    raise RuntimeError("Timed out waiting for job to complete")
+            (
+                tmp_bit_register_dict,
+                tmp_float_register_dict,
+                tmp_complex_register_dict,
+            ) = queued.poll_result()
+            output_bit_register_dict.update(tmp_bit_register_dict)
+            output_float_register_dict.update(tmp_float_register_dict)
+            output_complex_register_dict.update(tmp_complex_register_dict)
+
+        return measurement.evaluate(
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
+
     def queued_from_json(self, string: str) -> QueuedCircuitRun:
         """Get a queued result from a json string.
 

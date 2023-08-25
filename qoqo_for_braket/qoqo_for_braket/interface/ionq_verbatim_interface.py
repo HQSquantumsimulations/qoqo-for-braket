@@ -30,8 +30,8 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
     """Convert a qoqo Circuit to a Braket Circuit with verbatim instructions for IonQ.
 
     Moving the RotateZ operations past the GPi, GPi2 and MS gates respects the following:
-    * GPi(phi) RotateZ(0, theta) = RotateZ(theta) GPi(phi - theta)
-    * GPi2(phi) RotateZ(0, theta) = RotateZ(theta) GPi2(phi - theta)
+    * GPi(phi) RotateZ(theta) = RotateZ(theta) GPi(phi - theta)
+    * GPi2(phi) RotateZ(theta) = RotateZ(theta) GPi2(phi - theta)
     * MS(0, 1, phi_0, phi_1) RotateZ(0, theta_0) RotateZ(1, theta_1) =
             RotateZ(0, theta_0) RotateZ(1, theta_1) MS(0, 1, phi_0 - theta_1, phi_1 - theta_0)
 
