@@ -16,6 +16,7 @@ from braket.tasks import GateModelQuantumTaskResult
 from braket.tracking.tracking_events import _TaskCompletionEvent
 from braket.tracking.tracking_context import broadcast_event
 import numpy as np
+from qoqo import measurements
 
 
 class QueuedCircuitRun:
@@ -155,3 +156,79 @@ class QueuedCircuitRun:
             else:
                 return None
         return self._results
+
+
+class QueuedProgramRun:
+    def __init__(self, measurement, queued_circuits: List[QueuedCircuitRun]) -> None:
+        self._measurement = measurement
+        self._queued_circuits: List[QueuedCircuitRun] = queued_circuits
+        self._results: Optional[Dict[str, float]] = None
+
+    def poll_result(self):
+        registers: List[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ] = [
+            {},
+            {},
+            {},
+        ]  # just empty registers
+        all_finished = [False] * len(self._queued_circuits)
+        while not all(all_finished):
+            for i, queued_circuit in enumerate(self._queued_circuits):
+                res = queued_circuit.poll_result()
+                if res is not None:
+                    registers[0].update(res[0])  # add results to bit registers
+                    registers[1].update(res[1])  # add results to float registers
+                    registers[2].update(res[2])  # add results to complex registers
+                    all_finished[i] = True
+
+        self._results = self._measurement.evaluate(registers[0], registers[1], registers[2])
+        return self._results
+
+    def to_json(self):
+        queued_circuits_serialised: List[str] = []
+        for circuit in self._queued_circuits:
+            queued_circuits_serialised.append(circuit.to_json())
+
+        if isinstance(self._measurement, measurements.PauliZProduct):
+            measurement_type = "PauliZProduct"
+        elif isinstance(self._measurement, measurements.CheatedPauliZProduct):
+            measurement_type = "CheatedPauliZProduct"
+        elif isinstance(self._measurement, measurements.Cheated):
+            measurement_type = "Cheated"
+        elif isinstance(self._measurement, measurements.ClassicalRegisters):
+            measurement_type = "ClassicalRegisters"
+        else:
+            raise TypeError("Unknown measurement type")
+
+        json_dict = {
+            "type": "QueuedAWSProgramRun",
+            "measurement_type": measurement_type,
+            "measurement": self._measurement.to_json(),
+            "queued_circuits": queued_circuits_serialised,
+        }
+
+        return json.dumps(json_dict)
+
+    @staticmethod
+    def from_json(string: str) -> "QueuedProgramRun":
+        json_dict = json.loads(string)
+
+        queued_circuits_deserialised: List[QueuedCircuitRun] = []
+        for circuit in json_dict["queued_circuits"]:
+            queued_circuits_deserialised.append(QueuedCircuitRun.from_json(circuit))
+
+        if json_dict["measurement_type"] == "PauliZProduct":
+            measurement = measurements.PauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "CheatedPauliZProduct":
+            measurement = measurements.CheatedPauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "Cheated":
+            measurement = measurements.Cheated.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "ClassicalRegisters":
+            measurement = measurements.ClassicalRegisters.from_json(json_dict["measurement"])
+        else:
+            raise TypeError("Unknown measurement type")
+
+        return QueuedProgramRun(measurement, queued_circuits_deserialised)

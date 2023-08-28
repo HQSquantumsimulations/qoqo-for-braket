@@ -64,7 +64,8 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-meas_result = backend.run_measurement_queued(measurement)
+queued = backend.run_measurement_queued(measurement)
+meas_result = queued.poll_result()
 
 assert "0Z" in meas_result.keys()
 assert meas_result["0Z"] == 1.0

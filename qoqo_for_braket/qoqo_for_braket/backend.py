@@ -24,7 +24,7 @@ from qoqo_for_braket.interface import (
 )
 
 from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
@@ -327,7 +327,7 @@ class BraketBackend:
         (quantum_task, metadata) = self._run_circuit(circuit)
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
-    def run_measurement_queued(self, measurement: Any) -> Optional[Dict[str, float]]:
+    def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
         """Run a Circuit on a AWS backend and return a queued Job Result.
 
         The default number of shots for the simulation is 100.
@@ -342,57 +342,16 @@ class BraketBackend:
         Returns:
             QueuedCircuitRun
         """
+        queued_circuits = []
         constant_circuit = measurement.constant_circuit()
-        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
-        output_float_register_dict: Dict[str, List[List[float]]] = {}
-        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
-
         for circuit in measurement.circuits():
             if constant_circuit is None:
                 run_circuit = circuit
             else:
                 run_circuit = constant_circuit + circuit
 
-            queued = self.run_circuit_queued(run_circuit)
-            i = 0
-            while queued.poll_result() is None:
-                i += 1
-                if i > 50:
-                    raise RuntimeError("Timed out waiting for job to complete")
-            (
-                tmp_bit_register_dict,
-                tmp_float_register_dict,
-                tmp_complex_register_dict,
-            ) = queued.poll_result()
-            output_bit_register_dict.update(tmp_bit_register_dict)
-            output_float_register_dict.update(tmp_float_register_dict)
-            output_complex_register_dict.update(tmp_complex_register_dict)
-
-        return measurement.evaluate(
-            output_bit_register_dict,
-            output_float_register_dict,
-            output_complex_register_dict,
-        )
-
-    def queued_from_json(self, string: str) -> QueuedCircuitRun:
-        """Get a queued result from a json string.
-
-        Args:
-            string (str): the json string to get the queued result from.
-
-        Returns:
-            QueuedCircuitRun
-
-        Raises:
-            ValueError: AwsSession has not been specified
-        """
-        return_dict = json.loads(string)
-        if return_dict["type"] == "QueuedAWSCircuitRun":
-            if self.aws_session is not None:
-                task = self.aws_session.get_quantum_task(arn=return_dict["arn"])
-            else:
-                raise ValueError("AwsSession has not been specified")
-        return task
+            queued_circuits.append(self.run_circuit_queued(run_circuit))
+        return QueuedProgramRun(measurement, queued_circuits)
 
 
 qoqo_to_rigetti = {
