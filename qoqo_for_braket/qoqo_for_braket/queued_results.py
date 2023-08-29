@@ -257,7 +257,11 @@ class QueuedProgramRun:
         json_dict = json.loads(string)
 
         queued_circuits_deserialised: List[QueuedCircuitRun] = []
-        registers = ({}, {}, {})
+        registers: Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ] = ({}, {}, {})
         for circuit in json_dict["queued_circuits"]:
             circ_instance = QueuedCircuitRun.from_json(circuit)
             queued_circuits_deserialised.append(circ_instance)
