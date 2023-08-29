@@ -213,7 +213,12 @@ class QueuedProgramRun:
         if not all(all_finished):
             return None
         else:
-            return self._registers
+            if isinstance(self._measurement, measurements.ClassicalRegister):
+                return self._registers
+            else:
+                return self._measurement.evaluate(
+                    self._registers[0], self._registers[1], self._registers[2]
+                )
 
     def to_json(self) -> str:
         """Convert self to a json string.

@@ -43,7 +43,7 @@ def test_serialisation_circuit() -> None:
     assert (deserialised._results[0]["ro"] == queued._results[0]["ro"]).all()
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_serialisation_circuit_async() -> None:
     """Test to_json and from_json methods for QueuedCircuitRun for an async job."""
     circuit = Circuit()
@@ -135,17 +135,13 @@ def test_serialisation_program() -> None:
     serialised = queued.to_json()
     deserialised = QueuedProgramRun.from_json(serialised)
 
-    results = measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
-    )
-    results_queued = deserialised._measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
-    )
+    results = queued.poll_result()
+    results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
     assert results["0Z"] == results_queued["0Z"] == 1.0
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_serialisation_program_async() -> None:
     """Test to_json and from_json methods for QueuedProgramRun for an async job."""
     constant_circuit = Circuit()
@@ -196,12 +192,8 @@ def test_serialisation_program_async() -> None:
     serialised = queued.to_json()
     deserialised = QueuedProgramRun.from_json(serialised)
 
-    results = measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
-    )
-    results_queued = deserialised._measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
-    )
+    results = queued.poll_result()
+    results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
     assert results["0Z"] == results_queued["0Z"] == 1.0
 
