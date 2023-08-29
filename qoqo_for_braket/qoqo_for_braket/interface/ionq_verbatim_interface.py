@@ -30,10 +30,10 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
     """Convert a qoqo Circuit to a Braket Circuit with verbatim instructions for IonQ.
 
     Moving the RotateZ operations past the GPi, GPi2 and MS gates respects the following:
-    * GPi(phi) RotateZ(theta) = RotateZ(theta) GPi(phi - theta)
-    * GPi2(phi) RotateZ(theta) = RotateZ(theta) GPi2(phi - theta)
-    * MS(0, 1, phi_0, phi_1) RotateZ(0, theta_0) RotateZ(1, theta_1) =
-            RotateZ(0, theta_0) RotateZ(1, theta_1) MS(0, 1, phi_0 - theta_1, phi_1 - theta_0)
+    * RotateZ(theta) GPi(phi) = GPi(phi + theta) RotateZ(theta)
+    * RotateZ(theta) GPi2(phi) = GPi2(phi + theta) RotateZ(theta)
+    * RotateZ(0, theta_0) RotateZ(1, theta_1) MS(0, 1, phi_0, phi_1)
+        = MS(0, 1, phi_0 + theta_0, phi_1 + theta_1) RotateZ(0, theta_0) RotateZ(1, theta_1)
 
     Args:
         circuit: the qoqo Circuit to be translated
@@ -57,8 +57,8 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
             braket_circuit.ms(
                 op.control(),
                 op.target(),
-                0.0 + qubit_phase.get(op.target(), 0.0),
                 0.0 + qubit_phase.get(op.control(), 0.0),
+                0.0 + qubit_phase.get(op.target(), 0.0),
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
