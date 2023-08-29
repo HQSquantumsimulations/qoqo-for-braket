@@ -183,22 +183,20 @@ class QueuedProgramRun:
 
     def poll_result(
         self,
-    ) -> Tuple[
+    ) -> Optional[
         Tuple[
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
-        ],
-        List[bool],
+        ]
     ]:
         """Poll the result once.
 
         Returns:
-            Tuple[Tuple[Dict[str, List[List[bool]]],
+            Optional[Tuple[Dict[str, List[List[bool]]],
                            Dict[str, List[List[float]]],
-                           Dict[str, List[List[complex]]],
-                  ], List[bool]]: Result registers updated by circuit
-                                  and a list of whether all circuits have run yet.
+                           Dict[str, List[List[complex]]],]
+                     ]: Result if all tasks were successful.
 
         Raises:
             RuntimeError: job failed or cancelled
@@ -212,7 +210,10 @@ class QueuedProgramRun:
                 self._registers[2].update(res[2])  # add results to complex registers
                 all_finished[i] = True
 
-        return (self._registers, all_finished)
+        if not all(all_finished):
+            return None
+        else:
+            return self._registers
 
     def to_json(self) -> str:
         """Convert self to a json string.

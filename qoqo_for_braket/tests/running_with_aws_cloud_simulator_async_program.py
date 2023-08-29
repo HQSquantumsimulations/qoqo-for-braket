@@ -66,11 +66,11 @@ backend.change_max_shots(2)
 
 queued = backend.run_measurement_queued(measurement)
 i = 0
-while not all(queued.poll_result()[1]):
+while queued.poll_result() is None:
     i += 1
     if i > 50:
         raise RuntimeError("Timed out waiting for job to complete")
-registers = queued.poll_result()[0]
+registers = queued.poll_result()
 result = measurement.evaluate(registers[0], registers[1], registers[2])
 
 assert "0Z" in result.keys()
