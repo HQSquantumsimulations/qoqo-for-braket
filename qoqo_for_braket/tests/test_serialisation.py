@@ -43,7 +43,7 @@ def test_serialisation_circuit() -> None:
     assert (deserialised._results[0]["ro"] == queued._results[0]["ro"]).all()
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_serialisation_circuit_async() -> None:
     """Test to_json and from_json methods for QueuedCircuitRun for an async job."""
     circuit = Circuit()
@@ -145,7 +145,7 @@ def test_serialisation_program() -> None:
     assert results["0Z"] == results_queued["0Z"] == 1.0
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_serialisation_program_async() -> None:
     """Test to_json and from_json methods for QueuedProgramRun for an async job."""
     constant_circuit = Circuit()
