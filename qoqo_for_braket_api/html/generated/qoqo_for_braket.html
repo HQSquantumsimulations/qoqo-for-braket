@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.2.0 documentation</title>
+  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.2.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=f34db371"></script>
+        <script src="../_static/documentation_options.js?v=16b99c04"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -35,7 +35,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.2.0
+                0.2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -61,10 +61,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.force_ionq_verbatim"><code class="docutils literal notranslate"><span class="pre">BraketBackend.force_ionq_verbatim()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.force_oqc_verbatim"><code class="docutils literal notranslate"><span class="pre">BraketBackend.force_oqc_verbatim()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.force_rigetti_verbatim"><code class="docutils literal notranslate"><span class="pre">BraketBackend.force_rigetti_verbatim()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.queued_from_json"><code class="docutils literal notranslate"><span class="pre">BraketBackend.queued_from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_circuit"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_circuit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_circuit_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_circuit_queued()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_queued()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_registers"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_registers()</span></code></a></li>
 </ul>
 </li>
@@ -74,6 +74,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun.from_json"><code class="docutils literal notranslate"><span class="pre">QueuedCircuitRun.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun.poll_result"><code class="docutils literal notranslate"><span class="pre">QueuedCircuitRun.poll_result()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun.to_json"><code class="docutils literal notranslate"><span class="pre">QueuedCircuitRun.to_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun.__init__"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun.__weakref__"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun.__weakref__</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun.from_json"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun.poll_result"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun.poll_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun.to_json"><code class="docutils literal notranslate"><span class="pre">QueuedProgramRun.to_json()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -107,9 +115,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="qoqo-for-braket">
-<h1>qoqo_for_braket<a class="headerlink" href="#qoqo-for-braket" title="Link to this heading"></a></h1>
-<p id="module-qoqo_for_braket">Qoqo interface to the AWS braket service.</p>
+  <section id="module-qoqo_for_braket">
+<span id="qoqo-for-braket"></span><h1>qoqo_for_braket<a class="headerlink" href="#module-qoqo_for_braket" title="Link to this heading"></a></h1>
+<p>Qoqo interface to the AWS braket service.</p>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -118,6 +126,9 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.QueuedCircuitRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedCircuitRun</span></code></a>(session, task, metadata)</p></td>
 <td><p>Queued Result of the circuit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.QueuedProgramRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedProgramRun</span></code></a>(measurement, queued_circuits)</p></td>
+<td><p>Queued Result of the measurement.</p></td>
 </tr>
 </tbody>
 </table>
@@ -262,23 +273,6 @@ registers are not supported.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.queued_from_json">
-<span class="sig-name descname"><span class="pre">queued_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.queued_from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.queued_from_json" title="Link to this definition"></a></dt>
-<dd><p>Get a queued result from a json string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) -- the json string to get the queued result from.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>QueuedCircuitRun</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> -- AwsSession has not been specified</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_circuit">
 <span class="sig-name descname"><span class="pre">run_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_circuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_circuit" title="Link to this definition"></a></dt>
 <dd><p>Simulate a Circuit on a AWS backend.</p>
@@ -331,6 +325,25 @@ registers are not supported.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Optional[Dict[str, float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_measurement_queued">
+<span class="sig-name descname"><span class="pre">run_measurement_queued</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.queued_results.QueuedProgramRun"><span class="pre">QueuedProgramRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_measurement_queued"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_measurement_queued" title="Link to this definition"></a></dt>
+<dd><p>Run a qoqo measurement on a AWS backend and return a queued Job Result.</p>
+<p>The default number of shots for the simulation is 100.
+Any kind of Measurement instruction only works as intended if
+it are the last instructions in the Circuit.
+Currently only one simulation is performed, meaning different measurements on different
+registers are not supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>measurement</strong> (<em>qoqo.measurement</em>) -- the measurement to simulate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>QueuedProgramRun</p>
 </dd>
 </dl>
 </dd></dl>
@@ -411,7 +424,7 @@ Dict[str, List[List[complex]]]]</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedCircuitRun.poll_result">
 <span class="sig-name descname"><span class="pre">poll_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun.poll_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun.poll_result" title="Link to this definition"></a></dt>
-<dd><p>Poll the result until it's no longer pending.</p>
+<dd><p>Poll the result once.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><dl class="simple">
@@ -430,6 +443,94 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedCircuitRun.to_json">
 <span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun.to_json" title="Link to this definition"></a></dt>
+<dd><p>Convert self to a json string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self as a json string</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedProgramRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queued_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun" title="Link to this definition"></a></dt>
+<dd><p>Queued Result of the measurement.</p>
+<p>Initialise the QueuedProgramRun class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measurement</strong> -- the qoqo Measurement to run</p></li>
+<li><p><strong>queued_circuits</strong> -- the list of associated queued circuits</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queued_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialise the QueuedProgramRun class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measurement</strong> -- the qoqo Measurement to run</p></li>
+<li><p><strong>queued_circuits</strong> -- the list of associated queued circuits</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.__weakref__" title="Link to this definition"></a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.from_json">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.queued_results.QueuedProgramRun"><span class="pre">QueuedProgramRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.from_json" title="Link to this definition"></a></dt>
+<dd><p>Convert a json string to an instance of QueuedProgramRun.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> -- json string to convert.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>converted json string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.QueuedProgramRun">QueuedProgramRun</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.poll_result">
+<span class="sig-name descname"><span class="pre">poll_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.poll_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.poll_result" title="Link to this definition"></a></dt>
+<dd><p>Poll the result once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl>
+<dt>Optional[Tuple[Dict[str, List[List[bool]]],</dt><dd><blockquote>
+<div><p>Dict[str, List[List[float]]],
+Dict[str, List[List[complex]]],]</p>
+</div></blockquote>
+<p>]: Result if all tasks were successful.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> -- job failed or cancelled</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.to_json" title="Link to this definition"></a></dt>
 <dd><p>Convert self to a json string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

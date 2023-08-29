@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.2.0 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.2.2 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,7 +12,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=f34db371"></script>
+        <script src="../../_static/documentation_options.js?v=16b99c04"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -33,7 +33,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.2.0
+                0.2.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -88,7 +88,6 @@
 <span class="sd">&quot;&quot;&quot;Provides the BraketBackend class.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span>
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
 <span class="kn">import</span> <span class="nn">qoqo_qasm</span>
@@ -99,7 +98,7 @@
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span>
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span>
 <span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span>
 <span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
 <span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
@@ -443,27 +442,33 @@
         <span class="k">return</span> <span class="n">QueuedCircuitRun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="p">,</span> <span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BraketBackend.queued_from_json">
-<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.queued_from_json">[docs]</a>
-    <span class="k">def</span> <span class="nf">queued_from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedCircuitRun</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a queued result from a json string.</span>
+<div class="viewcode-block" id="BraketBackend.run_measurement_queued">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_queued">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_measurement_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedProgramRun</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a qoqo measurement on a AWS backend and return a queued Job Result.</span>
+
+<span class="sd">        The default number of shots for the simulation is 100.</span>
+<span class="sd">        Any kind of Measurement instruction only works as intended if</span>
+<span class="sd">        it are the last instructions in the Circuit.</span>
+<span class="sd">        Currently only one simulation is performed, meaning different measurements on different</span>
+<span class="sd">        registers are not supported.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            string (str): the json string to get the queued result from.</span>
+<span class="sd">            measurement (qoqo.measurement): the measurement to simulate.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            QueuedCircuitRun</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: AwsSession has not been specified</span>
+<span class="sd">            QueuedProgramRun</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">return_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">return_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;QueuedAWSCircuitRun&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="o">.</span><span class="n">get_quantum_task</span><span class="p">(</span><span class="n">arn</span><span class="o">=</span><span class="n">return_dict</span><span class="p">[</span><span class="s2">&quot;arn&quot;</span><span class="p">])</span>
+        <span class="n">queued_circuits</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">constant_circuit</span> <span class="o">=</span> <span class="n">measurement</span><span class="o">.</span><span class="n">constant_circuit</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">constant_circuit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">run_circuit</span> <span class="o">=</span> <span class="n">circuit</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;AwsSession has not been specified&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">task</span></div>
+                <span class="n">run_circuit</span> <span class="o">=</span> <span class="n">constant_circuit</span> <span class="o">+</span> <span class="n">circuit</span>
+
+            <span class="n">queued_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_circuit_queued</span><span class="p">(</span><span class="n">run_circuit</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">QueuedProgramRun</span><span class="p">(</span><span class="n">measurement</span><span class="p">,</span> <span class="n">queued_circuits</span><span class="p">)</span></div>
 </div>
 
 
