@@ -13,7 +13,6 @@
 """Provides the BraketBackend class."""
 
 from typing import Tuple, Dict, List, Any, Optional, Union
-import json
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
@@ -328,7 +327,7 @@ class BraketBackend:
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
     def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
-        """Run a Circuit on a AWS backend and return a queued Job Result.
+        """Run a qoqo measurement on a AWS backend and return a queued Job Result.
 
         The default number of shots for the simulation is 100.
         Any kind of Measurement instruction only works as intended if
@@ -337,10 +336,10 @@ class BraketBackend:
         registers are not supported.
 
         Args:
-            circuit (Circuit): the Circuit to simulate.
+            measurement (qoqo.measurement): the measurement to simulate.
 
         Returns:
-            QueuedCircuitRun
+            QueuedProgramRun
         """
         queued_circuits = []
         constant_circuit = measurement.constant_circuit()

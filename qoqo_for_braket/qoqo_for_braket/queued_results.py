@@ -117,7 +117,7 @@ class QueuedCircuitRun:
             Dict[str, List[List[complex]]],
         ]
     ]:
-        """Poll the result until it's no longer pending.
+        """Poll the result once.
 
         Returns:
             Optional[Tuple[Dict[str, List[List[bool]]],
@@ -159,7 +159,15 @@ class QueuedCircuitRun:
 
 
 class QueuedProgramRun:
-    def __init__(self, measurement, queued_circuits: List[QueuedCircuitRun]) -> None:
+    """Queued Result of the measurement."""
+
+    def __init__(self, measurement: Any, queued_circuits: List[QueuedCircuitRun]) -> None:
+        """Initialise the QueuedProgramRun class.
+
+        Args:
+            measurement: the qoqo Measurement to run
+            queued_circuits: the list of associated queued circuits
+        """
         self._measurement = measurement
         self._queued_circuits: List[QueuedCircuitRun] = queued_circuits
         self._registers: Tuple[
@@ -183,6 +191,18 @@ class QueuedProgramRun:
         ],
         List[bool],
     ]:
+        """Poll the result once.
+
+        Returns:
+            Tuple[Tuple[Dict[str, List[List[bool]]],
+                           Dict[str, List[List[float]]],
+                           Dict[str, List[List[complex]]],
+                  ], List[bool]]: Result registers updated by circuit
+                                  and a list of whether all circuits have run yet.
+
+        Raises:
+            RuntimeError: job failed or cancelled
+        """
         all_finished = [False] * len(self._queued_circuits)
         for i, queued_circuit in enumerate(self._queued_circuits):
             res = queued_circuit.poll_result()
@@ -194,7 +214,12 @@ class QueuedProgramRun:
 
         return (self._registers, all_finished)
 
-    def to_json(self):
+    def to_json(self) -> str:
+        """Convert self to a json string.
+
+        Returns:
+            str: self as a json string
+        """
         queued_circuits_serialised: List[str] = []
         for circuit in self._queued_circuits:
             queued_circuits_serialised.append(circuit.to_json())
@@ -221,6 +246,14 @@ class QueuedProgramRun:
 
     @staticmethod
     def from_json(string: str) -> "QueuedProgramRun":
+        """Convert a json string to an instance of QueuedProgramRun.
+
+        Args:
+            string: json string to convert.
+
+        Returns:
+            QueuedProgramRun: converted json string
+        """
         json_dict = json.loads(string)
 
         queued_circuits_deserialised: List[QueuedCircuitRun] = []
