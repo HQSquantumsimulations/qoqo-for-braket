@@ -43,7 +43,7 @@ def test_serialisation_circuit() -> None:
     assert (deserialised._results[0]["ro"] == queued._results[0]["ro"]).all()
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_serialisation_circuit_async() -> None:
     """Test to_json and from_json methods for QueuedCircuitRun for an async job."""
     circuit = Circuit()
@@ -110,20 +110,42 @@ def test_serialisation_program() -> None:
     backend = BraketBackend(
         device=None,
     )
+    backend.change_max_shots(2)
     queued = backend.run_measurement_queued(measurement)
 
     serialised = queued.to_json()
     deserialised = QueuedProgramRun.from_json(serialised)
 
-    # Before polling: result is None
-    assert deserialised._results == queued._results
+    # Before polling: result is not None as tasks are local
+    results = measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    results_queued = deserialised._measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    assert len(results.keys()) == len(results_queued.keys()) == 1
+    assert results["0Z"] == results_queued["0Z"] == 1.0
 
     # After polling: result is not None
-    assert deserialised.poll_result().keys() == queued.poll_result().keys()
-    assert deserialised.poll_result()["0Z"] == queued.poll_result()["0Z"] == 1.0
+    i = 0
+    while not all(queued.poll_result()[1]):
+        i += 1
+        if i > 50:
+            raise RuntimeError("Timed out waiting for job to complete")
+    serialised = queued.to_json()
+    deserialised = QueuedProgramRun.from_json(serialised)
+
+    results = measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    results_queued = deserialised._measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    assert len(results.keys()) == len(results_queued.keys()) == 1
+    assert results["0Z"] == results_queued["0Z"] == 1.0
 
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 def test_serialisation_program_async() -> None:
     """Test to_json and from_json methods for QueuedProgramRun for an async job."""
     constant_circuit = Circuit()
@@ -161,11 +183,27 @@ def test_serialisation_program_async() -> None:
     deserialised = QueuedProgramRun.from_json(serialised)
 
     # Before polling: result is None
-    assert deserialised._results == queued._results
+    assert deserialised._registers == queued._registers
 
     # After polling: result is not None
-    assert deserialised.poll_result().keys() == queued.poll_result().keys()
-    assert deserialised.poll_result()["0Z"] == queued.poll_result()["0Z"] == 1.0
+
+    # After polling: result is not None
+    i = 0
+    while not all(queued.poll_result()[1]):
+        i += 1
+        if i > 50:
+            raise RuntimeError("Timed out waiting for job to complete")
+    serialised = queued.to_json()
+    deserialised = QueuedProgramRun.from_json(serialised)
+
+    results = measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    results_queued = deserialised._measurement.evaluate(
+        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+    )
+    assert len(results.keys()) == len(results_queued.keys()) == 1
+    assert results["0Z"] == results_queued["0Z"] == 1.0
 
 
 if __name__ == "__main__":

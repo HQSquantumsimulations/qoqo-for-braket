@@ -162,30 +162,37 @@ class QueuedProgramRun:
     def __init__(self, measurement, queued_circuits: List[QueuedCircuitRun]) -> None:
         self._measurement = measurement
         self._queued_circuits: List[QueuedCircuitRun] = queued_circuits
-        self._results: Optional[Dict[str, float]] = None
-
-    def poll_result(self):
-        registers: List[
+        self._registers: Tuple[
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
-        ] = [
-            {},
-            {},
-            {},
-        ]  # just empty registers
-        all_finished = [False] * len(self._queued_circuits)
-        while not all(all_finished):
-            for i, queued_circuit in enumerate(self._queued_circuits):
-                res = queued_circuit.poll_result()
-                if res is not None:
-                    registers[0].update(res[0])  # add results to bit registers
-                    registers[1].update(res[1])  # add results to float registers
-                    registers[2].update(res[2])  # add results to complex registers
-                    all_finished[i] = True
+        ] = ({}, {}, {})
+        for circuit in self._queued_circuits:
+            if circuit._results is not None:
+                self._registers[0].update(circuit._results[0])
+                self._registers[1].update(circuit._results[1])
+                self._registers[2].update(circuit._results[2])
 
-        self._results = self._measurement.evaluate(registers[0], registers[1], registers[2])
-        return self._results
+    def poll_result(
+        self,
+    ) -> Tuple[
+        Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ],
+        List[bool],
+    ]:
+        all_finished = [False] * len(self._queued_circuits)
+        for i, queued_circuit in enumerate(self._queued_circuits):
+            res = queued_circuit.poll_result()
+            if res is not None:
+                self._registers[0].update(res[0])  # add results to bit registers
+                self._registers[1].update(res[1])  # add results to float registers
+                self._registers[2].update(res[2])  # add results to complex registers
+                all_finished[i] = True
+
+        return (self._registers, all_finished)
 
     def to_json(self):
         queued_circuits_serialised: List[str] = []
@@ -217,8 +224,14 @@ class QueuedProgramRun:
         json_dict = json.loads(string)
 
         queued_circuits_deserialised: List[QueuedCircuitRun] = []
+        registers = ({}, {}, {})
         for circuit in json_dict["queued_circuits"]:
-            queued_circuits_deserialised.append(QueuedCircuitRun.from_json(circuit))
+            circ_instance = QueuedCircuitRun.from_json(circuit)
+            queued_circuits_deserialised.append(circ_instance)
+            if circ_instance._results is not None:
+                registers[0].update(circ_instance._results[0])
+                registers[1].update(circ_instance._results[1])
+                registers[2].update(circ_instance._results[2])
 
         if json_dict["measurement_type"] == "PauliZProduct":
             measurement = measurements.PauliZProduct.from_json(json_dict["measurement"])
@@ -231,4 +244,6 @@ class QueuedProgramRun:
         else:
             raise TypeError("Unknown measurement type")
 
-        return QueuedProgramRun(measurement, queued_circuits_deserialised)
+        instance = QueuedProgramRun(measurement, queued_circuits_deserialised)
+        instance._registers = registers
+        return instance

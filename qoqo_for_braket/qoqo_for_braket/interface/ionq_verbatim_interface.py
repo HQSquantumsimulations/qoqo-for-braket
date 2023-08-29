@@ -50,15 +50,15 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
         if op.hqslang() == "RotateZ":
             qubit_phase[op.qubit()] = qubit_phase.get(op.qubit(), 0.0) + op.theta()
         elif op.hqslang() == "GPi":
-            braket_circuit.gpi(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi(op.qubit(), op.theta() + qubit_phase.get(op.qubit(), 0.0))
         elif op.hqslang() == "GPi2":
-            braket_circuit.gpi2(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi2(op.qubit(), op.theta() + qubit_phase.get(op.qubit(), 0.0))
         elif op.hqslang() == "MolmerSorensenXX":
             braket_circuit.ms(
                 op.control(),
                 op.target(),
-                0.0 - qubit_phase.get(op.target(), 0.0),
-                0.0 - qubit_phase.get(op.control(), 0.0),
+                0.0 + qubit_phase.get(op.target(), 0.0),
+                0.0 + qubit_phase.get(op.control(), 0.0),
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass

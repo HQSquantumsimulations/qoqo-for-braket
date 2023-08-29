@@ -65,11 +65,17 @@ backend = BraketBackend(
 backend.change_max_shots(2)
 
 queued = backend.run_measurement_queued(measurement)
-meas_result = queued.poll_result()
+i = 0
+while not all(queued.poll_result()[1]):
+    i += 1
+    if i > 50:
+        raise RuntimeError("Timed out waiting for job to complete")
+registers = queued.poll_result()[0]
+result = measurement.evaluate(registers[0], registers[1], registers[2])
 
-assert "0Z" in meas_result.keys()
-assert meas_result["0Z"] == 1.0
-assert "1Z" in meas_result.keys()
-assert meas_result["1Z"] == 1.0
-assert "2Z" in meas_result.keys()
-assert meas_result["2Z"] == 1.0
+assert "0Z" in result.keys()
+assert result["0Z"] == 1.0
+assert "1Z" in result.keys()
+assert result["1Z"] == 1.0
+assert "2Z" in result.keys()
+assert result["2Z"] == 1.0
