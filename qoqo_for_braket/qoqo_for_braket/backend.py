@@ -13,7 +13,6 @@
 """Provides the BraketBackend class."""
 
 from typing import Tuple, Dict, List, Any, Optional, Union
-import json
 from qoqo import Circuit
 from qoqo import operations as ops
 import qoqo_qasm
@@ -24,7 +23,7 @@ from qoqo_for_braket.interface import (
 )
 
 from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun
 from braket.aws import AwsQuantumTask, AwsDevice
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
@@ -327,25 +326,31 @@ class BraketBackend:
         (quantum_task, metadata) = self._run_circuit(circuit)
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
-    def queued_from_json(self, string: str) -> QueuedCircuitRun:
-        """Get a queued result from a json string.
+    def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
+        """Run a qoqo measurement on a AWS backend and return a queued Job Result.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it are the last instructions in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
 
         Args:
-            string (str): the json string to get the queued result from.
+            measurement (qoqo.measurement): the measurement to simulate.
 
         Returns:
-            QueuedCircuitRun
-
-        Raises:
-            ValueError: AwsSession has not been specified
+            QueuedProgramRun
         """
-        return_dict = json.loads(string)
-        if return_dict["type"] == "QueuedAWSCircuitRun":
-            if self.aws_session is not None:
-                task = self.aws_session.get_quantum_task(arn=return_dict["arn"])
+        queued_circuits = []
+        constant_circuit = measurement.constant_circuit()
+        for circuit in measurement.circuits():
+            if constant_circuit is None:
+                run_circuit = circuit
             else:
-                raise ValueError("AwsSession has not been specified")
-        return task
+                run_circuit = constant_circuit + circuit
+
+            queued_circuits.append(self.run_circuit_queued(run_circuit))
+        return QueuedProgramRun(measurement, queued_circuits)
 
 
 qoqo_to_rigetti = {

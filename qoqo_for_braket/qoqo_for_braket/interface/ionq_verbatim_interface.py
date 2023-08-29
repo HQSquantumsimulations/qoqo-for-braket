@@ -30,8 +30,8 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
     """Convert a qoqo Circuit to a Braket Circuit with verbatim instructions for IonQ.
 
     Moving the RotateZ operations past the GPi, GPi2 and MS gates respects the following:
-    * GPi(phi) RotateZ(0, theta) = RotateZ(theta) GPi(phi - theta)
-    * GPi2(phi) RotateZ(0, theta) = RotateZ(theta) GPi2(phi - theta)
+    * GPi(phi) RotateZ(theta) = RotateZ(theta) GPi(phi - theta)
+    * GPi2(phi) RotateZ(theta) = RotateZ(theta) GPi2(phi - theta)
     * MS(0, 1, phi_0, phi_1) RotateZ(0, theta_0) RotateZ(1, theta_1) =
             RotateZ(0, theta_0) RotateZ(1, theta_1) MS(0, 1, phi_0 - theta_1, phi_1 - theta_0)
 
@@ -50,15 +50,15 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
         if op.hqslang() == "RotateZ":
             qubit_phase[op.qubit()] = qubit_phase.get(op.qubit(), 0.0) + op.theta()
         elif op.hqslang() == "GPi":
-            braket_circuit.gpi(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi(op.qubit(), op.theta() + qubit_phase.get(op.qubit(), 0.0))
         elif op.hqslang() == "GPi2":
-            braket_circuit.gpi2(op.qubit(), op.theta() - qubit_phase.get(op.qubit(), 0.0))
+            braket_circuit.gpi2(op.qubit(), op.theta() + qubit_phase.get(op.qubit(), 0.0))
         elif op.hqslang() == "MolmerSorensenXX":
             braket_circuit.ms(
                 op.control(),
                 op.target(),
-                0.0 - qubit_phase.get(op.target(), 0.0),
-                0.0 - qubit_phase.get(op.control(), 0.0),
+                0.0 + qubit_phase.get(op.target(), 0.0),
+                0.0 + qubit_phase.get(op.control(), 0.0),
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
