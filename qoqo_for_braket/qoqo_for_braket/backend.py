@@ -191,7 +191,7 @@ class BraketBackend:
 
         elif "Aspen" in self.device or self.__force_rigetti_verbatim:
             task_specification = rigetti_verbatim_interface.call_circuit(circuit)
-        elif "ionQ" in self.device or self.__force_ionq_verbatim:
+        elif "ionq" in self.device or self.__force_ionq_verbatim:
             task_specification = ionq_verbatim_interface.call_circuit(circuit)
 
         elif "Lucy" in self.device or self.__force_oqc_verbatim:
