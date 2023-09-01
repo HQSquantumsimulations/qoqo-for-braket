@@ -2,6 +2,10 @@
 
 This changelog track changes to the qoqo-for-braket project starting at version 0.1.0
 
+## 0.2.5
+
+* Moved rigetti remapping dictionary to verbatim box in rigetti interface
+
 ## 0.2.4
 
 * Fixed typo in `ionq` name in real devices
