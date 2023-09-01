@@ -181,9 +181,6 @@ class BraketBackend:
         else:
             readout = "ro"
 
-        if self.device == "arn:aws:braket:us-west-1::device/qpu/rigetti/Aspen-M-3":
-            circuit = circuit.remap_qubits(qoqo_to_rigetti)
-
         if not self.verbatim_mode:
             qasm_backend = qoqo_qasm.QasmBackend("q", "3.0Braket")
             qasm_string = qasm_backend.circuit_to_qasm_str(circuit)
