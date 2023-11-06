@@ -19,7 +19,7 @@ import sys
 
 def test_rigetti_error() -> None:
     """Test running with Rigetti, fails OperationNotInBackend."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_rigetti_verbatim()
 
     # OperationNotInBackend
@@ -47,7 +47,7 @@ def test_rigetti_error() -> None:
 
 def test_rigetti_all_gates() -> None:
     """Test running with Rigetti."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_rigetti_verbatim()
 
     rigetti_circuit = Circuit()
