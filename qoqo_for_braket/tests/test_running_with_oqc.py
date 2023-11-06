@@ -20,7 +20,7 @@ import numpy as np
 
 def test_oqc_error() -> None:
     """Test running with OQC, fails OperationNotInBackend."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_oqc_verbatim()
 
     # OperationNotInBackend
@@ -48,7 +48,7 @@ def test_oqc_error() -> None:
 
 def test_oqc_all_gates() -> None:
     """Test running with OQC."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_oqc_verbatim()
 
     oqc_circuit = Circuit()

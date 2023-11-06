@@ -20,7 +20,7 @@ import numpy as np
 
 def test_ionq_errors() -> None:
     """Test running with IonQ, fails OperationNotInBackend."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_ionq_verbatim()
 
     # OperationNotInBackend
@@ -48,7 +48,7 @@ def test_ionq_errors() -> None:
 
 def test_ionq_all_gates() -> None:
     """Test running with IonQ."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_ionq_verbatim()
 
     ionq_circuit = Circuit()
@@ -59,6 +59,7 @@ def test_ionq_all_gates() -> None:
     ionq_circuit += ops.RotateZ(2, np.pi)
     ionq_circuit += ops.GPi2(2, np.pi / 2)
     ionq_circuit += ops.MolmerSorensenXX(2, 3)
+    ionq_circuit += ops.VariableMSXX(1, 2, np.pi)
     ionq_circuit += ops.MeasureQubit(0, "ro", 0)
     ionq_circuit += ops.MeasureQubit(1, "ro", 1)
     ionq_circuit += ops.MeasureQubit(2, "ro", 2)

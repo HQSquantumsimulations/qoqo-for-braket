@@ -105,7 +105,9 @@ def test_serialisation_program() -> None:
     input_z.add_pauliz_product("ro", [0])
     input_z.add_linear_exp_val("0Z", {0: 1.0})
     measurement = measurements.PauliZProduct(
-        constant_circuit=constant_circuit, circuits=[circuit_1, circuit_2], input=input_z
+        constant_circuit=constant_circuit,
+        circuits=[circuit_1, circuit_2],
+        input=input_z,
     )
     backend = BraketBackend(
         device=None,
@@ -118,10 +120,14 @@ def test_serialisation_program() -> None:
 
     # Before polling: result is not None as tasks are local
     results = measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+        deserialised._registers[0],
+        deserialised._registers[1],
+        deserialised._registers[2],
     )
     results_queued = deserialised._measurement.evaluate(
-        deserialised._registers[0], deserialised._registers[1], deserialised._registers[2]
+        deserialised._registers[0],
+        deserialised._registers[1],
+        deserialised._registers[2],
     )
     assert len(results.keys()) == len(results_queued.keys()) == 1
     assert results["0Z"] == results_queued["0Z"] == 1.0
@@ -164,7 +170,9 @@ def test_serialisation_program_async() -> None:
     input_z.add_pauliz_product("ro", [0])
     input_z.add_linear_exp_val("0Z", {0: 1.0})
     measurement = measurements.PauliZProduct(
-        constant_circuit=constant_circuit, circuits=[circuit_1, circuit_2], input=input_z
+        constant_circuit=constant_circuit,
+        circuits=[circuit_1, circuit_2],
+        input=input_z,
     )
 
     aws_session = AwsSession()

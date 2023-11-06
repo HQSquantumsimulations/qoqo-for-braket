@@ -19,7 +19,7 @@ import sys
 
 def test_rigetti_error() -> None:
     """Test running with Rigetti, fails OperationNotInBackend."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_rigetti_verbatim()
 
     # OperationNotInBackend
@@ -47,12 +47,14 @@ def test_rigetti_error() -> None:
 
 def test_rigetti_all_gates() -> None:
     """Test running with Rigetti."""
-    backend = BraketBackend(verbatim_mode=True)
+    backend = BraketBackend()
     backend.force_rigetti_verbatim()
 
     rigetti_circuit = Circuit()
     rigetti_circuit += ops.DefinitionBit("ro", 4, True)
-    rigetti_circuit += ops.RotateX(0, 1.0)
+    rigetti_circuit += ops.PauliX(0)
+    rigetti_circuit += ops.SqrtPauliX(0)
+    rigetti_circuit += ops.InvSqrtPauliX(0)
     rigetti_circuit += ops.RotateZ(1, 1.0)
     rigetti_circuit += ops.ControlledPauliZ(2, 3)
     rigetti_circuit += ops.ControlledPhaseShift(3, 1, 1.0)

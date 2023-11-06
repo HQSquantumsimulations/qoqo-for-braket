@@ -87,14 +87,17 @@ class BraketBackend:
     def force_rigetti_verbatim(self) -> None:
         """Force the use of rigetti verbatim. Mostly used for testing purposes."""
         self.__force_rigetti_verbatim = True
+        self.verbatim_mode = True
 
     def force_ionq_verbatim(self) -> None:
         """Force the use of ionq verbatim. Mostly used for testing purposes."""
         self.__force_ionq_verbatim = True
+        self.verbatim_mode = True
 
     def force_oqc_verbatim(self) -> None:
         """Force the use of oqc verbatim. Mostly used for testing purposes."""
         self.__force_oqc_verbatim = True
+        self.verbatim_mode = True
 
     def change_max_shots(self, shots: int) -> None:
         """Change the maximum number of shots allowed.
