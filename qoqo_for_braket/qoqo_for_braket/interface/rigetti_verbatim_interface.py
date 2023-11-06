@@ -13,6 +13,7 @@
 
 from braket.circuits import Circuit
 import qoqo
+import numpy as np
 
 ALLOWED_OPERATIONS = [
     "PragmaRepeatedMeasurement",
@@ -36,8 +37,12 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
     """
     braket_circuit = Circuit()
     for op in circuit:
-        if op.hqslang() == "RotateX":
-            braket_circuit.rx(op.qubit(), op.theta())
+        if op.hqslang() == "PauliX":
+            braket_circuit.rx(op.qubit(), np.pi)
+        elif op.hqslang() == "SqrtPauliX":
+            braket_circuit.rx(op.qubit(), np.pi / 2)
+        elif op.hqslang() == "InvSqrtPauliX":
+            braket_circuit.rx(op.qubit(), -np.pi / 2)
         elif op.hqslang() == "RotateZ":
             braket_circuit.rz(op.qubit(), op.theta())
         elif op.hqslang() == "ControlledPauliZ":
