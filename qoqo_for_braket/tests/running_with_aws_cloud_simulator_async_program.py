@@ -22,37 +22,46 @@ import os
 
 os.environ["AWS_REGION"] = "eu-west-2"
 
+input_z = measurements.PauliZProductInput(number_qubits=3, use_flipped_measurement=False)
+
 constant_circuit = Circuit()
 constant_circuit += ops.PauliX(0)
 constant_circuit += ops.PauliX(0)
 
 circuit_1 = Circuit()
-circuit_1 += ops.DefinitionBit("ro", 3, False)
+circuit_1 += ops.DefinitionBit("ro_1", 3, False)
 circuit_1 += ops.PauliX(0)
 circuit_1 += ops.PauliX(1)
 circuit_1 += ops.PauliX(2)
-circuit_1 += ops.MeasureQubit(0, "ro", 0)
-circuit_1 += ops.MeasureQubit(1, "ro", 1)
-circuit_1 += ops.MeasureQubit(2, "ro", 2)
-circuit_1 += ops.PragmaSetNumberOfMeasurements(2, "ro")
+circuit_1 += ops.MeasureQubit(0, "ro_1", 0)
+circuit_1 += ops.MeasureQubit(1, "ro_1", 1)
+circuit_1 += ops.MeasureQubit(2, "ro_1", 2)
+circuit_1 += ops.PragmaSetNumberOfMeasurements(2, "ro_1")
+
+input_z.add_pauliz_product("ro_1", [0])
+input_z.add_pauliz_product("ro_1", [1])
+input_z.add_pauliz_product("ro_1", [2])
+input_z.add_linear_exp_val("0Z_1", {0: 1.0, 1: 0.0, 2: 0.0})
+input_z.add_linear_exp_val("1Z_1", {0: 0.0, 1: 1.0, 2: 0.0})
+input_z.add_linear_exp_val("2Z_1", {0: 0.0, 1: 0.0, 2: 1.0})
 
 circuit_2 = Circuit()
-circuit_2 += ops.DefinitionBit("ro", 3, False)
+circuit_2 += ops.DefinitionBit("ro_2", 3, False)
 circuit_2 += ops.RotateZ(0, np.pi)
 circuit_2 += ops.RotateZ(1, np.pi)
 circuit_2 += ops.RotateZ(2, np.pi)
-circuit_2 += ops.MeasureQubit(0, "ro", 0)
-circuit_2 += ops.MeasureQubit(1, "ro", 1)
-circuit_2 += ops.MeasureQubit(2, "ro", 2)
-circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "ro")
+circuit_2 += ops.MeasureQubit(0, "ro_2", 0)
+circuit_2 += ops.MeasureQubit(1, "ro_2", 1)
+circuit_2 += ops.MeasureQubit(2, "ro_2", 2)
+circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "ro_2")
 
-input_z = measurements.PauliZProductInput(number_qubits=3, use_flipped_measurement=False)
-input_z.add_pauliz_product("ro", [0])
-input_z.add_pauliz_product("ro", [1])
-input_z.add_pauliz_product("ro", [2])
-input_z.add_linear_exp_val("0Z", {0: 1.0, 1: 0.0, 2: 0.0})
-input_z.add_linear_exp_val("1Z", {0: 0.0, 1: 1.0, 2: 0.0})
-input_z.add_linear_exp_val("2Z", {0: 0.0, 1: 0.0, 2: 1.0})
+input_z.add_pauliz_product("ro_2", [0])
+input_z.add_pauliz_product("ro_2", [1])
+input_z.add_pauliz_product("ro_2", [2])
+input_z.add_linear_exp_val("0Z_2", {0: 1.0, 1: 0.0, 2: 0.0})
+input_z.add_linear_exp_val("1Z_2", {0: 0.0, 1: 1.0, 2: 0.0})
+input_z.add_linear_exp_val("2Z_2", {0: 0.0, 1: 0.0, 2: 1.0})
+
 measurement = measurements.PauliZProduct(
     constant_circuit=constant_circuit, circuits=[circuit_1, circuit_2], input=input_z
 )
@@ -72,9 +81,16 @@ while queued.poll_result() is None:
         raise RuntimeError("Timed out waiting for job to complete")
 result = queued.poll_result()
 
-assert "0Z" in result.keys()
-assert result["0Z"] == 1.0
-assert "1Z" in result.keys()
-assert result["1Z"] == 1.0
-assert "2Z" in result.keys()
-assert result["2Z"] == 1.0
+assert "0Z_1" in result.keys()
+assert result["0Z_1"] == -1.0
+assert "1Z_1" in result.keys()
+assert result["1Z_1"] == -1.0
+assert "2Z_1" in result.keys()
+assert result["2Z_1"] == -1.0
+
+assert "0Z_2" in result.keys()
+assert result["0Z_2"] == -1.0
+assert "1Z_2" in result.keys()
+assert result["1Z_2"] == -1.0
+assert "2Z_2" in result.keys()
+assert result["2Z_2"] == -1.0
