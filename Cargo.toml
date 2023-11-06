@@ -4,6 +4,8 @@ members = [
     "qoqo_for_braket_devices",
 ]
 
+resolver = "2"
+
 [profile.release]
 lto = true
 
