@@ -14,6 +14,7 @@
 from braket.circuits import Circuit
 import qoqo
 from typing import TYPE_CHECKING, Dict
+import numpy as np
 
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
@@ -59,6 +60,14 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
                 op.target(),
                 0.0 + qubit_phase.get(op.control(), 0.0),
                 0.0 + qubit_phase.get(op.target(), 0.0),
+            )
+        elif op.hqslang() == "VariableMSXX":
+            braket_circuit.ms(
+                op.control(),
+                op.target(),
+                0.0 - qubit_phase.get(op.control(), 0.0),
+                0.0 - qubit_phase.get(op.target(), 0.0),
+                op.theta(),
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
