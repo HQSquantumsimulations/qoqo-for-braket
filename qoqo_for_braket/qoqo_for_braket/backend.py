@@ -70,7 +70,7 @@ class BraketBackend:
             verbatim_mode: Whether to use verbatim boxes to avoid recompilation
             batch_mode: Run circuits in batch mode when running measurements. \
                     Does not work when circuits define different numbers of shots.
-    
+
         """
         self.aws_session = aws_session
         self.device = "braket_sv" if device is None else device
