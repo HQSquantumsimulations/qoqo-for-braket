@@ -64,10 +64,13 @@ class BraketBackend:
         """Initialise the BraketBackend class.
 
         Args:
-            device: Optional ARN of the Braket device to use. If none is provided, the
+            device: Optional ARN of the Braket device to use. If none is provided, the \
                     default LocalSimulator will be used.
             aws_session: Optional AwsSession to use. If none is provided, a new one will be created
             verbatim_mode: Whether to use verbatim boxes to avoid recompilation
+            batch_mode: Run circuits in batch mode when running measurements. \
+                    Does not work when circuits define different numbers of shots.
+    
         """
         self.aws_session = aws_session
         self.device = "braket_sv" if device is None else device
@@ -197,7 +200,7 @@ class BraketBackend:
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
         """
-        task_specifications = []
+        task_specifications: List[BraketCircuit] = []
         shots_list = []
         readouts = []
         for circuit in circuits:
@@ -215,7 +218,7 @@ class BraketBackend:
             readouts,
         )
 
-    def _prepare_circuit_for_run(self, circuit) -> Tuple[BraketCircuit, int, str]:
+    def _prepare_circuit_for_run(self, circuit: Circuit) -> Tuple[BraketCircuit, int, str]:
         """Prepares a braket circuit for running on braket.
 
         Args:
@@ -327,7 +330,7 @@ class BraketBackend:
         bool_register_dict: Dict[str, List[List[bool]]] = {}
         float_register_dict: Dict[str, List[List[float]]] = {}
         complex_register_dict: Dict[str, List[List[complex]]] = {}
-        for quantum_task, metadata in zip(quantum_task_batch, metadata):
+        for quantum_task, metadata in zip(quantum_task_batch, batch_metadata):
             results = quantum_task.result()
             (
                 tmp_bool_register_dict,
@@ -337,7 +340,7 @@ class BraketBackend:
             bool_register_dict.update(tmp_bool_register_dict)
             float_register_dict.update(tmp_float_register_dict)
             complex_register_dict.update(tmp_complex_register_dict)
-        return (bool_register_dict, float_register_dict, complex_register_dict), batch_metadata
+        return (bool_register_dict, float_register_dict, complex_register_dict)
 
     def run_measurement_registers(
         self, measurement: Any
