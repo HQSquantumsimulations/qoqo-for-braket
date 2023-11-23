@@ -205,7 +205,7 @@ class BraketBackend:
         readouts = []
         for circuit in circuits:
             (task_specification, shots, readout) = self._prepare_circuit_for_run(circuit)
-            task_specification.append(task_specification)
+            task_specifications.append(task_specification)
             shots_list.append(shots)
             readouts.append({"readout_name": readout})
         unique_shots = np.unique(shots_list)
@@ -214,7 +214,7 @@ class BraketBackend:
         else:
             shots = unique_shots[0]
         return (
-            self.__create_device().run_batch(task_specifications, shots=shots),
+            self.__create_device().run_batch(task_specifications, shots=int(shots)),
             readouts,
         )
 
@@ -330,8 +330,8 @@ class BraketBackend:
         bool_register_dict: Dict[str, List[List[bool]]] = {}
         float_register_dict: Dict[str, List[List[float]]] = {}
         complex_register_dict: Dict[str, List[List[complex]]] = {}
-        for quantum_task, metadata in zip(quantum_task_batch, batch_metadata):
-            results = quantum_task.result()
+        for quantum_task, metadata in zip(quantum_task_batch.results(), batch_metadata):
+            results = quantum_task
             (
                 tmp_bool_register_dict,
                 tmp_float_register_dict,

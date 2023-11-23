@@ -18,6 +18,7 @@ from typing import List, Any, Optional
 import pytest
 import sys
 import numpy.testing as npt
+import numpy as np
 
 list_of_operations = [
     [ops.PauliX(1), ops.PauliX(0), ops.PauliZ(2), ops.PauliX(3), ops.PauliY(4)],
@@ -100,6 +101,42 @@ def test_measurement(operations: List[Any]):
         _ = backend.run_measurement(measurement=measurement)
     except:
         assert False
+
+
+def test_batch_measurement():
+    input_z = PauliZProductInput(number_qubits=3, use_flipped_measurement=False)
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.DefinitionBit("ro_1", 1, False)
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.MeasureQubit(0, "ro_1", 0)
+
+    input_z.add_pauliz_product("ro_1", [0])
+    input_z.add_linear_exp_val("0Z_1", {0: 1.0})
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.DefinitionBit("ro_2", 1, False)
+    circuit_2 += ops.RotateZ(0, np.pi)
+    circuit_2 += ops.MeasureQubit(0, "ro_2", 0)
+
+    input_z.add_pauliz_product("ro_2", [0])
+    input_z.add_linear_exp_val("0Z_2", {0: 1.0})
+
+    measurement = PauliZProduct(
+        constant_circuit=None, circuits=[circuit_1, circuit_2], input=input_z
+    )
+
+    backend = BraketBackend(
+        # device="arn:aws:braket:::device/quantum-simulator/amazon/sv1",
+        batch_mode=True,
+    )
+    result = backend.run_measurement(measurement=measurement)
+
+    assert "0Z_1" in result.keys()
+    assert result["0Z_1"] == -1.0
+
+    assert "0Z_2" in result.keys()
+    assert result["0Z_2"] == -1.0
 
 
 if __name__ == "__main__":
