@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.2.6 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.3.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -12,7 +12,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=0620c4af"></script>
+        <script src="../../_static/documentation_options.js?v=8f8119fe"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -33,7 +33,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.2.6
+                0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -89,6 +89,7 @@
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<span class="kn">from</span> <span class="nn">braket.circuits</span> <span class="kn">import</span> <span class="n">Circuit</span> <span class="k">as</span> <span class="n">BraketCircuit</span>
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
 <span class="kn">import</span> <span class="nn">qoqo_qasm</span>
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
@@ -99,11 +100,11 @@
 
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span>
-<span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span>
+<span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
 <span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
 <span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
 <span class="kn">from</span> <span class="nn">braket.aws.aws_session</span> <span class="kn">import</span> <span class="n">AwsSession</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">LOCAL_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;braket_sv&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_dm&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_ahs&quot;</span><span class="p">]</span>
 <span class="n">REMOTE_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -126,6 +127,8 @@
 <span class="sd">                     AwsSession will be created automatically.</span>
 <span class="sd">        verbatim_mode: Only use native gates for real devices and block</span>
 <span class="sd">                       recompilation by devices</span>
+<span class="sd">        batch_mode: Run circuits in batch mode when running measurements.</span>
+<span class="sd">                    Does not work when circuits define different numbers of shots.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="BraketBackend.__init__">
@@ -135,14 +138,18 @@
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">aws_session</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AwsSession</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">verbatim_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">batch_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the BraketBackend class.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            device: Optional ARN of the Braket device to use. If none is provided, the</span>
+<span class="sd">            device: Optional ARN of the Braket device to use. If none is provided, the \</span>
 <span class="sd">                    default LocalSimulator will be used.</span>
 <span class="sd">            aws_session: Optional AwsSession to use. If none is provided, a new one will be created</span>
 <span class="sd">            verbatim_mode: Whether to use verbatim boxes to avoid recompilation</span>
+<span class="sd">            batch_mode: Run circuits in batch mode when running measurements. \</span>
+<span class="sd">                    Does not work when circuits define different numbers of shots.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="o">=</span> <span class="n">aws_session</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;braket_sv&quot;</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">device</span>
@@ -153,7 +160,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_ionq_verbatim</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_oqc_verbatim</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="mi">100</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">batch_mode</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend.allow_use_actual_hardware">
@@ -267,6 +275,67 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: Circuit contains multiple ways to set the number of measurements</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create_device</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">shots</span><span class="p">),</span>
+            <span class="p">{</span><span class="s2">&quot;readout_name&quot;</span><span class="p">:</span> <span class="n">readout</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1"># runs a circuit internally and can be used to produce sync and async results</span>
+<div class="viewcode-block" id="BraketBackend._run_circuits_batch">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._run_circuits_batch">[docs]</a>
+    <span class="k">def</span> <span class="nf">_run_circuits_batch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">AwsQuantumTaskBatch</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a list of Circuits on a AWS backend in batch mode.</span>
+
+<span class="sd">        The default number of shots for the simulation is 100.</span>
+<span class="sd">        Any kind of Measurement instruction only works as intended if</span>
+<span class="sd">        it is the last instruction in the Circuit.</span>
+<span class="sd">        Currently only one simulation is performed, meaning different measurements on different</span>
+<span class="sd">        registers are not supported.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            circuits (List[Circuit]): the Circuits to simulate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (AwsQuantumTaskBatch, {readout})</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: Circuit contains multiple ways to set the number of measurements</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task_specifications</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BraketCircuit</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">shots_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">readouts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">circuits</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+            <span class="n">task_specifications</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_specification</span><span class="p">)</span>
+            <span class="n">shots_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shots</span><span class="p">)</span>
+            <span class="n">readouts</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;readout_name&quot;</span><span class="p">:</span> <span class="n">readout</span><span class="p">})</span>
+        <span class="n">unique_shots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">shots_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_shots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Circuits contains multiple ways to set the number of measurements&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shots</span> <span class="o">=</span> <span class="n">unique_shots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create_device</span><span class="p">()</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span><span class="n">task_specifications</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">shots</span><span class="p">)),</span>
+            <span class="n">readouts</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BraketBackend._prepare_circuit_for_run">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._prepare_circuit_for_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">_prepare_circuit_for_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">BraketCircuit</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares a braket circuit for running on braket.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            circuit (Circuit): The qoqo Circuit that should be run.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (BraketCircuit, int, str): The braket circuit, the number of shots and the readout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">measurement_vector</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ops</span><span class="o">.</span><span class="n">Operation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">item</span>
             <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="p">[</span>
@@ -314,10 +383,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Circuit generated is longer that the max circuit length allowed for hardware&quot;</span>
                 <span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__create_device</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">shots</span><span class="p">),</span>
-            <span class="p">{</span><span class="s2">&quot;readout_name&quot;</span><span class="p">:</span> <span class="n">readout</span><span class="p">},</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend.run_circuit">
@@ -350,6 +416,48 @@
         <span class="k">return</span> <span class="n">_post_process_circuit_result</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="BraketBackend.run_circuits_batch">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_circuits_batch">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_circuits_batch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+        <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
+        <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
+        <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]],</span>
+    <span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a list of Circuits on a AWS backend in batch mode.</span>
+
+<span class="sd">        The default number of shots for the simulation is 100.</span>
+<span class="sd">        Any kind of Measurement instruction only works as intended if</span>
+<span class="sd">        it is the last instruction in the Circuit.</span>
+<span class="sd">        Currently only one simulation is performed, meaning different measurements on different</span>
+<span class="sd">        registers are not supported.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            circuits (List[Circuit]): the Circuit to simulate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[Dict[str, List[List[bool]]],</span>
+<span class="sd">                  Dict[str, List[List[float]]],</span>
+<span class="sd">                  Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">(</span><span class="n">quantum_task_batch</span><span class="p">,</span> <span class="n">batch_metadata</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuits_batch</span><span class="p">(</span><span class="n">circuits</span><span class="p">)</span>
+        <span class="n">bool_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">float_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">complex_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">quantum_task_batch</span><span class="o">.</span><span class="n">results</span><span class="p">(),</span> <span class="n">batch_metadata</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">quantum_task</span>
+            <span class="p">(</span>
+                <span class="n">tmp_bool_register_dict</span><span class="p">,</span>
+                <span class="n">tmp_float_register_dict</span><span class="p">,</span>
+                <span class="n">tmp_complex_register_dict</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="n">_post_process_circuit_result</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+            <span class="n">bool_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_bool_register_dict</span><span class="p">)</span>
+            <span class="n">float_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_float_register_dict</span><span class="p">)</span>
+            <span class="n">complex_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_complex_register_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">bool_register_dict</span><span class="p">,</span> <span class="n">float_register_dict</span><span class="p">,</span> <span class="n">complex_register_dict</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="BraketBackend.run_measurement_registers">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_registers">[docs]</a>
     <span class="k">def</span> <span class="nf">run_measurement_registers</span><span class="p">(</span>
@@ -373,22 +481,29 @@
         <span class="n">output_bit_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">output_float_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">output_complex_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
-
+        <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">constant_circuit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">run_circuit</span> <span class="o">=</span> <span class="n">circuit</span>
+                <span class="n">run_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">run_circuit</span> <span class="o">=</span> <span class="n">constant_circuit</span> <span class="o">+</span> <span class="n">circuit</span>
-
+                <span class="n">run_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constant_circuit</span> <span class="o">+</span> <span class="n">circuit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span><span class="p">:</span>
             <span class="p">(</span>
-                <span class="n">tmp_bit_register_dict</span><span class="p">,</span>
-                <span class="n">tmp_float_register_dict</span><span class="p">,</span>
-                <span class="n">tmp_complex_register_dict</span><span class="p">,</span>
-            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_circuit</span><span class="p">(</span><span class="n">run_circuit</span><span class="p">)</span>
+                <span class="n">output_bit_register_dict</span><span class="p">,</span>
+                <span class="n">output_float_register_dict</span><span class="p">,</span>
+                <span class="n">output_complex_register_dict</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_circuits_batch</span><span class="p">(</span><span class="n">run_circuits</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">run_circuit</span> <span class="ow">in</span> <span class="n">run_circuits</span><span class="p">:</span>
+                <span class="p">(</span>
+                    <span class="n">tmp_bit_register_dict</span><span class="p">,</span>
+                    <span class="n">tmp_float_register_dict</span><span class="p">,</span>
+                    <span class="n">tmp_complex_register_dict</span><span class="p">,</span>
+                <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_circuit</span><span class="p">(</span><span class="n">run_circuit</span><span class="p">)</span>
 
-            <span class="n">output_bit_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_bit_register_dict</span><span class="p">)</span>
-            <span class="n">output_float_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_float_register_dict</span><span class="p">)</span>
-            <span class="n">output_complex_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_complex_register_dict</span><span class="p">)</span>
+                <span class="n">output_bit_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_bit_register_dict</span><span class="p">)</span>
+                <span class="n">output_float_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_float_register_dict</span><span class="p">)</span>
+                <span class="n">output_complex_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_complex_register_dict</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">output_bit_register_dict</span><span class="p">,</span>

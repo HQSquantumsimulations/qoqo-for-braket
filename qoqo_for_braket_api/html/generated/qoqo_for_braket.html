@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.2.6 documentation</title>
+  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.3.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,7 +13,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=0620c4af"></script>
+        <script src="../_static/documentation_options.js?v=8f8119fe"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -35,7 +35,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.2.6
+                0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -53,7 +53,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__create_device"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__create_device()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__init__"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__weakref__"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__weakref__</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._prepare_circuit_for_run"><code class="docutils literal notranslate"><span class="pre">BraketBackend._prepare_circuit_for_run()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._run_circuit"><code class="docutils literal notranslate"><span class="pre">BraketBackend._run_circuit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._run_circuits_batch"><code class="docutils literal notranslate"><span class="pre">BraketBackend._run_circuits_batch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.allow_use_actual_hardware"><code class="docutils literal notranslate"><span class="pre">BraketBackend.allow_use_actual_hardware()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.change_max_circuit_length"><code class="docutils literal notranslate"><span class="pre">BraketBackend.change_max_circuit_length()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.change_max_shots"><code class="docutils literal notranslate"><span class="pre">BraketBackend.change_max_shots()</span></code></a></li>
@@ -63,6 +65,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.force_rigetti_verbatim"><code class="docutils literal notranslate"><span class="pre">BraketBackend.force_rigetti_verbatim()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_circuit"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_circuit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_circuit_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_circuit_queued()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_circuits_batch"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_circuits_batch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_queued()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_registers"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_registers()</span></code></a></li>
@@ -134,7 +137,7 @@
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">BraketBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">BraketBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend" title="Link to this definition"></a></dt>
 <dd><p>Qoqo backend execution qoqo objects on AWS braket.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -146,6 +149,8 @@ starting with &quot;local:&quot; as for the braket QuantumJob</p></li>
 AwsSession will be created automatically.</p></li>
 <li><p><strong>verbatim_mode</strong> -- Only use native gates for real devices and block
 recompilation by devices</p></li>
+<li><p><strong>batch_mode</strong> -- Run circuits in batch mode when running measurements.
+Does not work when circuits define different numbers of shots.</p></li>
 </ul>
 </dd>
 </dl>
@@ -153,10 +158,10 @@ recompilation by devices</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>device</strong> -- Optional ARN of the Braket device to use. If none is provided, the
-default LocalSimulator will be used.</p></li>
+<li><p><strong>device</strong> -- Optional ARN of the Braket device to use. If none is provided, the                     default LocalSimulator will be used.</p></li>
 <li><p><strong>aws_session</strong> -- Optional AwsSession to use. If none is provided, a new one will be created</p></li>
 <li><p><strong>verbatim_mode</strong> -- Whether to use verbatim boxes to avoid recompilation</p></li>
+<li><p><strong>batch_mode</strong> -- Run circuits in batch mode when running measurements.                     Does not work when circuits define different numbers of shots.</p></li>
 </ul>
 </dd>
 </dl>
@@ -178,15 +183,15 @@ default LocalSimulator will be used.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialise the BraketBackend class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>device</strong> -- Optional ARN of the Braket device to use. If none is provided, the
-default LocalSimulator will be used.</p></li>
+<li><p><strong>device</strong> -- Optional ARN of the Braket device to use. If none is provided, the                     default LocalSimulator will be used.</p></li>
 <li><p><strong>aws_session</strong> -- Optional AwsSession to use. If none is provided, a new one will be created</p></li>
 <li><p><strong>verbatim_mode</strong> -- Whether to use verbatim boxes to avoid recompilation</p></li>
+<li><p><strong>batch_mode</strong> -- Run circuits in batch mode when running measurements.                     Does not work when circuits define different numbers of shots.</p></li>
 </ul>
 </dd>
 </dl>
@@ -196,6 +201,23 @@ default LocalSimulator will be used.</p></li>
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qoqo_for_braket.BraketBackend.__weakref__" title="Link to this definition"></a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend._prepare_circuit_for_run">
+<span class="sig-name descname"><span class="pre">_prepare_circuit_for_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Circuit</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Circuit</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend._prepare_circuit_for_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend._prepare_circuit_for_run" title="Link to this definition"></a></dt>
+<dd><p>Prepares a braket circuit for running on braket.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>circuit</strong> (<em>Circuit</em>) -- The qoqo Circuit that should be run.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The braket circuit, the number of shots and the readout.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(BraketCircuit, int, str)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -213,6 +235,28 @@ registers are not supported.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(AwsQuantumTask, {readout})</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- Circuit contains multiple ways to set the number of measurements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend._run_circuits_batch">
+<span class="sig-name descname"><span class="pre">_run_circuits_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Circuit</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">AwsQuantumTaskBatch</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend._run_circuits_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend._run_circuits_batch" title="Link to this definition"></a></dt>
+<dd><p>Run a list of Circuits on a AWS backend in batch mode.</p>
+<p>The default number of shots for the simulation is 100.
+Any kind of Measurement instruction only works as intended if
+it is the last instruction in the Circuit.
+Currently only one simulation is performed, meaning different measurements on different
+registers are not supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>circuits</strong> (<em>List</em><em>[</em><em>Circuit</em><em>]</em>) -- the Circuits to simulate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(AwsQuantumTaskBatch, {readout})</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ValueError</strong> -- Circuit contains multiple ways to set the number of measurements</p>
@@ -311,6 +355,30 @@ registers are not supported.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>QueuedCircuitRun</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_circuits_batch">
+<span class="sig-name descname"><span class="pre">run_circuits_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Circuit</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_circuits_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_circuits_batch" title="Link to this definition"></a></dt>
+<dd><p>Run a list of Circuits on a AWS backend in batch mode.</p>
+<p>The default number of shots for the simulation is 100.
+Any kind of Measurement instruction only works as intended if
+it is the last instruction in the Circuit.
+Currently only one simulation is performed, meaning different measurements on different
+registers are not supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>circuits</strong> (<em>List</em><em>[</em><em>Circuit</em><em>]</em>) -- the Circuit to simulate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Tuple[Dict[str, List[List[bool]]],</dt><dd><p>Dict[str, List[List[float]]],
+Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.</p>
+</dd>
+</dl>
+</p>
 </dd>
 </dl>
 </dd></dl>
