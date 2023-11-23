@@ -4,6 +4,8 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.3.0
+
 * Adding option to run circuits from measurements in aws braket batch mode
 
 ## 0.2.6
