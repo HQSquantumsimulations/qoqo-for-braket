@@ -14,6 +14,7 @@
 
 from typing import Tuple, Dict, List, Any, Optional, Union
 from qoqo import Circuit
+from braket.circuits import Circuit as BraketCircuit
 from qoqo import operations as ops
 import qoqo_qasm
 from qoqo_for_braket.interface import (
@@ -24,11 +25,11 @@ from qoqo_for_braket.interface import (
 
 from qoqo_for_braket.post_processing import _post_process_circuit_result
 from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun
-from braket.aws import AwsQuantumTask, AwsDevice
+from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.aws.aws_session import AwsSession
-
+import numpy as np
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
@@ -49,6 +50,8 @@ class BraketBackend:
                      AwsSession will be created automatically.
         verbatim_mode: Only use native gates for real devices and block
                        recompilation by devices
+        batch_mode: Run circuits in batch mode when running measurements.
+                    Does not work when circuits define different numbers of shots.
     """
 
     def __init__(
@@ -56,14 +59,18 @@ class BraketBackend:
         device: Optional[str] = None,
         aws_session: Optional[AwsSession] = None,
         verbatim_mode: bool = False,
+        batch_mode: bool = False,
     ) -> None:
         """Initialise the BraketBackend class.
 
         Args:
-            device: Optional ARN of the Braket device to use. If none is provided, the
+            device: Optional ARN of the Braket device to use. If none is provided, the \
                     default LocalSimulator will be used.
             aws_session: Optional AwsSession to use. If none is provided, a new one will be created
             verbatim_mode: Whether to use verbatim boxes to avoid recompilation
+            batch_mode: Run circuits in batch mode when running measurements. \
+                    Does not work when circuits define different numbers of shots.
+
         """
         self.aws_session = aws_session
         self.device = "braket_sv" if device is None else device
@@ -75,6 +82,7 @@ class BraketBackend:
         self.__force_oqc_verbatim = False
         self.__max_circuit_length = 100
         self.__max_number_shots = 100
+        self.batch_mode = batch_mode
 
     def allow_use_actual_hardware(self) -> None:
         """Allow the use of actual hardware - will cost money."""
@@ -164,6 +172,61 @@ class BraketBackend:
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
         """
+        (task_specification, shots, readout) = self._prepare_circuit_for_run(circuit)
+        return (
+            self.__create_device().run(task_specification, shots=shots),
+            {"readout_name": readout},
+        )
+
+    # runs a circuit internally and can be used to produce sync and async results
+    def _run_circuits_batch(
+        self,
+        circuits: List[Circuit],
+    ) -> Tuple[AwsQuantumTaskBatch, List[Dict[Any, Any]]]:
+        """Run a list of Circuits on a AWS backend in batch mode.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it is the last instruction in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuits (List[Circuit]): the Circuits to simulate.
+
+        Returns:
+            (AwsQuantumTaskBatch, {readout})
+
+        Raises:
+            ValueError: Circuit contains multiple ways to set the number of measurements
+        """
+        task_specifications: List[BraketCircuit] = []
+        shots_list = []
+        readouts = []
+        for circuit in circuits:
+            (task_specification, shots, readout) = self._prepare_circuit_for_run(circuit)
+            task_specification.append(task_specification)
+            shots_list.append(shots)
+            readouts.append({"readout_name": readout})
+        unique_shots = np.unique(shots_list)
+        if len(unique_shots) > 1:
+            raise ValueError("Circuits contains multiple ways to set the number of measurements")
+        else:
+            shots = unique_shots[0]
+        return (
+            self.__create_device().run_batch(task_specifications, shots=shots),
+            readouts,
+        )
+
+    def _prepare_circuit_for_run(self, circuit: Circuit) -> Tuple[BraketCircuit, int, str]:
+        """Prepares a braket circuit for running on braket.
+
+        Args:
+            circuit (Circuit): The qoqo Circuit that should be run.
+
+        Returns:
+            (BraketCircuit, int, str): The braket circuit, the number of shots and the readout.
+        """
         measurement_vector: List[ops.Operation] = [
             item
             for sublist in [
@@ -211,10 +274,7 @@ class BraketBackend:
                 raise ValueError(
                     "Circuit generated is longer that the max circuit length allowed for hardware"
                 )
-        return (
-            self.__create_device().run(task_specification, shots=shots),
-            {"readout_name": readout},
-        )
+        return (task_specification, shots, readout)
 
     def run_circuit(
         self, circuit: Circuit
@@ -243,6 +303,45 @@ class BraketBackend:
         results = quantum_task.result()
         return _post_process_circuit_result(results, metadata)
 
+    def run_circuits_batch(
+        self, circuits: List[Circuit]
+    ) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        """Run a list of Circuits on a AWS backend in batch mode.
+
+        The default number of shots for the simulation is 100.
+        Any kind of Measurement instruction only works as intended if
+        it is the last instruction in the Circuit.
+        Currently only one simulation is performed, meaning different measurements on different
+        registers are not supported.
+
+        Args:
+            circuits (List[Circuit]): the Circuit to simulate.
+
+        Returns:
+            Tuple[Dict[str, List[List[bool]]],
+                  Dict[str, List[List[float]]],
+                  Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.
+        """
+        (quantum_task_batch, batch_metadata) = self._run_circuits_batch(circuits)
+        bool_register_dict: Dict[str, List[List[bool]]] = {}
+        float_register_dict: Dict[str, List[List[float]]] = {}
+        complex_register_dict: Dict[str, List[List[complex]]] = {}
+        for quantum_task, metadata in zip(quantum_task_batch, batch_metadata):
+            results = quantum_task.result()
+            (
+                tmp_bool_register_dict,
+                tmp_float_register_dict,
+                tmp_complex_register_dict,
+            ) = _post_process_circuit_result(results, metadata)
+            bool_register_dict.update(tmp_bool_register_dict)
+            float_register_dict.update(tmp_float_register_dict)
+            complex_register_dict.update(tmp_complex_register_dict)
+        return (bool_register_dict, float_register_dict, complex_register_dict)
+
     def run_measurement_registers(
         self, measurement: Any
     ) -> Tuple[
@@ -264,22 +363,29 @@ class BraketBackend:
         output_bit_register_dict: Dict[str, List[List[bool]]] = {}
         output_float_register_dict: Dict[str, List[List[float]]] = {}
         output_complex_register_dict: Dict[str, List[List[complex]]] = {}
-
+        run_circuits = []
         for circuit in measurement.circuits():
             if constant_circuit is None:
-                run_circuit = circuit
+                run_circuits.append(circuit)
             else:
-                run_circuit = constant_circuit + circuit
-
+                run_circuits.append(constant_circuit + circuit)
+        if self.batch_mode:
             (
-                tmp_bit_register_dict,
-                tmp_float_register_dict,
-                tmp_complex_register_dict,
-            ) = self.run_circuit(run_circuit)
+                output_bit_register_dict,
+                output_float_register_dict,
+                output_complex_register_dict,
+            ) = self.run_circuits_batch(run_circuits)
+        else:
+            for run_circuit in run_circuits:
+                (
+                    tmp_bit_register_dict,
+                    tmp_float_register_dict,
+                    tmp_complex_register_dict,
+                ) = self.run_circuit(run_circuit)
 
-            output_bit_register_dict.update(tmp_bit_register_dict)
-            output_float_register_dict.update(tmp_float_register_dict)
-            output_complex_register_dict.update(tmp_complex_register_dict)
+                output_bit_register_dict.update(tmp_bit_register_dict)
+                output_float_register_dict.update(tmp_float_register_dict)
+                output_complex_register_dict.update(tmp_complex_register_dict)
 
         return (
             output_bit_register_dict,

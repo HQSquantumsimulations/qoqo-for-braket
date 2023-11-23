@@ -2,6 +2,10 @@
 
 This changelog track changes to the qoqo-for-braket project starting at version 0.1.0
 
+## Unpublished
+
+* Adding option to run circuits from measurements in aws braket batch mode
+
 ## 0.2.6
 
 * Added VariableMSXX gate for ionq interface
