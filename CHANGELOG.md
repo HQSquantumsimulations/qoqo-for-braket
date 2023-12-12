@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.3.1
+
+* Updated to pyo3 0.20
+
 ## 0.3.0
 
 * Adding option to run circuits from measurements in aws braket batch mode
