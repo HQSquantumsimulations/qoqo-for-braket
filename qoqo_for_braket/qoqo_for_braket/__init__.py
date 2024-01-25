@@ -13,4 +13,4 @@
 """Qoqo interface to the AWS braket service."""
 from qoqo_for_braket import post_processing
 from qoqo_for_braket.backend import BraketBackend
-from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun

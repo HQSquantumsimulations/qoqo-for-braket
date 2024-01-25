@@ -37,5 +37,5 @@ def _post_process_circuit_result(
     bit_results = {}
     measurements = results.measurements
     bit_field = measurements > 0
-    bit_results[metadata["readout_name"]] = bit_field
+    bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
     return (bit_results, {}, {})

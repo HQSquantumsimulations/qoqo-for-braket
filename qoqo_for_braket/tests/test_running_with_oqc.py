@@ -65,7 +65,8 @@ def test_oqc_all_gates() -> None:
     (oqc_bit_res, _, _) = backend.run_circuit(oqc_circuit)
     assert "ro" in oqc_bit_res.keys()
     oqc_registers = oqc_bit_res["ro"]
-    assert oqc_registers.shape == (10, 4)
+    assert len(oqc_registers) == 10
+    assert len(oqc_registers[0]) == 4
     for oqc_measurement in oqc_registers:
         for qubit in oqc_measurement:
             assert qubit == 1 or qubit == 0

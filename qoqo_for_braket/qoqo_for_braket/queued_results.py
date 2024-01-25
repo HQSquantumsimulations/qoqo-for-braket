@@ -3,9 +3,12 @@
 
 """Provides the QueuedCircuitRun class for async runs."""
 
-from typing import Any, Dict, Optional, List, Tuple
+from typing import Any, Dict, Optional, List, Tuple, Union
 from braket.tasks.local_quantum_task import LocalQuantumTask
 from braket.tasks import QuantumTask
+from braket.aws import AwsQuantumJob
+from braket.jobs.local import LocalQuantumJob
+from braket.jobs.quantum_job import QuantumJob
 import json
 import boto3
 from qoqo_for_braket.post_processing import _post_process_circuit_result
@@ -17,8 +20,8 @@ from braket.tracking.tracking_events import _TaskCompletionEvent
 from braket.tracking.tracking_context import broadcast_event
 import numpy as np
 from qoqo import measurements
-
-
+import tempfile
+import os
 class QueuedCircuitRun:
     """Queued Result of the circuit."""
 
@@ -290,3 +293,130 @@ class QueuedProgramRun:
         instance = QueuedProgramRun(measurement, queued_circuits_deserialised)
         instance._registers = registers
         return instance
+
+class QueuedHybridRun:
+    """Queued Result of the running a QuantumProgram with a hybrid job."""
+
+    def __init__(
+        self, session: AwsSession, job: Optional[QuantumJob], metadata: Dict[Any, Any]
+    ) -> None:
+        """Initialise the QueuedCircuitRun class.
+
+        Args:
+            session: Braket AwsSession to use
+            job: Braket QuantumJob to query
+            metadata: Additional information about the circuit
+        """
+        self._job: Optional[QuantumJob] = job
+        self._results: Optional[Union[
+            Tuple[
+                Dict[str, List[List[bool]]],
+                Dict[str, List[List[float]]],
+                Dict[str, List[List[complex]]],
+            ],Dict[str, float]]
+        ] = None
+        self.session = session
+        self.internal_metadata = metadata
+        if self._job is not None:
+            self.aws_metadata = self._job.metadata()
+        else:
+            self.aws_metadata = None
+        if isinstance(self._job, LocalQuantumJob()):
+            results = self._job.result()
+            self._results = results
+
+    def to_json(self) -> str:
+        """Convert self to a json string.
+
+        Returns:
+            str: self as a json string
+        """
+        results = None
+        if self._results is not None:
+            results = {}
+            for key, value in self._results[0].items():
+                if isinstance(value, np.ndarray):
+                    results[key] = value.tolist()
+                else:
+                    results[key] = value
+        if isinstance(self._task, LocalQuantumJob):
+            json_dict = {
+                "type": "QueuedLocalQuantumJob",
+                "arn": None,
+                "region": None,
+                "metadata": self.internal_metadata,
+                "results": results,
+            }
+        if isinstance(self._task, AwsQuantumTask):
+            json_dict = {
+                "type": "QueuedAWSQuantumJob",
+                "arn": self._job.arn,
+                "region": self._job.arn.split(":")[3],
+                "metadata": self.internal_metadata,
+                "results": results,
+            }
+
+        return json.dumps(json_dict)
+
+    @staticmethod
+    def from_json(string: str) -> "QueuedCircuitRun":
+        """Convert a json string to an instance of QueuedCircuitRun.
+
+        Args:
+            string: json string to convert.
+
+        Returns:
+            QueuedCircuitRun: converted json string
+        """
+        json_dict = json.loads(string)
+        if json_dict["type"] == "QueuedLocalQuantumJob":
+            session = None
+            task = None
+        elif json_dict["type"] == "QueuedAWSQuantumJob":
+            session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
+            task = AwsQuantumTask(json_dict["arn"])
+
+        instance = QueuedHybridRun(session=session, task=task, metadata=json_dict["metadata"])
+        if json_dict["results"] is not None:
+            instance._results = (json_dict["results"], {}, {})
+
+        return instance
+
+    def poll_result(
+        self,
+    ) -> Optional[
+        Union[Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ], Dict[str, float]]
+    ]:
+        """Poll the result once.
+
+        Returns:
+            Optional[Tuple[Dict[str, List[List[bool]]],
+                           Dict[str, List[List[float]]],
+                           Dict[str, List[List[complex]]],]]: Result if task was successful.
+
+        Raises:
+            RuntimeError: job failed or cancelled
+        """
+        if self._results is not None:
+            return self._results
+        else:
+            if isinstance(self._job, AwsQuantumJob()):
+                state = self._job.state()
+                if state == "COMPLETED":
+                    with tempfile.TemporaryDirectory() as tmpdir:
+                        jobname = self._job.name
+                        self._job.download_result(tmpdir)
+                        with open(os.path.join(os.path.join(tmpdir, jobname),"output.json")) as f:
+                            outputs = json.load(f)
+                        self._results = outputs
+                elif state == "FAILED":
+                    raise RuntimeError("")
+                elif state == "CANCELED":
+                    raise RuntimeError("")
+            else:
+                return None
+        return self._results
