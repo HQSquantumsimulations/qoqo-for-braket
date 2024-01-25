@@ -51,7 +51,8 @@ def test_all_no_device(device: Optional[str]) -> None:
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 
-    assert registers.shape == (2, 3)
+    assert len(registers) == 2
+    assert len(registers[0]) == 3
 
     for reg in registers:
         npt.assert_array_equal(reg, [True, False, False])
@@ -73,7 +74,7 @@ def test_measurement_register_classicalregister(operations: List[Any]):
 
     try:
         output = backend.run_measurement_registers(measurement=measurement)
-    except:
+    except Exception:
         assert False
 
     assert len(output[0]["ri"][0]) == len(involved_qubits)
@@ -93,13 +94,13 @@ def test_measurement(operations: List[Any]):
 
     circuit += ops.PragmaRepeatedMeasurement("ri", 10)
 
-    input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
+    measurement_input = PauliZProductInput(number_qubits=len(involved_qubits), use_flipped_measurement=True)
 
-    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=input)
+    measurement = PauliZProduct(constant_circuit=None, circuits=[circuit], input=measurement_input)
 
     try:
         _ = backend.run_measurement(measurement=measurement)
-    except:
+    except Exception:
         assert False
 
 

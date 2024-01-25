@@ -40,7 +40,7 @@ def test_serialisation_circuit() -> None:
     assert deserialised._results[1] == queued._results[1]
     assert deserialised._results[2] == queued._results[2]
     assert deserialised._results[0].keys() == queued._results[0].keys()
-    assert (deserialised._results[0]["ro"] == queued._results[0]["ro"]).all()
+    assert deserialised._results[0]["ro"] == queued._results[0]["ro"]
 
 
 @pytest.mark.skip()
@@ -130,7 +130,8 @@ def test_serialisation_program() -> None:
         deserialised._registers[2],
     )
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert results["0Z"] == results_queued["0Z"] == 1.0
+    assert np.isclose(results["0Z"], 1.0)
+    assert np.isclose(results_queued["0Z"], 1.0)
 
     # After polling: result is not None
     i = 0
@@ -144,7 +145,8 @@ def test_serialisation_program() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert results["0Z"] == results_queued["0Z"] == 1.0
+    assert np.isclose(results["0Z"], 1.0)
+    assert np.isclose(results_queued["0Z"], 1.0)
 
 
 @pytest.mark.skip()
@@ -203,7 +205,8 @@ def test_serialisation_program_async() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert results["0Z"] == results_queued["0Z"] == 1.0
+    assert np.isclose(results["0Z"], 1.0)
+    assert np.isclose(results_queued["0Z"], 1.0)
 
 
 if __name__ == "__main__":

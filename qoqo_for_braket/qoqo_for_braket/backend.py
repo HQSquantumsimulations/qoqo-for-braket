@@ -42,6 +42,7 @@ REMOTE_SIMULATORS_LIST: List[str] = [
     "arn:aws:braket:::device/quantum-simulator/amazon/dm1",
 ]
 
+
 class BraketBackend:
     """Qoqo backend execution qoqo objects on AWS braket.
 
@@ -417,8 +418,10 @@ class BraketBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
-    
-    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
+
+    def run_measurement_registers_hybrid(
+        self, measurement: Any
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -435,11 +438,11 @@ class BraketBackend:
                   Dict[str, List[List[float]]],
                   Dict[str, List[List[complex]]]]
         """
-        job = self._run_measurement_registers_hybrid(self, measurement)
+        job = self._run_measurement_registers_hybrid(measurement)
         with tempfile.TemporaryDirectory() as tmpdir:
             jobname = job.name
             job.download_result(tmpdir)
-            with open(os.path.join(os.path.join(tmpdir, jobname),"output.json")) as f:
+            with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
                 outputs = json.load(f)
         return outputs
 
@@ -454,7 +457,7 @@ class BraketBackend:
         Returns:
             QueuedQuantumProgramHybrid
         """
-        job = self._run_measurement_registers_hybrid(self, measurement)
+        job = self._run_measurement_registers_hybrid(measurement)
         return QueuedHybridRun(self.aws_session, job)
 
     def _run_measurement_registers_hybrid(self, measurement: Any) -> AwsQuantumJob:
@@ -478,21 +481,25 @@ class BraketBackend:
         helper_file_path = os.path.join(file_path, "qoqo_hybrid_helper.py")
         # create named temporary directory with tempfile
         os.mkdir("_tmp_hybrid_helper")
-        shutil.copyfile(helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py"))
+        shutil.copyfile(
+            helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
+        )
         shutil.copyfile(requirements_path, os.path.join("_tmp_hybrid_helper", "requirements.txt"))
         with open(".tmp_measurement_input.json", "w") as f:
             f.write(measurement_json)
         with open(".tmp_config_input.json", "w") as f:
             json.dump(self._create_config(), f)
         job = AwsQuantumJob.create(
-            device = self.device,
+            device=self.device,
             source_module="_tmp_hybrid_helper",
             entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
             wait_until_complete=True,
-            input_data={"measurement": ".tmp_measurement_input.json",
-                        "config": ".tmp_config_input.json"}
+            input_data={
+                "measurement": ".tmp_measurement_input.json",
+                "config": ".tmp_config_input.json",
+            },
         )
-        shutil.rmtree('_tmp_hybrid_helper')
+        shutil.rmtree("_tmp_hybrid_helper")
         os.remove(".tmp_measurement_input.json")
         os.remove(".tmp_config_input.json")
         return job

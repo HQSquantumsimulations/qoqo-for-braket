@@ -22,6 +22,8 @@ import numpy as np
 from qoqo import measurements
 import tempfile
 import os
+
+
 class QueuedCircuitRun:
     """Queued Result of the circuit."""
 
@@ -294,6 +296,7 @@ class QueuedProgramRun:
         instance._registers = registers
         return instance
 
+
 class QueuedHybridRun:
     """Queued Result of the running a QuantumProgram with a hybrid job."""
 
@@ -308,12 +311,15 @@ class QueuedHybridRun:
             metadata: Additional information about the circuit
         """
         self._job: Optional[QuantumJob] = job
-        self._results: Optional[Union[
-            Tuple[
-                Dict[str, List[List[bool]]],
-                Dict[str, List[List[float]]],
-                Dict[str, List[List[complex]]],
-            ],Dict[str, float]]
+        self._results: Optional[
+            Union[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ],
+                Dict[str, float],
+            ]
         ] = None
         self.session = session
         self.internal_metadata = metadata
@@ -385,11 +391,14 @@ class QueuedHybridRun:
     def poll_result(
         self,
     ) -> Optional[
-        Union[Tuple[
-            Dict[str, List[List[bool]]],
-            Dict[str, List[List[float]]],
-            Dict[str, List[List[complex]]],
-        ], Dict[str, float]]
+        Union[
+            Tuple[
+                Dict[str, List[List[bool]]],
+                Dict[str, List[List[float]]],
+                Dict[str, List[List[complex]]],
+            ],
+            Dict[str, float],
+        ]
     ]:
         """Poll the result once.
 
@@ -410,7 +419,7 @@ class QueuedHybridRun:
                     with tempfile.TemporaryDirectory() as tmpdir:
                         jobname = self._job.name
                         self._job.download_result(tmpdir)
-                        with open(os.path.join(os.path.join(tmpdir, jobname),"output.json")) as f:
+                        with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
                             outputs = json.load(f)
                         self._results = outputs
                 elif state == "FAILED":
