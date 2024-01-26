@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.4.0-alpha.0
+
+* Starting developing for hybrid jobs
+
 ## 0.3.1
 
 * Updated to pyo3 0.20
