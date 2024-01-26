@@ -302,9 +302,7 @@ class BraketBackend:
                 )
         return (task_specification, shots, readout)
 
-    def run_circuit(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def run_circuit(self, circuit: Circuit) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -329,9 +327,7 @@ class BraketBackend:
         results = quantum_task.result()
         return _post_process_circuit_result(results, metadata)
 
-    def run_circuits_batch(
-        self, circuits: List[Circuit]
-    ) -> Tuple[
+    def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -368,9 +364,7 @@ class BraketBackend:
             complex_register_dict.update(tmp_complex_register_dict)
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
-    def run_measurement_registers(
-        self, measurement: Any
-    ) -> Tuple[
+    def run_measurement_registers(self, measurement: Any) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -419,9 +413,7 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement_registers_hybrid(
-        self, measurement: Any
-    ) -> Tuple[
+    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
