@@ -155,9 +155,9 @@ class QueuedCircuitRun:
                     )
                     self._results = processed_results
                 elif state == "FAILED":
-                    raise RuntimeError("")
+                    raise RuntimeError("Job has failed on AWS")
                 elif state == "CANCELED":
-                    raise RuntimeError("")
+                    raise RuntimeError("Job was cancelled by AWS")
             else:
                 return None
         return self._results
@@ -423,9 +423,9 @@ class QueuedHybridRun:
                             outputs = json.load(f)
                         self._results = outputs
                 elif state == "FAILED":
-                    raise RuntimeError("")
+                    raise RuntimeError("Job has failed on AWS")
                 elif state == "CANCELED":
-                    raise RuntimeError("")
+                    raise RuntimeError("Job was cancelled by AWS")
             else:
                 return None
         return self._results
