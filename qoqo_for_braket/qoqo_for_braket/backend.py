@@ -458,7 +458,7 @@ class BraketBackend:
             QueuedQuantumProgramHybrid
         """
         job = self._run_measurement_registers_hybrid(measurement)
-        return QueuedHybridRun(self.aws_session, job)
+        return QueuedHybridRun(self.aws_session, job, job.metadata())
 
     def _run_measurement_registers_hybrid(self, measurement: Any) -> AwsQuantumJob:
         """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.

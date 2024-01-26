@@ -312,13 +312,10 @@ class QueuedHybridRun:
         """
         self._job: Optional[QuantumJob] = job
         self._results: Optional[
-            Union[
-                Tuple[
-                    Dict[str, List[List[bool]]],
-                    Dict[str, List[List[float]]],
-                    Dict[str, List[List[complex]]],
-                ],
-                Dict[str, float],
+            Tuple[
+                Dict[str, List[List[bool]]],
+                Dict[str, List[List[float]]],
+                Dict[str, List[List[complex]]],
             ]
         ] = None
         self.session = session
@@ -337,7 +334,7 @@ class QueuedHybridRun:
         Returns:
             str: self as a json string
         """
-        results = None
+        results: Optional[Dict[str, Any]] = None
         if self._results is not None:
             results = {}
             for key, value in self._results[0].items():
@@ -345,7 +342,7 @@ class QueuedHybridRun:
                     results[key] = value.tolist()
                 else:
                     results[key] = value
-        if isinstance(self._task, LocalQuantumJob):
+        if isinstance(self._job, LocalQuantumJob):
             json_dict = {
                 "type": "QueuedLocalQuantumJob",
                 "arn": None,
@@ -353,7 +350,7 @@ class QueuedHybridRun:
                 "metadata": self.internal_metadata,
                 "results": results,
             }
-        if isinstance(self._task, AwsQuantumTask):
+        if isinstance(self._job, AwsQuantumJob):
             json_dict = {
                 "type": "QueuedAWSQuantumJob",
                 "arn": self._job.arn,
@@ -365,24 +362,24 @@ class QueuedHybridRun:
         return json.dumps(json_dict)
 
     @staticmethod
-    def from_json(string: str) -> "QueuedCircuitRun":
-        """Convert a json string to an instance of QueuedCircuitRun.
+    def from_json(string: str) -> "QueuedHybridRun":
+        """Convert a json string to an instance of QueuedHybridRun.
 
         Args:
             string: json string to convert.
 
         Returns:
-            QueuedCircuitRun: converted json string
+            QueuedHybridRun: converted json string
         """
         json_dict = json.loads(string)
         if json_dict["type"] == "QueuedLocalQuantumJob":
             session = None
-            task = None
+            job = None
         elif json_dict["type"] == "QueuedAWSQuantumJob":
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
-            task = AwsQuantumTask(json_dict["arn"])
+            job = AwsQuantumJob(json_dict["arn"])
 
-        instance = QueuedHybridRun(session=session, task=task, metadata=json_dict["metadata"])
+        instance = QueuedHybridRun(session=session, job=job, metadata=json_dict["metadata"])
         if json_dict["results"] is not None:
             instance._results = (json_dict["results"], {}, {})
 
