@@ -67,7 +67,8 @@ def test_rigetti_all_gates() -> None:
     (rigetti_bit_res, _, _) = backend.run_circuit(rigetti_circuit)
     assert "ro" in rigetti_bit_res.keys()
     rigetti_registers = rigetti_bit_res["ro"]
-    assert rigetti_registers.shape == (10, 4)
+    assert len(rigetti_registers) == 10
+    assert len(rigetti_registers[0]) == 4
     for rigetti_measurement in rigetti_registers:
         for qubit in rigetti_measurement:
             assert qubit == 1 or qubit == 0

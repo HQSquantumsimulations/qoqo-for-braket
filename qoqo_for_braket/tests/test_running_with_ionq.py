@@ -68,7 +68,8 @@ def test_ionq_all_gates() -> None:
     (ionq_bit_res, _, _) = backend.run_circuit(ionq_circuit)
     assert "ro" in ionq_bit_res.keys()
     ionq_registers = ionq_bit_res["ro"]
-    assert ionq_registers.shape == (10, 4)
+    assert len(ionq_registers) == 10
+    assert len(ionq_registers[0]) == 4
     for ionq_measurement in ionq_registers:
         for qubit in ionq_measurement:
             assert qubit == 1 or qubit == 0

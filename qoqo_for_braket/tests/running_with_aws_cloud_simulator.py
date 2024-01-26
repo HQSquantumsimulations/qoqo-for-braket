@@ -42,7 +42,8 @@ backend.change_max_shots(2)
 # assert "ro" in bit_res.keys()
 # registers = bit_res["ro"]
 
-# assert registers.shape == (2, 3)
+# assert len(registers) == 2
+# assert len(registers[0]) == 3
 
 # for reg in registers:
 #     npt.assert_array_equal(reg, [True, True, True])

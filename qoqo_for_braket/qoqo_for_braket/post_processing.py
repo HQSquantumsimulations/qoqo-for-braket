@@ -13,9 +13,7 @@
 from typing import Dict, List, Tuple, Any
 
 
-def _post_process_circuit_result(
-    results: Any, metadata: Dict[Any, Any]
-) -> Tuple[
+def _post_process_circuit_result(results: Any, metadata: Dict[Any, Any]) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
     Dict[str, List[List[complex]]],
@@ -37,5 +35,5 @@ def _post_process_circuit_result(
     bit_results = {}
     measurements = results.measurements
     bit_field = measurements > 0
-    bit_results[metadata["readout_name"]] = bit_field
+    bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
     return (bit_results, {}, {})

@@ -9,13 +9,13 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Test running local operation with qasm backend."""
+"""Test running a hybrid job."""
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
 from braket.aws.aws_session import AwsSession
 from numpy import testing as npt
-
+from qoqo import measurements
 
 import os
 
@@ -31,6 +31,8 @@ circuit += ops.MeasureQubit(1, "ro", 1)
 circuit += ops.MeasureQubit(2, "ro", 2)
 circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
+measurement = measurements.ClassicalRegister(constant_circuit=None, circuits=[circuit])
+
 aws_session = AwsSession()
 backend = BraketBackend(
     aws_session=aws_session,
@@ -38,14 +40,7 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-queued = backend.run_circuit_queued(circuit)
-i = 0
-while queued.poll_result() is None:
-    i += 1
-    if i > 50:
-        raise RuntimeError("Timed out waiting for job to complete")
-(bit_res, _, _) = queued.poll_result()
-
+(bit_res, _, _) = backend.run_measurement_registers_hybrid(measurement)
 assert "ro" in bit_res.keys()
 registers = bit_res["ro"]
 

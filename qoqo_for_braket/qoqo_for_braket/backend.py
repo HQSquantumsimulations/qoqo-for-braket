@@ -12,6 +12,9 @@
 
 """Provides the BraketBackend class."""
 
+import os
+import shutil
+import tempfile
 from typing import Tuple, Dict, List, Any, Optional, Union
 from qoqo import Circuit
 from braket.circuits import Circuit as BraketCircuit
@@ -22,14 +25,15 @@ from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
     oqc_verbatim_interface,
 )
-
+import json
 from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun
-from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun
+from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch, AwsQuantumJob
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.aws.aws_session import AwsSession
 import numpy as np
+
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
@@ -60,6 +64,7 @@ class BraketBackend:
         aws_session: Optional[AwsSession] = None,
         verbatim_mode: bool = False,
         batch_mode: bool = False,
+        use_hybrid_jobs: bool = True,
     ) -> None:
         """Initialise the BraketBackend class.
 
@@ -70,6 +75,7 @@ class BraketBackend:
             verbatim_mode: Whether to use verbatim boxes to avoid recompilation
             batch_mode: Run circuits in batch mode when running measurements. \
                     Does not work when circuits define different numbers of shots.
+            use_hybrid_jobs: Uses hybrid jobs to run measurements and register measurements.
 
         """
         self.aws_session = aws_session
@@ -83,6 +89,26 @@ class BraketBackend:
         self.__max_circuit_length = 100
         self.__max_number_shots = 100
         self.batch_mode = batch_mode
+        self.use_hybrid_jobs = use_hybrid_jobs
+
+    def _create_config(self) -> Dict[str, Any]:
+        return {
+            "device": self.device,
+            "max_shots": self.__max_number_shots,
+            "max_circuit_length": self.__max_circuit_length,
+            "use_actual_hardware": self.__use_actual_hardware,
+            "force_rigetti_verbatim": self.__force_rigetti_verbatim,
+            "force_ionq_verbatim": self.__force_ionq_verbatim,
+        }
+
+    def _load_config(self, config: Dict[str, Any]) -> None:
+        self.device = config["device"]
+        self.__max_number_shots = config["max_shots"]
+        self.__max_circuit_length = config["max_circuit_length"]
+        self.__use_actual_hardware = config["use_actual_hardware"]
+        self.__force_rigetti_verbatim = config["force_rigetti_verbatim"]
+        self.__force_ionq_verbatim = config["force_ionq_verbatim"]
+        self.batch_mode = config["batch_mode"]
 
     def allow_use_actual_hardware(self) -> None:
         """Allow the use of actual hardware - will cost money."""
@@ -276,9 +302,7 @@ class BraketBackend:
                 )
         return (task_specification, shots, readout)
 
-    def run_circuit(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def run_circuit(self, circuit: Circuit) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -303,9 +327,7 @@ class BraketBackend:
         results = quantum_task.result()
         return _post_process_circuit_result(results, metadata)
 
-    def run_circuits_batch(
-        self, circuits: List[Circuit]
-    ) -> Tuple[
+    def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -342,9 +364,7 @@ class BraketBackend:
             complex_register_dict.update(tmp_complex_register_dict)
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
-    def run_measurement_registers(
-        self, measurement: Any
-    ) -> Tuple[
+    def run_measurement_registers(self, measurement: Any) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -392,6 +412,89 @@ class BraketBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.
+
+        Using hybrid jobs allows us to naturally group the circuits from a measurement.
+
+        Args:
+            measurement: The measurement that is run.
+
+        Returns:
+            Tuple[Dict[str, List[List[bool]]],
+                  Dict[str, List[List[float]]],
+                  Dict[str, List[List[complex]]]]
+        """
+        job = self._run_measurement_registers_hybrid(measurement)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jobname = job.name
+            job.download_result(tmpdir)
+            with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
+                outputs = json.load(f)
+        return outputs
+
+    def run_measurement_registers_hybrid_queued(self, measurement: Any) -> QueuedHybridRun:
+        """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.
+
+        Using hybrid jobs allows us to naturally group the circuits from a measurement.
+
+        Args:
+            measurement: The measurement that is run.
+
+        Returns:
+            QueuedQuantumProgramHybrid
+        """
+        job = self._run_measurement_registers_hybrid(measurement)
+        return QueuedHybridRun(self.aws_session, job, job.metadata())
+
+    def _run_measurement_registers_hybrid(self, measurement: Any) -> AwsQuantumJob:
+        """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.
+
+        Using hybrid jobs allows us to naturally group the circuits from a measurement.
+
+        Args:
+            measurement: The measurement that is run.
+
+        Returns:
+            Tuple[Dict[str, List[List[bool]]],
+                  Dict[str, List[List[float]]],
+                  Dict[str, List[List[complex]]]]
+        """
+        # get path of this file
+        file_path = os.path.dirname(os.path.realpath(__file__))
+        # get path of the requirements.txt file
+        requirements_path = os.path.join(file_path, "qoqo_requirements.txt")
+        measurement_json = measurement.to_json()
+        helper_file_path = os.path.join(file_path, "qoqo_hybrid_helper.py")
+        # create named temporary directory with tempfile
+        os.mkdir("_tmp_hybrid_helper")
+        shutil.copyfile(
+            helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
+        )
+        shutil.copyfile(requirements_path, os.path.join("_tmp_hybrid_helper", "requirements.txt"))
+        with open(".tmp_measurement_input.json", "w") as f:
+            f.write(measurement_json)
+        with open(".tmp_config_input.json", "w") as f:
+            json.dump(self._create_config(), f)
+        job = AwsQuantumJob.create(
+            device=self.device,
+            source_module="_tmp_hybrid_helper",
+            entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
+            wait_until_complete=True,
+            input_data={
+                "measurement": ".tmp_measurement_input.json",
+                "config": ".tmp_config_input.json",
+            },
+        )
+        shutil.rmtree("_tmp_hybrid_helper")
+        os.remove(".tmp_measurement_input.json")
+        os.remove(".tmp_config_input.json")
+        return job
 
     def run_measurement(self, measurement: Any) -> Optional[Dict[str, float]]:
         """Run a circuit with the AWS Braket backend.
