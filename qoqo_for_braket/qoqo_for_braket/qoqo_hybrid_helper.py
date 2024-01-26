@@ -1,10 +1,12 @@
+"""Qoqo hybrid helper for running hybrid jobs on AWS."""
 from qoqo_for_braket import BraketBackend
 from qoqo import measurements
 import os
 import json
 
 
-def run_measurement_register():
+def run_measurement_register() -> None:
+    """Run the measurement register on AWS."""
     input_dir = os.environ["AMZN_BRAKET_INPUT_DIR"]
     with open(os.path.join(input_dir, "measurement/.tmp_measurement_input.json"), "r") as f:
         measurement_json = f.read()

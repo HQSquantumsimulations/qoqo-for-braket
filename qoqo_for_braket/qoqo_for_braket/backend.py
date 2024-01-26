@@ -33,7 +33,7 @@ from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.aws.aws_session import AwsSession
 import numpy as np
-from qoqo import measurements
+
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
