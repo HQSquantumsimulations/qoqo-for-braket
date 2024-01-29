@@ -1,6 +1,6 @@
 [package]
 name = "roqoqo_for_braket_devices"
-version = "0.4.0-alpha.1"
+version = "0.4.0-alpha.2"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
