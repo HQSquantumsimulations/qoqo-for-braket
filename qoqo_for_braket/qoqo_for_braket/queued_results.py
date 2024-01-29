@@ -324,7 +324,7 @@ class QueuedHybridRun:
             self.aws_metadata = self._job.metadata()
         else:
             self.aws_metadata = None
-        if isinstance(self._job, LocalQuantumJob()):
+        if isinstance(self._job, LocalQuantumJob):
             results = self._job.result()
             self._results = results
 
@@ -410,7 +410,7 @@ class QueuedHybridRun:
         if self._results is not None:
             return self._results
         else:
-            if isinstance(self._job, AwsQuantumJob()):
+            if isinstance(self._job, AwsQuantumJob):
                 state = self._job.state()
                 if state == "COMPLETED":
                     with tempfile.TemporaryDirectory() as tmpdir:
