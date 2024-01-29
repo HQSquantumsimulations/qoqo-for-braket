@@ -99,6 +99,7 @@ class BraketBackend:
             "use_actual_hardware": self.__use_actual_hardware,
             "force_rigetti_verbatim": self.__force_rigetti_verbatim,
             "force_ionq_verbatim": self.__force_ionq_verbatim,
+            "batch_mode": self.batch_mode,
         }
 
     def _load_config(self, config: Dict[str, Any]) -> None:
