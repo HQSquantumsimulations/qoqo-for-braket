@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.4.0-alpha.2
+
+* Bugfix for QueuedHybridRun isinstance checks
+
 ## 0.4.0-alpha.1
 
 * Bugfix for load_config function
