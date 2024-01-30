@@ -64,8 +64,8 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
             braket_circuit.ms(
                 op.control(),
                 op.target(),
-                0.0 - qubit_phase.get(op.control(), 0.0),
-                0.0 - qubit_phase.get(op.target(), 0.0),
+                0.0 + qubit_phase.get(op.control(), 0.0),
+                0.0 + qubit_phase.get(op.target(), 0.0),
                 op.theta(),
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
