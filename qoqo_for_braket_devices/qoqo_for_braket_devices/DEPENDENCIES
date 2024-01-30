@@ -2733,8 +2733,8 @@ limitations under the License.
 
 
 ====================================================
-indexmap 2.1.0
-https://github.com/bluss/indexmap
+indexmap 2.2.1
+https://github.com/indexmap-rs/indexmap
 by 
 A hash table with consistent order and fast iteration.
 License: Apache-2.0 OR MIT
@@ -3402,7 +3402,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-itertools 0.12.0
+itertools 0.12.1
 https://github.com/rust-itertools/itertools
 by bluss
 Extra iterator adaptors, iterator methods, free functions, and macros.
@@ -9915,7 +9915,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_for_braket_devices 0.4.0-alpha.2
+qoqo_for_braket_devices 0.4.0-alpha.3
 https://github.com/HQSquantumsimulations/qoqo_for_braket
 by HQS Quantum Simulations <info@quantumsimulations.de>
 AWS's Braket devices interface for qoqo python quantum computing toolkit
@@ -11960,7 +11960,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_for_braket_devices 0.4.0-alpha.2
+roqoqo_for_braket_devices 0.4.0-alpha.3
 https://github.com/HQSquantumsimulations/qoqo_for_braket
 by HQS Quantum Simulations <info@quantumsimulations.de>
 AWS's Braket devices interface for roqoqo rust quantum computing toolkit
@@ -13035,7 +13035,7 @@ limitations under the License.
 
 
 ====================================================
-serde 1.0.195
+serde 1.0.196
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A generic serialization/deserialization framework
@@ -13249,7 +13249,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-serde_derive 1.0.195
+serde_derive 1.0.196
 https://serde.rs
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 Macros 1.1 implementation of #[derive(Serialize, Deserialize)]
@@ -13702,7 +13702,7 @@ limitations under the License.
 
 
 ====================================================
-serde_json 1.0.111
+serde_json 1.0.113
 https://github.com/serde-rs/json
 by Erick Tryzelaar <erick.tryzelaar@gmail.com>, David Tolnay <dtolnay@gmail.com>
 A JSON serialization file format
@@ -17688,7 +17688,7 @@ limitations under the License.
 
 
 ====================================================
-wide 0.7.14
+wide 0.7.15
 https://github.com/Lokathor/wide
 by Lokathor <zefria@gmail.com>
 A crate to help you go wide.
