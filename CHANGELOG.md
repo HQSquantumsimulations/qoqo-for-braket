@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.4.0 
+
+* Released the 0.4.0-alpha.x changes as stable
+
 ## 0.4.0-alpha.3
 
 * Bugfix for the IonQ interface (VirtualZ for VariableMSXX)
