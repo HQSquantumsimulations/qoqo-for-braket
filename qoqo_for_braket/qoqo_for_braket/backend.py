@@ -450,16 +450,20 @@ class BraketBackend:
         Returns:
             QueuedQuantumProgramHybrid
         """
-        job = self._run_measurement_registers_hybrid(measurement)
+        job = self._run_measurement_registers_hybrid(measurement, wait_until_complete=False)
         return QueuedHybridRun(self.aws_session, job, job.metadata())
 
-    def _run_measurement_registers_hybrid(self, measurement: Any) -> AwsQuantumJob:
+    def _run_measurement_registers_hybrid(
+        self, measurement: Any, wait_until_complete: bool = True
+    ) -> AwsQuantumJob:
         """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.
 
         Using hybrid jobs allows us to naturally group the circuits from a measurement.
 
         Args:
             measurement: The measurement that is run.
+            wait_until_complete: Whether to wait for the job to complete.\
+                Should be False when using queued runs.
 
         Returns:
             Tuple[Dict[str, List[List[bool]]],
@@ -468,8 +472,6 @@ class BraketBackend:
         """
         # get path of this file
         file_path = os.path.dirname(os.path.realpath(__file__))
-        # get path of the requirements.txt file
-        requirements_path = os.path.join(file_path, "qoqo_requirements.txt")
         measurement_json = measurement.to_json()
         helper_file_path = os.path.join(file_path, "qoqo_hybrid_helper.py")
         # create named temporary directory with tempfile
@@ -491,7 +493,7 @@ class BraketBackend:
             device=self.device,
             source_module="_tmp_hybrid_helper",
             entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
-            wait_until_complete=True,
+            wait_until_complete=wait_until_complete,
             input_data={
                 "measurement": ".tmp_measurement_input.json",
                 "config": ".tmp_config_input.json",
