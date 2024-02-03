@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_for_braket_devices"
-version = "0.4.0-alpha.3"
+version = "0.4.0"
 dependencies = [
   'qoqo_calculator_pyo3>=1.1',
   'qoqo>=1.5',

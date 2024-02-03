@@ -477,7 +477,12 @@ class BraketBackend:
         shutil.copyfile(
             helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
         )
-        shutil.copyfile(requirements_path, os.path.join("_tmp_hybrid_helper", "requirements.txt"))
+        # qoqo-for-braket requirements needs to be updated to >= 0.4 after 0.4.0
+        # has been released.
+        requirement_lines = ["qoqo >= 1.7\n", "qoqo-for-braket == 0.4.0-alpha.3"]
+        with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
+            # write each line from requirement_lines to separate lines in file
+            f.writelines(requirement_lines)
         with open(".tmp_measurement_input.json", "w") as f:
             f.write(measurement_json)
         with open(".tmp_config_input.json", "w") as f:
