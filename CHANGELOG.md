@@ -4,25 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
-## 0.4.0 
-
-* Released the 0.4.0-alpha.x changes as stable
-
-## 0.4.0-alpha.3
+## 0.4.0
 
 * Bugfix for the IonQ interface (VirtualZ for VariableMSXX)
-
-## 0.4.0-alpha.2
-
-* Bugfix for QueuedHybridRun isinstance checks
-
-## 0.4.0-alpha.1
-
-* Bugfix for load_config function
-
-## 0.4.0-alpha.0
-
-* Starting developing for hybrid jobs
+* Added support using hybrid jobs to completely run QuantumPrograms on the cloud (qoqo QuantumProgram is serailized to json, uploaded in a AwsQuantumJob and deserialized and executed on AWS instance with qoqo and qoqo-for-braket installed from requirements)
 
 ## 0.3.1
 
