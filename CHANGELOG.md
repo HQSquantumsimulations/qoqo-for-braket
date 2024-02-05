@@ -9,7 +9,6 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 * Bugfix for the IonQ interface (VirtualZ for VariableMSXX)
 * Added support using hybrid jobs to completely run QuantumPrograms on the cloud (qoqo QuantumProgram is serailized to json, uploaded in a AwsQuantumJob and deserialized and executed on AWS instance with qoqo and qoqo-for-braket installed from requirements)
 
-
 ## 0.3.1
 
 * Updated to pyo3 0.20
