@@ -481,7 +481,7 @@ class BraketBackend:
         )
         # qoqo-for-braket requirements needs to be updated to >= 0.4 after 0.4.0
         # has been released.
-        requirement_lines = ["qoqo >= 1.7\n", "qoqo-for-braket == 0.4.0-alpha.3"]
+        requirement_lines = ["qoqo >= 1.9\n", "qoqo-for-braket == 0.4.0"]
         with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
             # write each line from requirement_lines to separate lines in file
             f.writelines(requirement_lines)
