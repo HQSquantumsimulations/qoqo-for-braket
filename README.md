@@ -9,6 +9,8 @@ There are two ways to use this repository to run jobs on AWS Braket: using hybri
 
 ### Hybrid jobs using qoqo-for-braket
 
+The prefered mode to use qoqo-for-braket is the hybrid job submission mode. This mode corresponds closest to using the qoqo concept of a `QuantumProgram`, where several circuits are bundled, executed and post-processed together. A `QuantumProgram` can easily be serialized to json. qoqo-for-braket uses the flexibility of the AWS braket hybrid job model to upload the serialized version of a `QuantumProgram` and run it completely on the hybrid instance with `qoqo` and `qoqo-for-braket` installed on the hybrid instance. 
+
 After having installed qoqo-for-braket from either source or pypi, you can run the following snippet (provided you have AWS credentials):
 
 ```python
