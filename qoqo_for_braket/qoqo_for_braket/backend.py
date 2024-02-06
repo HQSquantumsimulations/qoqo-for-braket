@@ -29,6 +29,7 @@ import json
 from qoqo_for_braket.post_processing import _post_process_circuit_result
 from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun
 from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch, AwsQuantumJob
+from braket.jobs.local import LocalQuantumJob
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.aws.aws_session import AwsSession
@@ -434,9 +435,15 @@ class BraketBackend:
         job = self._run_measurement_registers_hybrid(measurement)
         with tempfile.TemporaryDirectory() as tmpdir:
             jobname = job.name
-            job.download_result(tmpdir)
-            with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
-                outputs = json.load(f)
+            job.download_result(extract_to=tmpdir)
+            if isinstance(job, AwsQuantumJob):
+                with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
+                    outputs = json.load(f)
+            elif isinstance(job, LocalQuantumJob):
+                with open(os.path.join(os.path.join(os.getcwd(), jobname), "output.json")) as f:
+                    outputs = json.load(f)
+                shutil.rmtree(os.path.join(os.getcwd(), jobname))
+
         return outputs
 
     def run_measurement_registers_hybrid_queued(self, measurement: Any) -> QueuedHybridRun:
@@ -489,16 +496,29 @@ class BraketBackend:
             f.write(measurement_json)
         with open(".tmp_config_input.json", "w") as f:
             json.dump(self._create_config(), f)
-        job = AwsQuantumJob.create(
-            device=self.__create_device()._arn,
-            source_module="_tmp_hybrid_helper",
-            entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
-            wait_until_complete=wait_until_complete,
-            input_data={
-                "measurement": ".tmp_measurement_input.json",
-                "config": ".tmp_config_input.json",
-            },
-        )
+        device_for_run = self.__create_device()
+        if isinstance(device_for_run, LocalSimulator):
+            job = LocalQuantumJob.create(
+                device=self.device,
+                source_module="_tmp_hybrid_helper",
+                entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
+                # wait_until_complete=wait_until_complete,
+                input_data={
+                    "measurement": ".tmp_measurement_input.json",
+                    "config": ".tmp_config_input.json",
+                },
+            )
+        elif isinstance(device_for_run, AwsDevice):
+            job = AwsQuantumJob.create(
+                device=device_for_run._arn,
+                source_module="_tmp_hybrid_helper",
+                entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
+                wait_until_complete=wait_until_complete,
+                input_data={
+                    "measurement": ".tmp_measurement_input.json",
+                    "config": ".tmp_config_input.json",
+                },
+            )
         shutil.rmtree("_tmp_hybrid_helper")
         os.remove(".tmp_measurement_input.json")
         os.remove(".tmp_config_input.json")

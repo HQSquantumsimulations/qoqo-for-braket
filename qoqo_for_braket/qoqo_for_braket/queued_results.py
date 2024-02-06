@@ -24,6 +24,7 @@ import tempfile
 import os
 import copy
 import datetime
+import shutil
 
 
 class QueuedCircuitRun:
@@ -326,9 +327,9 @@ class QueuedHybridRun:
             self.aws_metadata = self._job.metadata()
         else:
             self.aws_metadata = None
-        if isinstance(self._job, LocalQuantumJob):
-            results = self._job.result()
-            self._results = results
+        # if isinstance(self._job, LocalQuantumJob):
+        #     results = self._job.result()
+        #     self._results = results
 
     def to_json(self) -> str:
         """Convert self to a json string.
@@ -347,7 +348,7 @@ class QueuedHybridRun:
         if isinstance(self._job, LocalQuantumJob):
             json_dict = {
                 "type": "QueuedLocalQuantumJob",
-                "arn": None,
+                "arn": self._job.arn,
                 "region": None,
                 "metadata": self.internal_metadata,
                 "results": results,
@@ -377,14 +378,15 @@ class QueuedHybridRun:
         """
         json_dict = json.loads(string)
         if json_dict["type"] == "QueuedLocalQuantumJob":
-            session = None
-            job = None
+            session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
+            job = LocalQuantumJob(json_dict["arn"])
+            metadata = None
         elif json_dict["type"] == "QueuedAWSQuantumJob":
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
             job = AwsQuantumJob(json_dict["arn"])
+            metadata = json_dict["metadata"]
+            metadata["createdAt"] = datetime.datetime.fromisoformat(metadata["createdAt"])
 
-        metadata = json_dict["metadata"]
-        metadata["createdAt"] = datetime.datetime.fromisoformat(metadata["createdAt"])
         instance = QueuedHybridRun(session=session, job=job, metadata=metadata)
         if json_dict["results"] is not None:
             instance._results = (json_dict["results"], {}, {})
@@ -416,19 +418,26 @@ class QueuedHybridRun:
         if self._results is not None:
             return self._results
         else:
-            if isinstance(self._job, AwsQuantumJob):
-                state = self._job.state()
-                if state == "COMPLETED":
-                    with tempfile.TemporaryDirectory() as tmpdir:
-                        jobname = self._job.name
-                        self._job.download_result(tmpdir)
+            state = self._job.state()
+            if state == "COMPLETED":
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    jobname = self._job.name
+                    self._job.download_result(tmpdir)
+                    if isinstance(self._job, AwsQuantumJob):
                         with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
                             outputs = json.load(f)
-                        self._results = outputs
-                elif state == "FAILED":
-                    raise RuntimeError("Job has failed on AWS")
-                elif state == "CANCELED":
-                    raise RuntimeError("Job was cancelled by AWS")
-            else:
-                return None
-        return self._results
+                    elif isinstance(self._job, LocalQuantumJob):
+                        with open(
+                            os.path.join(os.path.join(os.getcwd(), jobname), "output.json")
+                        ) as f:
+                            outputs = json.load(f)
+                    self._results = outputs
+                # if isinstance(self._job, LocalQuantumJob):
+                #     shutil.rmtree(os.path.join(os.getcwd(), jobname))
+            elif state == "FAILED":
+                raise RuntimeError("Job has failed on AWS")
+            elif state == "CANCELED":
+                raise RuntimeError("Job was cancelled by AWS")
+            # else:
+            #     return None
+            return self._results
