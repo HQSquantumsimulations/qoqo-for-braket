@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.queued_results &mdash; qoqo_for_braket 0.4.0 documentation</title>
+  <title>qoqo_for_braket.queued_results &mdash; qoqo_for_braket 0.4.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=22974a12"></script>
+        <script src="../../_static/documentation_options.js?v=bdd5de88"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -35,7 +35,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.4.0
+                0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -99,6 +99,10 @@
 <span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">measurements</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 
 <div class="viewcode-block" id="QueuedCircuitRun">
@@ -412,7 +416,11 @@
 <div class="viewcode-block" id="QueuedHybridRun.__init__">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.QueuedHybridRun.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">AwsSession</span><span class="p">,</span> <span class="n">job</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QuantumJob</span><span class="p">],</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session</span><span class="p">:</span> <span class="n">AwsSession</span><span class="p">,</span>
+        <span class="n">job</span><span class="p">:</span> <span class="n">QuantumJob</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">measurement</span><span class="p">:</span> <span class="n">measurements</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the QueuedCircuitRun class.</span>
 
@@ -420,8 +428,9 @@
 <span class="sd">            session: Braket AwsSession to use</span>
 <span class="sd">            job: Braket QuantumJob to query</span>
 <span class="sd">            metadata: Additional information about the circuit</span>
+<span class="sd">            measurement: The qoqo measurement to be run</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QuantumJob</span><span class="p">]</span> <span class="o">=</span> <span class="n">job</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">:</span> <span class="n">QuantumJob</span> <span class="o">=</span> <span class="n">job</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
             <span class="n">Tuple</span><span class="p">[</span>
                 <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
@@ -431,13 +440,7 @@
         <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">internal_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aws_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aws_metadata</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">LocalQuantumJob</span><span class="p">):</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">results</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span> <span class="o">=</span> <span class="n">measurement</span></div>
 
 
 <div class="viewcode-block" id="QueuedHybridRun.to_json">
@@ -448,6 +451,17 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            str: self as a json string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">PauliZProduct</span><span class="p">):</span>
+            <span class="n">measurement_type</span> <span class="o">=</span> <span class="s2">&quot;PauliZProduct&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">CheatedPauliZProduct</span><span class="p">):</span>
+            <span class="n">measurement_type</span> <span class="o">=</span> <span class="s2">&quot;CheatedPauliZProduct&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">Cheated</span><span class="p">):</span>
+            <span class="n">measurement_type</span> <span class="o">=</span> <span class="s2">&quot;Cheated&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">ClassicalRegisters</span><span class="p">):</span>
+            <span class="n">measurement_type</span> <span class="o">=</span> <span class="s2">&quot;ClassicalRegisters&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown measurement type&quot;</span><span class="p">)</span>
+
         <span class="n">results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
@@ -459,18 +473,24 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">LocalQuantumJob</span><span class="p">):</span>
             <span class="n">json_dict</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;QueuedLocalQuantumJob&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;arn&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;arn&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">arn</span><span class="p">,</span>
                 <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_metadata</span><span class="p">,</span>
                 <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+                <span class="s2">&quot;measurement_type&quot;</span><span class="p">:</span> <span class="n">measurement_type</span><span class="p">,</span>
+                <span class="s2">&quot;measurement&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">):</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internal_metadata</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;createdAt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_metadata</span><span class="p">[</span><span class="s2">&quot;createdAt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
             <span class="n">json_dict</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;QueuedAWSQuantumJob&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;arn&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">arn</span><span class="p">,</span>
                 <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">arn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
-                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_metadata</span><span class="p">,</span>
+                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">metadata</span><span class="p">,</span>
                 <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+                <span class="s2">&quot;measurement_type&quot;</span><span class="p">:</span> <span class="n">measurement_type</span><span class="p">,</span>
+                <span class="s2">&quot;measurement&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="o">.</span><span class="n">to_json</span><span class="p">(),</span>
             <span class="p">}</span>
 
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_dict</span><span class="p">)</span></div>
@@ -490,13 +510,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">json_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;QueuedLocalQuantumJob&quot;</span><span class="p">:</span>
-            <span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">AwsSession</span><span class="p">(</span><span class="n">boto3</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">region_name</span><span class="o">=</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]))</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">LocalQuantumJob</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;arn&quot;</span><span class="p">])</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">elif</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;QueuedAWSQuantumJob&quot;</span><span class="p">:</span>
             <span class="n">session</span> <span class="o">=</span> <span class="n">AwsSession</span><span class="p">(</span><span class="n">boto3</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">region_name</span><span class="o">=</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]))</span>
             <span class="n">job</span> <span class="o">=</span> <span class="n">AwsQuantumJob</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;arn&quot;</span><span class="p">])</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;createdAt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;createdAt&quot;</span><span class="p">])</span>
 
-        <span class="n">instance</span> <span class="o">=</span> <span class="n">QueuedHybridRun</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span> <span class="n">job</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PauliZProduct&quot;</span><span class="p">:</span>
+            <span class="n">measurement</span> <span class="o">=</span> <span class="n">measurements</span><span class="o">.</span><span class="n">PauliZProduct</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;CheatedPauliZProduct&quot;</span><span class="p">:</span>
+            <span class="n">measurement</span> <span class="o">=</span> <span class="n">measurements</span><span class="o">.</span><span class="n">CheatedPauliZProduct</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Cheated&quot;</span><span class="p">:</span>
+            <span class="n">measurement</span> <span class="o">=</span> <span class="n">measurements</span><span class="o">.</span><span class="n">Cheated</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement&quot;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ClassicalRegisters&quot;</span><span class="p">:</span>
+            <span class="n">measurement</span> <span class="o">=</span> <span class="n">measurements</span><span class="o">.</span><span class="n">ClassicalRegisters</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;measurement&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown measurement type&quot;</span><span class="p">)</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">QueuedHybridRun</span><span class="p">(</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span> <span class="n">job</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="n">measurement</span><span class="o">=</span><span class="n">measurement</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">instance</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">(</span><span class="n">json_dict</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">],</span> <span class="p">{},</span> <span class="p">{})</span>
 
@@ -528,24 +564,51 @@
 <span class="sd">            RuntimeError: job failed or cancelled</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">ClassicalRegister</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">):</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">state</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;COMPLETED&quot;</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
-                        <span class="n">jobname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">name</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">download_result</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">state</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;COMPLETED&quot;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+                    <span class="n">jobname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">name</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">download_result</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">):</span>
                         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">jobname</span><span class="p">),</span> <span class="s2">&quot;output.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                             <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">outputs</span>
-                <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Job has failed on AWS&quot;</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;CANCELED&quot;</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Job was cancelled by AWS&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">LocalQuantumJob</span><span class="p">):</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">jobname</span><span class="p">),</span> <span class="s2">&quot;output.json&quot;</span><span class="p">)</span>
+                        <span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">outputs</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="p">,</span> <span class="n">measurements</span><span class="o">.</span><span class="n">ClassicalRegister</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;FAILED&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Job has failed on AWS&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;CANCELED&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Job was cancelled by AWS&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span></div>
+                <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="QueuedHybridRun.delete_tmp_folder">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.QueuedHybridRun.delete_tmp_folder">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_tmp_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete the folder created by AWS for the LocalQuantumJob.&quot;&quot;&quot;</span>
+        <span class="n">jobname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_job</span><span class="p">,</span> <span class="n">LocalQuantumJob</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">jobname</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;File is not present, has it already been deleted?&quot;</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

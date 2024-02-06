@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.4.0 documentation</title>
+  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.4.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=22974a12"></script>
+        <script src="../_static/documentation_options.js?v=bdd5de88"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -37,7 +37,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.4.0
+                0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -87,6 +87,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.__init__"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.__weakref__"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.__weakref__</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.delete_tmp_folder"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.delete_tmp_folder()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.from_json"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.from_json()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.poll_result"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.poll_result()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun.to_json"><code class="docutils literal notranslate"><span class="pre">QueuedHybridRun.to_json()</span></code></a></li>
@@ -143,7 +144,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.QueuedCircuitRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedCircuitRun</span></code></a>(session, task, metadata)</p></td>
 <td><p>Queued Result of the circuit.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun" title="qoqo_for_braket.QueuedHybridRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedHybridRun</span></code></a>(session, job, metadata)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun" title="qoqo_for_braket.QueuedHybridRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedHybridRun</span></code></a>(session, job, metadata, ...)</p></td>
 <td><p>Queued Result of the running a QuantumProgram with a hybrid job.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.QueuedProgramRun"><code class="xref py py-obj docutils literal notranslate"><span class="pre">QueuedProgramRun</span></code></a>(measurement, queued_circuits)</p></td>
@@ -602,7 +603,7 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedHybridRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumJob</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedHybridRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">session:</span> <span class="pre">~braket.aws.aws_session.AwsSession,</span> <span class="pre">job:</span> <span class="pre">~braket.jobs.quantum_job.QuantumJob,</span> <span class="pre">metadata:</span> <span class="pre">~typing.Dict[~typing.Any,</span> <span class="pre">~typing.Any],</span> <span class="pre">measurement:</span> <span class="pre">&lt;module</span> <span class="pre">'measurements'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun" title="Link to this definition"></a></dt>
 <dd><p>Queued Result of the running a QuantumProgram with a hybrid job.</p>
 <p>Initialise the QueuedCircuitRun class.</p>
 <dl class="field-list simple">
@@ -611,12 +612,13 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 <li><p><strong>session</strong> -- Braket AwsSession to use</p></li>
 <li><p><strong>job</strong> -- Braket QuantumJob to query</p></li>
 <li><p><strong>metadata</strong> -- Additional information about the circuit</p></li>
+<li><p><strong>measurement</strong> -- The qoqo measurement to be run</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">job</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumJob</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">session:</span> <span class="pre">~braket.aws.aws_session.AwsSession,</span> <span class="pre">job:</span> <span class="pre">~braket.jobs.quantum_job.QuantumJob,</span> <span class="pre">metadata:</span> <span class="pre">~typing.Dict[~typing.Any,</span> <span class="pre">~typing.Any],</span> <span class="pre">measurement:</span> <span class="pre">&lt;module</span> <span class="pre">'measurements'&gt;</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialise the QueuedCircuitRun class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -624,6 +626,7 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 <li><p><strong>session</strong> -- Braket AwsSession to use</p></li>
 <li><p><strong>job</strong> -- Braket QuantumJob to query</p></li>
 <li><p><strong>metadata</strong> -- Additional information about the circuit</p></li>
+<li><p><strong>measurement</strong> -- The qoqo measurement to be run</p></li>
 </ul>
 </dd>
 </dl>
@@ -633,6 +636,12 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.__weakref__" title="Link to this definition"></a></dt>
 <dd><p>list of weak references to the object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun.delete_tmp_folder">
+<span class="sig-name descname"><span class="pre">delete_tmp_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun.delete_tmp_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.delete_tmp_folder" title="Link to this definition"></a></dt>
+<dd><p>Delete the folder created by AWS for the LocalQuantumJob.</p>
 </dd></dl>
 
 <dl class="py method">

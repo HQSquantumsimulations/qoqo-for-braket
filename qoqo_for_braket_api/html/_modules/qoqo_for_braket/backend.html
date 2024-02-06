@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.4.0 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.4.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=22974a12"></script>
+        <script src="../../_static/documentation_options.js?v=bdd5de88"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -35,7 +35,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.4.0
+                0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -106,6 +106,7 @@
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
 <span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span><span class="p">,</span> <span class="n">QueuedHybridRun</span>
 <span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span><span class="p">,</span> <span class="n">AwsQuantumJob</span>
+<span class="kn">from</span> <span class="nn">braket.jobs.local</span> <span class="kn">import</span> <span class="n">LocalQuantumJob</span>
 <span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
 <span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
 <span class="kn">from</span> <span class="nn">braket.aws.aws_session</span> <span class="kn">import</span> <span class="n">AwsSession</span>
@@ -176,20 +177,24 @@
     <span class="k">def</span> <span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="s2">&quot;verbatim_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span><span class="p">,</span>
             <span class="s2">&quot;max_shots&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span><span class="p">,</span>
             <span class="s2">&quot;max_circuit_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span><span class="p">,</span>
             <span class="s2">&quot;use_actual_hardware&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span><span class="p">,</span>
             <span class="s2">&quot;force_rigetti_verbatim&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__force_rigetti_verbatim</span><span class="p">,</span>
+            <span class="s2">&quot;force_oqc_verbatim&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__force_oqc_verbatim</span><span class="p">,</span>
             <span class="s2">&quot;force_ionq_verbatim&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__force_ionq_verbatim</span><span class="p">,</span>
             <span class="s2">&quot;batch_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;verbatim_mode&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;max_shots&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;max_circuit_length&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;use_actual_hardware&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_rigetti_verbatim</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;force_rigetti_verbatim&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__force_oqc_verbatim</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;force_oqc_verbatim&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_ionq_verbatim</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;force_ionq_verbatim&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_mode&quot;</span><span class="p">]</span>
 
@@ -557,9 +562,15 @@
         <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_measurement_registers_hybrid</span><span class="p">(</span><span class="n">measurement</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
             <span class="n">jobname</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">name</span>
-            <span class="n">job</span><span class="o">.</span><span class="n">download_result</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">jobname</span><span class="p">),</span> <span class="s2">&quot;output.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">job</span><span class="o">.</span><span class="n">download_result</span><span class="p">(</span><span class="n">extract_to</span><span class="o">=</span><span class="n">tmpdir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">,</span> <span class="n">jobname</span><span class="p">),</span> <span class="s2">&quot;output.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">LocalQuantumJob</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">jobname</span><span class="p">),</span> <span class="s2">&quot;output.json&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">jobname</span><span class="p">))</span>
+
         <span class="k">return</span> <span class="n">outputs</span></div>
 
 
@@ -577,7 +588,7 @@
 <span class="sd">            QueuedQuantumProgramHybrid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_measurement_registers_hybrid</span><span class="p">(</span><span class="n">measurement</span><span class="p">,</span> <span class="n">wait_until_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">QueuedHybridRun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">metadata</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">QueuedHybridRun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="p">,</span> <span class="n">job</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">metadata</span><span class="p">(),</span> <span class="n">measurement</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend._run_measurement_registers_hybrid">
@@ -608,9 +619,7 @@
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
             <span class="n">helper_file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo_hybrid_helper.py&quot;</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="c1"># qoqo-for-braket requirements needs to be updated to &gt;= 0.4 after 0.4.0</span>
-        <span class="c1"># has been released.</span>
-        <span class="n">requirement_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qoqo &gt;= 1.9</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo-for-braket == 0.4.0&quot;</span><span class="p">]</span>
+        <span class="n">requirement_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qoqo &gt;= 1.9</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo-for-braket &gt;= 0.4&quot;</span><span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="c1"># write each line from requirement_lines to separate lines in file</span>
             <span class="n">f</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">requirement_lines</span><span class="p">)</span>
@@ -618,16 +627,28 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">measurement_json</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;.tmp_config_input.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_config</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="n">AwsQuantumJob</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-            <span class="n">source_module</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span>
-            <span class="n">entry_point</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register&quot;</span><span class="p">,</span>
-            <span class="n">wait_until_complete</span><span class="o">=</span><span class="n">wait_until_complete</span><span class="p">,</span>
-            <span class="n">input_data</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;measurement&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_measurement_input.json&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_config_input.json&quot;</span><span class="p">,</span>
-            <span class="p">},</span>
-        <span class="p">)</span>
+        <span class="n">device_for_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_device</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device_for_run</span><span class="p">,</span> <span class="n">LocalSimulator</span><span class="p">):</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">LocalQuantumJob</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="n">source_module</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span>
+                <span class="n">entry_point</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register&quot;</span><span class="p">,</span>
+                <span class="n">input_data</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;measurement&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_measurement_input.json&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_config_input.json&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device_for_run</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">):</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">AwsQuantumJob</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">device</span><span class="o">=</span><span class="n">device_for_run</span><span class="o">.</span><span class="n">_arn</span><span class="p">,</span>
+                <span class="n">source_module</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span>
+                <span class="n">entry_point</span><span class="o">=</span><span class="s2">&quot;_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register&quot;</span><span class="p">,</span>
+                <span class="n">wait_until_complete</span><span class="o">=</span><span class="n">wait_until_complete</span><span class="p">,</span>
+                <span class="n">input_data</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;measurement&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_measurement_input.json&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;.tmp_config_input.json&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;.tmp_measurement_input.json&quot;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;.tmp_config_input.json&quot;</span><span class="p">)</span>
