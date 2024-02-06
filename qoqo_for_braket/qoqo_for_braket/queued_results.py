@@ -317,6 +317,7 @@ class QueuedHybridRun:
             session: Braket AwsSession to use
             job: Braket QuantumJob to query
             metadata: Additional information about the circuit
+            measurement: The qoqo measurement to be run
         """
         self._job: Optional[QuantumJob] = job
         self._results: Optional[
@@ -482,9 +483,10 @@ class QueuedHybridRun:
                 return None
 
     def delete_tmp_folder(self) -> None:
+        """Delete the folder created by AWS for the LocalQuantumJob."""
         jobname = self._job.name
         if isinstance(self._job, LocalQuantumJob) & (self._results is not None):
             try:
                 shutil.rmtree(os.path.join(os.getcwd(), jobname))
             except FileNotFoundError:
-                warnings.warn("File is not present, has it already been deleted?")
+                warnings.warn("File is not present, has it already been deleted?", stacklevel=1)

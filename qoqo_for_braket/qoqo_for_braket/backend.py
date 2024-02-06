@@ -100,7 +100,7 @@ class BraketBackend:
             "max_circuit_length": self.__max_circuit_length,
             "use_actual_hardware": self.__use_actual_hardware,
             "force_rigetti_verbatim": self.__force_rigetti_verbatim,
-            "force_oqc_verbatim": self.__force_rigetti_verbatim,
+            "force_oqc_verbatim": self.__force_oqc_verbatim,
             "force_ionq_verbatim": self.__force_ionq_verbatim,
             "batch_mode": self.batch_mode,
         }
@@ -504,7 +504,6 @@ class BraketBackend:
                 device=self.device,
                 source_module="_tmp_hybrid_helper",
                 entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
-                # wait_until_complete=wait_until_complete,
                 input_data={
                     "measurement": ".tmp_measurement_input.json",
                     "config": ".tmp_config_input.json",
