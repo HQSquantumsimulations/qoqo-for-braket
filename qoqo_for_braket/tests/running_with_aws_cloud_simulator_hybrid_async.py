@@ -50,6 +50,7 @@ while queued.poll_result() is None:
     if i > 50:
         raise RuntimeError("Timed out waiting for job to complete")
 (bit_res, _, _) = queued.poll_result()
+queued.delete_tmp_folder()
 
 registers = bit_res["ro"]
 

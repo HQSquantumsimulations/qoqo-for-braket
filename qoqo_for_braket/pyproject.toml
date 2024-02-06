@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_for_braket"
-version = "0.4.0"
+version = "0.4.1"
 license = {file="LICENSE"}
 authors = [
     {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
