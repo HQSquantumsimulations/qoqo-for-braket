@@ -490,7 +490,7 @@ class BraketBackend:
         with open(".tmp_config_input.json", "w") as f:
             json.dump(self._create_config(), f)
         job = AwsQuantumJob.create(
-            device=self.device,
+            device=self.__create_device()._arn,
             source_module="_tmp_hybrid_helper",
             entry_point="_tmp_hybrid_helper.qoqo_hybrid_helper:run_measurement_register",
             wait_until_complete=wait_until_complete,

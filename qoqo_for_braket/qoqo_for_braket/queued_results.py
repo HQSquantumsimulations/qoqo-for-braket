@@ -22,6 +22,8 @@ import numpy as np
 from qoqo import measurements
 import tempfile
 import os
+import copy
+import datetime
 
 
 class QueuedCircuitRun:
@@ -351,11 +353,13 @@ class QueuedHybridRun:
                 "results": results,
             }
         if isinstance(self._job, AwsQuantumJob):
+            metadata = copy.deepcopy(self.internal_metadata)
+            metadata["createdAt"] = self.internal_metadata["createdAt"].isoformat()
             json_dict = {
                 "type": "QueuedAWSQuantumJob",
                 "arn": self._job.arn,
                 "region": self._job.arn.split(":")[3],
-                "metadata": self.internal_metadata,
+                "metadata": metadata,
                 "results": results,
             }
 
@@ -379,7 +383,9 @@ class QueuedHybridRun:
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
             job = AwsQuantumJob(json_dict["arn"])
 
-        instance = QueuedHybridRun(session=session, job=job, metadata=json_dict["metadata"])
+        metadata = json_dict["metadata"]
+        metadata["createdAt"] = datetime.datetime.fromisoformat(metadata["createdAt"])
+        instance = QueuedHybridRun(session=session, job=job, metadata=metadata)
         if json_dict["results"] is not None:
             instance._results = (json_dict["results"], {}, {})
 
