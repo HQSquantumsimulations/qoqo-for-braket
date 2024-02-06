@@ -25,6 +25,7 @@ import os
 import copy
 import datetime
 import shutil
+import warnings
 
 
 class QueuedCircuitRun:
@@ -327,9 +328,6 @@ class QueuedHybridRun:
             self.aws_metadata = self._job.metadata()
         else:
             self.aws_metadata = None
-        # if isinstance(self._job, LocalQuantumJob):
-        #     results = self._job.result()
-        #     self._results = results
 
     def to_json(self) -> str:
         """Convert self to a json string.
@@ -422,6 +420,7 @@ class QueuedHybridRun:
             if state == "COMPLETED":
                 with tempfile.TemporaryDirectory() as tmpdir:
                     jobname = self._job.name
+                    print(f"Job name: {jobname}")
                     self._job.download_result(tmpdir)
                     if isinstance(self._job, AwsQuantumJob):
                         with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
@@ -432,12 +431,18 @@ class QueuedHybridRun:
                         ) as f:
                             outputs = json.load(f)
                     self._results = outputs
-                # if isinstance(self._job, LocalQuantumJob):
-                #     shutil.rmtree(os.path.join(os.getcwd(), jobname))
+                return self._results
             elif state == "FAILED":
                 raise RuntimeError("Job has failed on AWS")
             elif state == "CANCELED":
                 raise RuntimeError("Job was cancelled by AWS")
-            # else:
-            #     return None
-            return self._results
+            else:
+                return None
+
+    def delete_tmp_folder(self) -> None:
+        jobname = self._job.name
+        if isinstance(self._job, LocalQuantumJob) & (self._results is not None):
+            try:
+                shutil.rmtree(os.path.join(os.getcwd(), jobname))
+            except FileNotFoundError:
+                warnings.warn("File is not present, has it already been deleted?")
