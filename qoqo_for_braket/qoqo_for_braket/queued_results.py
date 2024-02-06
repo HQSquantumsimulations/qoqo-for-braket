@@ -307,7 +307,7 @@ class QueuedHybridRun:
     def __init__(
         self,
         session: AwsSession,
-        job: Optional[QuantumJob],
+        job: QuantumJob,
         metadata: Dict[Any, Any],
         measurement: measurements,
     ) -> None:
@@ -319,7 +319,7 @@ class QueuedHybridRun:
             metadata: Additional information about the circuit
             measurement: The qoqo measurement to be run
         """
-        self._job: Optional[QuantumJob] = job
+        self._job: QuantumJob = job
         self._results: Optional[
             Tuple[
                 Dict[str, List[List[bool]]],
@@ -329,10 +329,6 @@ class QueuedHybridRun:
         ] = None
         self.session = session
         self.internal_metadata = metadata
-        if self._job is not None:
-            self.aws_metadata = self._job.metadata()
-        else:
-            self.aws_metadata = None
         self._measurement = measurement
 
     def to_json(self) -> str:
@@ -399,7 +395,7 @@ class QueuedHybridRun:
         if json_dict["type"] == "QueuedLocalQuantumJob":
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
             job = LocalQuantumJob(json_dict["arn"])
-            metadata = None
+            metadata = {}
         elif json_dict["type"] == "QueuedAWSQuantumJob":
             session = AwsSession(boto3.session.Session(region_name=json_dict["region"]))
             job = AwsQuantumJob(json_dict["arn"])
