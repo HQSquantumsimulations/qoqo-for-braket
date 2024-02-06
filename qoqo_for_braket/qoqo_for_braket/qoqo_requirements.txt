@@ -1,2 +1,2 @@
 qoqo >= 1.7
-qoqo-for-braket == 0.4.0
+qoqo-for-braket == 0.4.1

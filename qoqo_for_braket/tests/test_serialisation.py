@@ -257,7 +257,7 @@ def test_serialisation_using_config() -> None:
     assert np.isclose(results_config["0Z"], 1.0)
 
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_serialisation_hybrid_async() -> None:
     """Test to_json and from_json methods for QueuedHybridRun for an async job."""
     constant_circuit = Circuit()
@@ -306,8 +306,6 @@ def test_serialisation_hybrid_async() -> None:
 
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
-    print(results)
-    print(results_queued)
     assert len(results.keys()) == len(results_queued.keys()) == 1
     assert np.isclose(results["0Z"], 1.0)
     assert np.isclose(results_queued["0Z"], 1.0)

@@ -95,20 +95,24 @@ class BraketBackend:
     def _create_config(self) -> Dict[str, Any]:
         return {
             "device": self.device,
+            "verbatim_mode": self.verbatim_mode,
             "max_shots": self.__max_number_shots,
             "max_circuit_length": self.__max_circuit_length,
             "use_actual_hardware": self.__use_actual_hardware,
             "force_rigetti_verbatim": self.__force_rigetti_verbatim,
+            "force_oqc_verbatim": self.__force_rigetti_verbatim,
             "force_ionq_verbatim": self.__force_ionq_verbatim,
             "batch_mode": self.batch_mode,
         }
 
     def _load_config(self, config: Dict[str, Any]) -> None:
         self.device = config["device"]
+        self.verbatim_mode = config["verbatim_mode"]
         self.__max_number_shots = config["max_shots"]
         self.__max_circuit_length = config["max_circuit_length"]
         self.__use_actual_hardware = config["use_actual_hardware"]
         self.__force_rigetti_verbatim = config["force_rigetti_verbatim"]
+        self.__force_oqc_verbatim = config["force_oqc_verbatim"]
         self.__force_ionq_verbatim = config["force_ionq_verbatim"]
         self.batch_mode = config["batch_mode"]
 
@@ -486,9 +490,7 @@ class BraketBackend:
         shutil.copyfile(
             helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
         )
-        # qoqo-for-braket requirements needs to be updated to >= 0.4 after 0.4.0
-        # has been released.
-        requirement_lines = ["qoqo >= 1.9\n", "qoqo-for-braket == 0.4.0"]
+        requirement_lines = ["qoqo >= 1.9\n", "qoqo-for-braket >= 0.4"]
         with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
             # write each line from requirement_lines to separate lines in file
             f.writelines(requirement_lines)

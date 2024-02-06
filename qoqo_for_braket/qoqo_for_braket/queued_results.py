@@ -458,7 +458,6 @@ class QueuedHybridRun:
             if state == "COMPLETED":
                 with tempfile.TemporaryDirectory() as tmpdir:
                     jobname = self._job.name
-                    print(f"Job name: {jobname}")
                     self._job.download_result(tmpdir)
                     if isinstance(self._job, AwsQuantumJob):
                         with open(os.path.join(os.path.join(tmpdir, jobname), "output.json")) as f:
