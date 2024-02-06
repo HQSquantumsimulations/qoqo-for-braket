@@ -305,7 +305,11 @@ class QueuedHybridRun:
     """Queued Result of the running a QuantumProgram with a hybrid job."""
 
     def __init__(
-        self, session: AwsSession, job: Optional[QuantumJob], metadata: Dict[Any, Any]
+        self,
+        session: AwsSession,
+        job: Optional[QuantumJob],
+        metadata: Dict[Any, Any],
+        measurement: measurements,
     ) -> None:
         """Initialise the QueuedCircuitRun class.
 
@@ -328,6 +332,7 @@ class QueuedHybridRun:
             self.aws_metadata = self._job.metadata()
         else:
             self.aws_metadata = None
+        self._measurement = measurement
 
     def to_json(self) -> str:
         """Convert self to a json string.
@@ -335,6 +340,17 @@ class QueuedHybridRun:
         Returns:
             str: self as a json string
         """
+        if isinstance(self._measurement, measurements.PauliZProduct):
+            measurement_type = "PauliZProduct"
+        elif isinstance(self._measurement, measurements.CheatedPauliZProduct):
+            measurement_type = "CheatedPauliZProduct"
+        elif isinstance(self._measurement, measurements.Cheated):
+            measurement_type = "Cheated"
+        elif isinstance(self._measurement, measurements.ClassicalRegisters):
+            measurement_type = "ClassicalRegisters"
+        else:
+            raise TypeError("Unknown measurement type")
+
         results: Optional[Dict[str, Any]] = None
         if self._results is not None:
             results = {}
@@ -350,6 +366,8 @@ class QueuedHybridRun:
                 "region": None,
                 "metadata": self.internal_metadata,
                 "results": results,
+                "measurement_type": measurement_type,
+                "measurement": self._measurement.to_json(),
             }
         if isinstance(self._job, AwsQuantumJob):
             metadata = copy.deepcopy(self.internal_metadata)
@@ -360,6 +378,8 @@ class QueuedHybridRun:
                 "region": self._job.arn.split(":")[3],
                 "metadata": metadata,
                 "results": results,
+                "measurement_type": measurement_type,
+                "measurement": self._measurement.to_json(),
             }
 
         return json.dumps(json_dict)
@@ -385,7 +405,20 @@ class QueuedHybridRun:
             metadata = json_dict["metadata"]
             metadata["createdAt"] = datetime.datetime.fromisoformat(metadata["createdAt"])
 
-        instance = QueuedHybridRun(session=session, job=job, metadata=metadata)
+        if json_dict["measurement_type"] == "PauliZProduct":
+            measurement = measurements.PauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "CheatedPauliZProduct":
+            measurement = measurements.CheatedPauliZProduct.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "Cheated":
+            measurement = measurements.Cheated.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "ClassicalRegisters":
+            measurement = measurements.ClassicalRegisters.from_json(json_dict["measurement"])
+        else:
+            raise TypeError("Unknown measurement type")
+
+        instance = QueuedHybridRun(
+            session=session, job=job, metadata=metadata, measurement=measurement
+        )
         if json_dict["results"] is not None:
             instance._results = (json_dict["results"], {}, {})
 
@@ -414,7 +447,12 @@ class QueuedHybridRun:
             RuntimeError: job failed or cancelled
         """
         if self._results is not None:
-            return self._results
+            if isinstance(self._measurement, measurements.ClassicalRegister):
+                return self._results
+            else:
+                return self._measurement.evaluate(
+                    self._results[0], self._results[1], self._results[2]
+                )
         else:
             state = self._job.state()
             if state == "COMPLETED":
@@ -431,7 +469,12 @@ class QueuedHybridRun:
                         ) as f:
                             outputs = json.load(f)
                     self._results = outputs
-                return self._results
+                    if isinstance(self._measurement, measurements.ClassicalRegister):
+                        return self._results
+                    else:
+                        return self._measurement.evaluate(
+                            self._results[0], self._results[1], self._results[2]
+                        )
             elif state == "FAILED":
                 raise RuntimeError("Job has failed on AWS")
             elif state == "CANCELED":

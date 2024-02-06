@@ -458,7 +458,7 @@ class BraketBackend:
             QueuedQuantumProgramHybrid
         """
         job = self._run_measurement_registers_hybrid(measurement, wait_until_complete=False)
-        return QueuedHybridRun(self.aws_session, job, job.metadata())
+        return QueuedHybridRun(self.aws_session, job, job.metadata(), measurement)
 
     def _run_measurement_registers_hybrid(
         self, measurement: Any, wait_until_complete: bool = True
