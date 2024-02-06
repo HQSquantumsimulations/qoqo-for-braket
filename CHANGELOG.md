@@ -4,6 +4,11 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.4.1
+
+* Added keys to the config dictionary to allow for correct verbatim mode runs
+* Added LocalQuantumJob functionality for run_measurement_hybrid_queued and QueuedHybridRun
+
 ## 0.4.0
 
 * Bugfix for the IonQ interface (VirtualZ for VariableMSXX)
