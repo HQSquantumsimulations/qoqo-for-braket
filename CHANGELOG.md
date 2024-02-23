@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.4.2
+
+* Fixed ClassicalRegister typo in the Queued classes
+
 ## 0.4.1
 
 * Added keys to the config dictionary to allow for correct verbatim mode runs
