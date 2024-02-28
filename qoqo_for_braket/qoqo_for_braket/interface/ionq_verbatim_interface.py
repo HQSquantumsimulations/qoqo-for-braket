@@ -14,6 +14,9 @@
 from braket.circuits import Circuit
 import qoqo
 from typing import TYPE_CHECKING, Dict
+import numpy as np
+from qoqo_calculator_pyo3 import CalculatorFloat
+import warnings
 
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
@@ -61,12 +64,24 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
                 0.0 + qubit_phase.get(op.target(), 0.0),
             )
         elif op.hqslang() == "VariableMSXX":
+            phi_0 = qubit_phase.get(op.control(), 0.0)
+            phi_1 = qubit_phase.get(op.target(), 0.0)
+            theta = op.theta()
+            try:
+                if -np.pi / 2 < phi_0.float() < 0.0:
+                    phi_0 += np.pi
+                if -np.pi / 2 < phi_1.float() < 0.0:
+                    phi_1 += np.pi
+                if -np.pi / 2 < theta.float() < 0.0:
+                    theta += np.pi
+            except Exception:
+                warnings.warn("Arguments to VariableMSXX are imaginary, this will break.")
             braket_circuit.ms(
                 op.control(),
                 op.target(),
-                0.0 + qubit_phase.get(op.control(), 0.0),
-                0.0 + qubit_phase.get(op.target(), 0.0),
-                op.theta(),
+                phi_0,
+                phi_1,
+                theta,
             )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
