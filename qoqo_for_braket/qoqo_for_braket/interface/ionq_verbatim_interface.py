@@ -75,7 +75,9 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
                 if -np.pi / 2 < theta.float() < 0.0:
                     theta += np.pi
             except Exception:
-                warnings.warn("Arguments to VariableMSXX are imaginary, this will break.")
+                warnings.warn(
+                    "Arguments to VariableMSXX are imaginary, this will break.", stacklevel=2
+                )
             braket_circuit.ms(
                 op.control(),
                 op.target(),
