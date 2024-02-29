@@ -16,7 +16,6 @@ import qoqo
 from typing import TYPE_CHECKING, Dict
 import numpy as np
 from qoqo_calculator_pyo3 import CalculatorFloat
-import warnings
 
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
@@ -83,7 +82,8 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
                 )
             else:
                 print(
-                    "The value of theta in this VariableMSXX gate is out of range. The allowed range is [-pi/2, pi/2]."
+                    "The value of theta in this VariableMSXX gate is out of range. "
+                    + "The allowed range is [-pi/2, pi/2]."
                 )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
