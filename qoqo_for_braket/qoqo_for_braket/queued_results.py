@@ -245,8 +245,8 @@ class QueuedProgramRun:
             measurement_type = "CheatedPauliZProduct"
         elif isinstance(self._measurement, measurements.Cheated):
             measurement_type = "Cheated"
-        elif isinstance(self._measurement, measurements.ClassicalRegisters):
-            measurement_type = "ClassicalRegisters"
+        elif isinstance(self._measurement, measurements.ClassicalRegister):
+            measurement_type = "ClassicalRegister"
         else:
             raise TypeError("Unknown measurement type")
 
@@ -291,8 +291,8 @@ class QueuedProgramRun:
             measurement = measurements.CheatedPauliZProduct.from_json(json_dict["measurement"])
         elif json_dict["measurement_type"] == "Cheated":
             measurement = measurements.Cheated.from_json(json_dict["measurement"])
-        elif json_dict["measurement_type"] == "ClassicalRegisters":
-            measurement = measurements.ClassicalRegisters.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "ClassicalRegister":
+            measurement = measurements.ClassicalRegister.from_json(json_dict["measurement"])
         else:
             raise TypeError("Unknown measurement type")
 
@@ -343,8 +343,8 @@ class QueuedHybridRun:
             measurement_type = "CheatedPauliZProduct"
         elif isinstance(self._measurement, measurements.Cheated):
             measurement_type = "Cheated"
-        elif isinstance(self._measurement, measurements.ClassicalRegisters):
-            measurement_type = "ClassicalRegisters"
+        elif isinstance(self._measurement, measurements.ClassicalRegister):
+            measurement_type = "ClassicalRegister"
         else:
             raise TypeError("Unknown measurement type")
 
@@ -408,8 +408,8 @@ class QueuedHybridRun:
             measurement = measurements.CheatedPauliZProduct.from_json(json_dict["measurement"])
         elif json_dict["measurement_type"] == "Cheated":
             measurement = measurements.Cheated.from_json(json_dict["measurement"])
-        elif json_dict["measurement_type"] == "ClassicalRegisters":
-            measurement = measurements.ClassicalRegisters.from_json(json_dict["measurement"])
+        elif json_dict["measurement_type"] == "ClassicalRegister":
+            measurement = measurements.ClassicalRegister.from_json(json_dict["measurement"])
         else:
             raise TypeError("Unknown measurement type")
 
