@@ -12,29 +12,30 @@
 
 """Provides the BraketBackend class."""
 
+import json
 import os
 import shutil
 import tempfile
-from typing import Tuple, Dict, List, Any, Optional, Union
-from qoqo import Circuit
-from braket.circuits import Circuit as BraketCircuit
-from qoqo import operations as ops
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
 import qoqo_qasm
-from qoqo_for_braket.interface import (
-    rigetti_verbatim_interface,
-    ionq_verbatim_interface,
-    oqc_verbatim_interface,
-)
-import json
-from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun
-from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch, AwsQuantumJob
-from braket.jobs.local import LocalQuantumJob
+from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
+from braket.aws.aws_session import AwsSession
+from braket.circuits import Circuit as BraketCircuit
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
-from braket.aws.aws_session import AwsSession
-import numpy as np
+from braket.jobs.local import LocalQuantumJob
+from qoqo import Circuit
+from qoqo import operations as ops
 
+from qoqo_for_braket.interface import (
+    ionq_verbatim_interface,
+    oqc_verbatim_interface,
+    rigetti_verbatim_interface,
+)
+from qoqo_for_braket.post_processing import _post_process_circuit_result
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedHybridRun, QueuedProgramRun
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
@@ -308,7 +309,9 @@ class BraketBackend:
                 )
         return (task_specification, shots, readout)
 
-    def run_circuit(self, circuit: Circuit) -> Tuple[
+    def run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -333,7 +336,9 @@ class BraketBackend:
         results = quantum_task.result()
         return _post_process_circuit_result(results, metadata)
 
-    def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
+    def run_circuits_batch(
+        self, circuits: List[Circuit]
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -370,7 +375,9 @@ class BraketBackend:
             complex_register_dict.update(tmp_complex_register_dict)
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
-    def run_measurement_registers(self, measurement: Any) -> Tuple[
+    def run_measurement_registers(
+        self, measurement: Any
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -419,7 +426,9 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
+    def run_measurement_registers_hybrid(
+        self, measurement: Any
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
