@@ -12,7 +12,7 @@
 """Test running local operation with qasm backend."""
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
-from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct
+from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct  # type:ignore
 from qoqo import operations as ops
 from typing import List, Any, Optional
 import pytest
