@@ -308,7 +308,9 @@ class BraketBackend:
                 )
         return (task_specification, shots, readout)
 
-    def run_circuit(self, circuit: Circuit) -> Tuple[
+    def run_circuit(
+        self, circuit: Circuit
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -333,7 +335,9 @@ class BraketBackend:
         results = quantum_task.result()
         return _post_process_circuit_result(results, metadata)
 
-    def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
+    def run_circuits_batch(
+        self, circuits: List[Circuit]
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -365,12 +369,26 @@ class BraketBackend:
                 tmp_float_register_dict,
                 tmp_complex_register_dict,
             ) = _post_process_circuit_result(results, metadata)
-            bool_register_dict.update(tmp_bool_register_dict)
-            float_register_dict.update(tmp_float_register_dict)
-            complex_register_dict.update(tmp_complex_register_dict)
+            for key, value in tmp_bool_register_dict.items():
+                if key in bool_register_dict:
+                    bool_register_dict[key].extend(value)
+                else:
+                    bool_register_dict[key] = value
+            for key, value in tmp_float_register_dict.items():
+                if key in float_register_dict:
+                    float_register_dict[key].extend(value)
+                else:
+                    float_register_dict[key] = value
+            for key, value in tmp_complex_register_dict.items():
+                if key in complex_register_dict:
+                    complex_register_dict[key].extend(value)
+                else:
+                    complex_register_dict[key] = value
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
-    def run_measurement_registers(self, measurement: Any) -> Tuple[
+    def run_measurement_registers(
+        self, measurement: Any
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -409,9 +427,21 @@ class BraketBackend:
                     tmp_complex_register_dict,
                 ) = self.run_circuit(run_circuit)
 
-                output_bit_register_dict.update(tmp_bit_register_dict)
-                output_float_register_dict.update(tmp_float_register_dict)
-                output_complex_register_dict.update(tmp_complex_register_dict)
+                for key, value in tmp_bit_register_dict.items():
+                    if key in output_bit_register_dict:
+                        output_bit_register_dict[key].extend(value)
+                    else:
+                        output_bit_register_dict[key] = value
+                for key, value in tmp_float_register_dict.items():
+                    if key in output_float_register_dict:
+                        output_float_register_dict[key].extend(value)
+                    else:
+                        output_float_register_dict[key] = value
+                for key, value in tmp_complex_register_dict.items():
+                    if key in output_complex_register_dict:
+                        output_complex_register_dict[key].extend(value)
+                    else:
+                        output_complex_register_dict[key] = value
 
         return (
             output_bit_register_dict,
@@ -419,7 +449,9 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
+    def run_measurement_registers_hybrid(
+        self, measurement: Any
+    ) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
