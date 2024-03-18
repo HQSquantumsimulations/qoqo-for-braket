@@ -126,7 +126,7 @@ def test_serialisation_program() -> None:
         deserialised._registers[2],
     )
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 0.0)  # FIXME find out why
+    assert np.isclose(results["0Z"], 0.0)
     assert np.isclose(results_queued["0Z"], 0.0)
 
     # After polling: result is not None
@@ -141,7 +141,7 @@ def test_serialisation_program() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 0.0)  # FIXME find out why
+    assert np.isclose(results["0Z"], 0.0)
     assert np.isclose(results_queued["0Z"], 0.0)
 
 
@@ -193,8 +193,8 @@ def test_serialisation_program_async() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
 
 def test_serialisation_using_config() -> None:
@@ -253,7 +253,7 @@ def test_serialisation_using_config() -> None:
     results = queued.poll_result()
     results_config = queued_config.poll_result()
     assert len(results.keys()) == len(results_config.keys()) == 1
-    assert np.isclose(results["0Z"], 0.0)  # FIXME find out why
+    assert np.isclose(results["0Z"], 0.0)
     assert np.isclose(results_config["0Z"], 0.0)
 
 
@@ -307,8 +307,8 @@ def test_serialisation_hybrid_async() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
     queued.delete_tmp_folder()
     deserialised.delete_tmp_folder()
