@@ -12,29 +12,30 @@
 
 """Provides the BraketBackend class."""
 
+import json
 import os
 import shutil
 import tempfile
-from typing import Tuple, Dict, List, Any, Optional, Union
-from qoqo import Circuit
-from braket.circuits import Circuit as BraketCircuit
-from qoqo import operations as ops
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
 import qoqo_qasm
-from qoqo_for_braket.interface import (
-    rigetti_verbatim_interface,
-    ionq_verbatim_interface,
-    oqc_verbatim_interface,
-)
-import json
-from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun
-from braket.aws import AwsQuantumTask, AwsDevice, AwsQuantumTaskBatch, AwsQuantumJob
-from braket.jobs.local import LocalQuantumJob
+from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
+from braket.aws.aws_session import AwsSession
+from braket.circuits import Circuit as BraketCircuit
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
-from braket.aws.aws_session import AwsSession
-import numpy as np
+from braket.jobs.local import LocalQuantumJob
+from qoqo import Circuit
+from qoqo import operations as ops
 
+from qoqo_for_braket.interface import (
+    ionq_verbatim_interface,
+    oqc_verbatim_interface,
+    rigetti_verbatim_interface,
+)
+from qoqo_for_braket.post_processing import _post_process_circuit_result
+from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedHybridRun, QueuedProgramRun
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
@@ -369,21 +370,21 @@ class BraketBackend:
                 tmp_float_register_dict,
                 tmp_complex_register_dict,
             ) = _post_process_circuit_result(results, metadata)
-            for key, value in tmp_bool_register_dict.items():
+            for key, value_bools in tmp_bool_register_dict.items():
                 if key in bool_register_dict:
-                    bool_register_dict[key].extend(value)
+                    bool_register_dict[key].extend(value_bools)
                 else:
-                    bool_register_dict[key] = value
-            for key, value in tmp_float_register_dict.items():
+                    bool_register_dict[key] = value_bools
+            for key, value_floats in tmp_float_register_dict.items():
                 if key in float_register_dict:
-                    float_register_dict[key].extend(value)
+                    float_register_dict[key].extend(value_floats)
                 else:
-                    float_register_dict[key] = value
-            for key, value in tmp_complex_register_dict.items():
+                    float_register_dict[key] = value_floats
+            for key, value_complexes in tmp_complex_register_dict.items():
                 if key in complex_register_dict:
-                    complex_register_dict[key].extend(value)
+                    complex_register_dict[key].extend(value_complexes)
                 else:
-                    complex_register_dict[key] = value
+                    complex_register_dict[key] = value_complexes
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
     def run_measurement_registers(
@@ -426,22 +427,21 @@ class BraketBackend:
                     tmp_float_register_dict,
                     tmp_complex_register_dict,
                 ) = self.run_circuit(run_circuit)
-
-                for key, value in tmp_bit_register_dict.items():
+                for key, value_bools in tmp_bit_register_dict.items():
                     if key in output_bit_register_dict:
-                        output_bit_register_dict[key].extend(value)
+                        output_bit_register_dict[key].extend(value_bools)
                     else:
-                        output_bit_register_dict[key] = value
-                for key, value in tmp_float_register_dict.items():
+                        output_bit_register_dict[key] = value_bools
+                for key, value_floats in tmp_float_register_dict.items():
                     if key in output_float_register_dict:
-                        output_float_register_dict[key].extend(value)
+                        output_float_register_dict[key].extend(value_floats)
                     else:
-                        output_float_register_dict[key] = value
-                for key, value in tmp_complex_register_dict.items():
+                        output_float_register_dict[key] = value_floats
+                for key, value_complexes in tmp_complex_register_dict.items():
                     if key in output_complex_register_dict:
-                        output_complex_register_dict[key].extend(value)
+                        output_complex_register_dict[key].extend(value_complexes)
                     else:
-                        output_complex_register_dict[key] = value
+                        output_complex_register_dict[key] = value_complexes
 
         return (
             output_bit_register_dict,
