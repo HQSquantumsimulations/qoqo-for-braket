@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.5.0
+
+* Added `BraketBackend.run_program()` allowing for multiple runs in one call thanks to a list of lists of parameter values
+
 ## 0.4.1
 
 * Added keys to the config dictionary to allow for correct verbatim mode runs
