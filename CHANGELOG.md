@@ -7,6 +7,7 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 ## 0.4.3
 
 * Fixed overwriting registers bug
+* Fixed missing registers checks from QueuedProgramRun.poll_results()
 
 ## 0.4.2
 
