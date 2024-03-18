@@ -570,7 +570,7 @@ class BraketBackend:
 
         Returns:
             Optional[List[Dict[str, float]]]: list of dictionaries of containing the
-                resulting run results.
+                run results.
         """
         returned_registers = []
 
