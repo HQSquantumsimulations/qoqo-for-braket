@@ -76,6 +76,49 @@ def test_ionq_all_gates() -> None:
             assert qubit == 1 or qubit == 0
 
 
+def test_ionq_allowed_argument_ranges() -> None:
+    """Test running with IonQ."""
+    backend = BraketBackend()
+    backend.force_ionq_verbatim()
+
+    ionq_circuit = Circuit()
+    ionq_circuit += ops.DefinitionBit("ro", 4, True)
+    # arguments larger than 2 * pi
+    ionq_circuit += ops.GPi(0, 3 * np.pi)
+    ionq_circuit += ops.GPi2(1, 3 * np.pi)
+    ionq_circuit += ops.MolmerSorensenXX(2, 3)
+    ionq_circuit += ops.VariableMSXX(1, 2, 3 * np.pi)
+    # arguments negative
+    ionq_circuit += ops.GPi(0, -np.pi / 2)
+    ionq_circuit += ops.GPi2(1, -np.pi / 2)
+    ionq_circuit += ops.MolmerSorensenXX(2, 3)
+    ionq_circuit += ops.VariableMSXX(1, 2, -np.pi / 2)
+    # MolmerSorensen phi_0 and phi_1 argument larger than pi/2
+    ionq_circuit += ops.RotateZ(0, 3 * np.pi)
+    ionq_circuit += ops.RotateZ(1, 3 * np.pi)
+    ionq_circuit += ops.MolmerSorensenXX(0, 1)
+    ionq_circuit += ops.VariableMSXX(0, 1, 3 * np.pi)
+    # MolmerSorensen phi_0 argument negative
+    ionq_circuit += ops.RotateZ(0, -np.pi / 2)
+    ionq_circuit += ops.RotateZ(1, -np.pi / 2)
+    ionq_circuit += ops.MolmerSorensenXX(0, 1)
+    ionq_circuit += ops.VariableMSXX(0, 1, 3 * np.pi)
+
+    ionq_circuit += ops.MeasureQubit(0, "ro", 0)
+    ionq_circuit += ops.MeasureQubit(1, "ro", 1)
+    ionq_circuit += ops.MeasureQubit(2, "ro", 2)
+    ionq_circuit += ops.MeasureQubit(3, "ro", 3)
+    ionq_circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
+    (ionq_bit_res, _, _) = backend.run_circuit(ionq_circuit)
+    assert "ro" in ionq_bit_res.keys()
+    ionq_registers = ionq_bit_res["ro"]
+    assert len(ionq_registers) == 10
+    assert len(ionq_registers[0]) == 4
+    for ionq_measurement in ionq_registers:
+        for qubit in ionq_measurement:
+            assert qubit == 1 or qubit == 0
+
+
 def test_ionq_sign() -> None:
     """Test running with IonQ."""
     backend = BraketBackend()

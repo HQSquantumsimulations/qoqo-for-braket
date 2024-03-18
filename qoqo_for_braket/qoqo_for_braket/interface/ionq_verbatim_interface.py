@@ -14,6 +14,8 @@
 from braket.circuits import Circuit
 import qoqo
 from typing import TYPE_CHECKING, Dict
+import numpy as np
+from qoqo_calculator_pyo3 import CalculatorFloat
 
 if TYPE_CHECKING:
     from qoqo_calculator_pyo3 import CalculatorFloat
@@ -61,13 +63,28 @@ def call_circuit(circuit: qoqo.Circuit) -> Circuit:
                 0.0 + qubit_phase.get(op.target(), 0.0),
             )
         elif op.hqslang() == "VariableMSXX":
-            braket_circuit.ms(
-                op.control(),
-                op.target(),
-                0.0 + qubit_phase.get(op.control(), 0.0),
-                0.0 + qubit_phase.get(op.target(), 0.0),
-                op.theta(),
-            )
+            theta = op.theta().float()
+            if -0.5 * np.pi <= theta < 0:
+                braket_circuit.ms(
+                    op.control(),
+                    op.target(),
+                    0.0 + qubit_phase.get(op.control(), 0.0),
+                    (np.pi + float(qubit_phase.get(op.target(), 0.0))) % (2 * np.pi),
+                    abs(op.theta()),
+                )
+            elif 0 <= theta <= 0.5 * np.pi:
+                braket_circuit.ms(
+                    op.control(),
+                    op.target(),
+                    0.0 + qubit_phase.get(op.control(), 0.0),
+                    0.0 + qubit_phase.get(op.target(), 0.0),
+                    op.theta(),
+                )
+            else:
+                print(
+                    "The value of theta in this VariableMSXX gate is out of range. "
+                    + "The allowed range is [-pi/2, pi/2]."
+                )
         elif op.hqslang() in ALLOWED_OPERATIONS:
             pass
         else:
