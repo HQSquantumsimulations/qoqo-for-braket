@@ -26,7 +26,7 @@ from braket.circuits import Circuit as BraketCircuit
 from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.jobs.local import LocalQuantumJob
-from qoqo import Circuit
+from qoqo import Circuit, QuantumProgram
 from qoqo import operations as ops
 
 from qoqo_for_braket.interface import (
@@ -554,6 +554,31 @@ class BraketBackend:
             output_float_register_dict,
             output_complex_register_dict,
         )
+
+    def run_program(
+        self, program: QuantumProgram, params_values: List[List[float]]
+    ) -> Optional[List[Dict[str, float]]]:
+        """Run a qoqo quantum program on a AWS backend.
+
+        The list of lists of parameters will be used to call `program.run()` as many
+        times as the number of sublists.
+
+        Args:
+            program (QuantumProgram): the qoqo quantum program to run.
+            params_values (List[List[float]]): the parameters values to pass to the quantum
+                program.
+
+        Returns:
+            Optional[List[Dict[str, float]]]: list of dictionaries of containing the
+                resulting run results.
+        """
+        returned_registers = []
+
+        for params in params_values:
+            res = program.run(self, params)
+            returned_registers.append(res)
+
+        return returned_registers
 
     def run_circuit_queued(self, circuit: Circuit) -> QueuedCircuitRun:
         """Run a Circuit on a AWS backend and return a queued Job Result.
