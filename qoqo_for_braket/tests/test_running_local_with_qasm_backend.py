@@ -102,7 +102,6 @@ def test_measurement_overwrite():
 
     try:
         output = backend.run_measurement_registers(measurement=measurement)
-        print(output)
     except Exception:
         assert False
 
