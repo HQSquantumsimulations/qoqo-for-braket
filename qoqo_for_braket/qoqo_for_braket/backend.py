@@ -444,10 +444,13 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement_registers_hybrid(self, measurement: Any) -> Tuple[
-        Dict[str, List[List[bool]]],
-        Dict[str, List[List[float]]],
-        Dict[str, List[List[complex]]],
+    def run_measurement_registers_hybrid(self, measurement: Any) -> Union[
+        Tuple[
+            Dict[str, List[List[bool]]],
+            Dict[str, List[List[float]]],
+            Dict[str, List[List[complex]]],
+        ],
+        Dict[str, float],
     ]:
         """Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.
 
@@ -457,9 +460,14 @@ class BraketBackend:
             measurement: The measurement that is run.
 
         Returns:
-            Tuple[Dict[str, List[List[bool]]],
-                  Dict[str, List[List[float]]],
-                  Dict[str, List[List[complex]]]]
+            Union[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ],
+                Dict[str, float],
+            ]
         """
         job = self._run_measurement_registers_hybrid(measurement)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -472,6 +480,8 @@ class BraketBackend:
                 with open(os.path.join(os.path.join(os.getcwd(), jobname), "output.json")) as f:
                     outputs = json.load(f)
                 shutil.rmtree(os.path.join(os.getcwd(), jobname))
+            if not isinstance(measurement, ClassicalRegister):
+                outputs = measurement.evaluate(outputs[0], outputs[1], outputs[2])
 
         return outputs
 
@@ -484,7 +494,7 @@ class BraketBackend:
             measurement: The measurement that is run.
 
         Returns:
-            QueuedQuantumProgramHybrid
+            QueuedHybridRun
         """
         job = self._run_measurement_registers_hybrid(measurement, wait_until_complete=False)
         return QueuedHybridRun(self.aws_session, job, job.metadata(), measurement)
