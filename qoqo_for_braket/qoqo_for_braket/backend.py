@@ -706,12 +706,12 @@ class BraketBackend:
         input_parameter_names = program.input_parameter_names()
 
         if not params_values:
-            queued_programs.append(self.run_measurement_queued(program.measurement(), []))
+            queued_programs.append(self.run_measurement_queued(program.measurement()))
         for params in params_values:
             if len(params) != len(input_parameter_names):
                 raise ValueError(
-                    "Incorrect length of params_values compared to program's input parameter"
-                    " names."
+                    f"Wrong number of parameters {len(input_parameter_names)} parameters"
+                    f" expected {len(params)} parameters given."
                 )
             substituted_parameters = dict(zip(input_parameter_names, params))
             measurement = program.measurement().substitute_parameters(substituted_parameters)

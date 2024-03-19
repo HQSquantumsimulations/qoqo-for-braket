@@ -9,15 +9,18 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
-"""Test running local operation with qasm backend."""
-from qoqo_for_braket import BraketBackend, QueuedCircuitRun, QueuedProgramRun, QueuedHybridRun
-from qoqo import Circuit, measurements
-from qoqo import operations as ops
+"""Test running local operation with qasm backend (Queued Jobs)."""
+
+import copy
+import sys
+
 import numpy as np
 import pytest
-import sys
 from braket.aws.aws_session import AwsSession
-import copy
+from qoqo import Circuit, QuantumProgram, measurements
+from qoqo import operations as ops
+
+from qoqo_for_braket import BraketBackend, QueuedCircuitRun, QueuedHybridRun, QueuedProgramRun
 
 
 def test_serialisation_circuit() -> None:
@@ -313,6 +316,7 @@ def test_serialisation_hybrid_async() -> None:
     queued.delete_tmp_folder()
     deserialised.delete_tmp_folder()
 
+
 def test_serialization_program_overwrite():
     backend = BraketBackend()
 
@@ -329,7 +333,9 @@ def test_serialization_program_overwrite():
     circuit_2 += ops.MeasureQubit(0, "same", 0)
     circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
 
-    measurement = measurements.ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+    measurement = measurements.ClassicalRegister(
+        constant_circuit=None, circuits=[circuit_1, circuit_2]
+    )
 
     queued = backend.run_measurement_queued(measurement)
 
@@ -359,6 +365,79 @@ def test_serialization_program_overwrite():
     assert not results_queued[0]["same"][3][0]
     assert not results_queued[1]
     assert not results_queued[2]
+
+
+def test_serialisation_run_program():
+    backend = BraketBackend()
+
+    init_circuit = Circuit()
+    init_circuit += ops.RotateX(0, "angle_0")
+    init_circuit += ops.RotateY(0, "angle_1")
+
+    z_circuit = Circuit()
+    z_circuit += ops.DefinitionBit("ro_z", 1, is_output=True)
+    z_circuit += ops.PragmaRepeatedMeasurement("ro_z", 1000, None)
+
+    x_circuit = Circuit()
+    x_circuit += ops.DefinitionBit("ro_x", 1, is_output=True)
+    x_circuit += ops.Hadamard(0)
+    x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
+
+    measurement_input = measurements.PauliZProductInput(1, False)
+    z_basis_index = measurement_input.add_pauliz_product(
+        "ro_z",
+        [
+            0,
+        ],
+    )
+    x_basis_index = measurement_input.add_pauliz_product(
+        "ro_x",
+        [
+            0,
+        ],
+    )
+    measurement_input.add_linear_exp_val(
+        "<H>",
+        {x_basis_index: 0.1, z_basis_index: 0.2},
+    )
+
+    measurement = measurements.PauliZProduct(
+        constant_circuit=init_circuit,
+        circuits=[z_circuit, x_circuit],
+        input=measurement_input,
+    )
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    with pytest.raises(ValueError) as exc:
+        _ = backend.run_program_queued(program=program, params_values=[[0.4]])
+    assert "Wrong number of parameters 2 parameters expected 1 parameters given." in str(exc.value)
+
+    with pytest.raises(NameError) as exc:
+        _ = backend.run_program_queued(program=program, params_values=[])
+    assert "Missing input variable 'angle_0'." in str(exc.value)
+
+    queued_jobs = backend.run_program_queued(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
+
+    assert len(queued_jobs) == 3
+
+    for queued in queued_jobs:
+        i = 0
+        while queued.poll_result() is None:
+            i += 1
+            if i > 50:
+                raise RuntimeError("Timed out waiting for job to complete")
+
+        serialised = queued.to_json()
+        deserialised = QueuedProgramRun.from_json(serialised)
+
+        results = queued.poll_result()
+        results_queued = deserialised.poll_result()
+
+        assert len(results) == len(results_queued) == 1
+        assert results["<H>"]
 
 
 if __name__ == "__main__":
