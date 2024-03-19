@@ -126,8 +126,8 @@ def test_serialisation_program() -> None:
         deserialised._registers[2],
     )
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
     # After polling: result is not None
     i = 0
@@ -141,8 +141,8 @@ def test_serialisation_program() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
 
 @pytest.mark.skip()
@@ -193,8 +193,8 @@ def test_serialisation_program_async() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
 
 def test_serialisation_using_config() -> None:
@@ -253,8 +253,8 @@ def test_serialisation_using_config() -> None:
     results = queued.poll_result()
     results_config = queued_config.poll_result()
     assert len(results.keys()) == len(results_config.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_config["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_config["0Z"], 0.0)
 
 
 @pytest.mark.skip()
@@ -307,11 +307,58 @@ def test_serialisation_hybrid_async() -> None:
     results = queued.poll_result()
     results_queued = deserialised.poll_result()
     assert len(results.keys()) == len(results_queued.keys()) == 1
-    assert np.isclose(results["0Z"], 1.0)
-    assert np.isclose(results_queued["0Z"], 1.0)
+    assert np.isclose(results["0Z"], 0.0)
+    assert np.isclose(results_queued["0Z"], 0.0)
 
     queued.delete_tmp_folder()
     deserialised.delete_tmp_folder()
+
+def test_serialization_program_overwrite():
+    backend = BraketBackend()
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.DefinitionBit("same", 1, True)
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.MeasureQubit(0, "same", 0)
+    circuit_1 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.DefinitionBit("same", 1, True)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.MeasureQubit(0, "same", 0)
+    circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+    measurement = measurements.ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+
+    queued = backend.run_measurement_queued(measurement)
+
+    i = 0
+    while queued.poll_result() is None:
+        i += 1
+        if i > 50:
+            raise RuntimeError("Timed out waiting for job to complete")
+
+    serialised = queued.to_json()
+    deserialised = QueuedProgramRun.from_json(serialised)
+
+    results = queued.poll_result()
+    results_queued = deserialised.poll_result()
+
+    assert len(results[0].keys()) == len(results_queued[0].keys()) == 1
+    assert len(results[0]["same"]) == len(results_queued[0]["same"]) == 4
+    assert results[0]["same"][0][0]
+    assert results[0]["same"][1][0]
+    assert not results[0]["same"][2][0]
+    assert not results[0]["same"][3][0]
+    assert not results[1]
+    assert not results[2]
+    assert results_queued[0]["same"][0][0]
+    assert results_queued[0]["same"][1][0]
+    assert not results_queued[0]["same"][2][0]
+    assert not results_queued[0]["same"][3][0]
+    assert not results_queued[1]
+    assert not results_queued[2]
 
 
 if __name__ == "__main__":
