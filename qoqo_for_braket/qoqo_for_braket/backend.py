@@ -28,6 +28,7 @@ from braket.ir import openqasm
 from braket.jobs.local import LocalQuantumJob
 from qoqo import Circuit, QuantumProgram
 from qoqo import operations as ops
+from qoqo.measurements import ClassicalRegister  # type:ignore
 
 from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
@@ -580,11 +581,24 @@ class BraketBackend:
 
     def run_program(
         self, program: QuantumProgram, params_values: List[List[float]]
-    ) -> Optional[List[Dict[str, float]]]:
+    ) -> Optional[
+        List[
+            Union[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ],
+                Dict[str, float],
+            ]
+        ]
+    ]:
         """Run a qoqo quantum program on a AWS backend.
 
-        The list of lists of parameters will be used to call `program.run()` as many
-        times as the number of sublists.
+        It can handle QuantumProgram instances containing any kind of measurement. The list of
+        lists of parameters will be used to call `program.run(self, params)` or
+        `program.run_registers(self, params)`as many times as the number of sublists.
+        The return type will change accordingly.
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
@@ -592,16 +606,34 @@ class BraketBackend:
                 program.
 
         Returns:
-            Optional[List[Dict[str, float]]]: list of dictionaries of containing the
+            Optional[
+                List[
+                    Union[
+                        Tuple[
+                            Dict[str, List[List[bool]]],
+                            Dict[str, List[List[float]]],
+                            Dict[str, List[List[complex]]],
+                        ],
+                        Dict[str, float],
+                    ]
+                ]
+            ]: list of dictionaries (or tuples of dictionaries) containing the
                 run results.
         """
-        returned_registers = []
+        returned_results = []
 
-        for params in params_values:
-            res = program.run(self, params)
-            returned_registers.append(res)
+        if isinstance(program.measurement(), ClassicalRegister):
+            if not params_values:
+                returned_results.append(program.run_registers(self, []))
+            for params in params_values:
+                returned_results.append(program.run_registers(self, params))
+        else:
+            if not params_values:
+                returned_results.append(program.run(self, []))
+            for params in params_values:
+                returned_results.append(program.run(self, params))
 
-        return returned_registers
+        return returned_results
 
     def run_circuit_queued(self, circuit: Circuit) -> QueuedCircuitRun:
         """Run a Circuit on a AWS backend and return a queued Job Result.
@@ -646,3 +678,27 @@ class BraketBackend:
 
             queued_circuits.append(self.run_circuit_queued(run_circuit))
         return QueuedProgramRun(measurement, queued_circuits)
+
+    # def run_program_queued(
+    #     self, program: QuantumProgram, params_values: List[List[float]]
+    # ) -> List[QueuedProgramRun]:
+    #     """Run a qoqo quantum program on a AWS backend and return a list of queued Job Results.
+
+    #     The list of lists of parameters will be used to call `program.run()` as many
+    #     times as the number of sublists.
+
+    #     Args:
+    #         program (QuantumProgram): the qoqo quantum program to run.
+    #         params_values (List[List[float]]): the parameters values to pass to the quantum
+    #             program.
+
+    #     Returns:
+    #         List[QueuedProgramRun]
+    #     """
+    #     # NO
+    #     queued_programs = []
+
+    #     for params in params_values:
+    #         queued_programs.append(self.run_measurement_queued(program.measurement, params))
+
+    #     return queued_programs

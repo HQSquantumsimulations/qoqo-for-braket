@@ -214,5 +214,17 @@ def test_quantum_program():
     for el in res:
         assert float(el['<H>'])
 
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+
+    assert len(res) == 3
+    assert res[0][0]
+    assert not res[0][1]
+    assert not res[0][2]
+
+
 if __name__ == "__main__":
     pytest.main(sys.argv)
