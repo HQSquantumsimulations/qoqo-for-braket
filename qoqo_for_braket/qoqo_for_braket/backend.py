@@ -13,16 +13,9 @@
 """Provides the BraketBackend class."""
 
 import json
-import json
 import os
 import shutil
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-import numpy as np
-import qoqo_qasm
-from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
-from braket.aws.aws_session import AwsSession
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -35,7 +28,6 @@ from braket.ir import openqasm
 from braket.jobs.local import LocalQuantumJob
 from qoqo import Circuit, QuantumProgram
 from qoqo import operations as ops
-
 
 from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
