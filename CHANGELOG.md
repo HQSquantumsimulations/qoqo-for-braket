@@ -8,6 +8,15 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 * Added `BraketBackend.run_program()` allowing for multiple runs in one call thanks to a list of lists of parameter values
 
+## 0.4.3
+
+* Fixed overwriting registers bug
+* Fixed missing registers checks from QueuedProgramRun.poll_results()
+
+## 0.4.2
+
+* Fixed ClassicalRegister typo in the Queued classes
+
 ## 0.4.1
 
 * Added keys to the config dictionary to allow for correct verbatim mode runs

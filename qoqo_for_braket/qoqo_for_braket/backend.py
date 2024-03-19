@@ -13,9 +13,16 @@
 """Provides the BraketBackend class."""
 
 import json
+import json
 import os
 import shutil
 import tempfile
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import qoqo_qasm
+from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
+from braket.aws.aws_session import AwsSession
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -28,6 +35,7 @@ from braket.ir import openqasm
 from braket.jobs.local import LocalQuantumJob
 from qoqo import Circuit, QuantumProgram
 from qoqo import operations as ops
+
 
 from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
@@ -370,9 +378,21 @@ class BraketBackend:
                 tmp_float_register_dict,
                 tmp_complex_register_dict,
             ) = _post_process_circuit_result(results, metadata)
-            bool_register_dict.update(tmp_bool_register_dict)
-            float_register_dict.update(tmp_float_register_dict)
-            complex_register_dict.update(tmp_complex_register_dict)
+            for key, value_bools in tmp_bool_register_dict.items():
+                if key in bool_register_dict:
+                    bool_register_dict[key].extend(value_bools)
+                else:
+                    bool_register_dict[key] = value_bools
+            for key, value_floats in tmp_float_register_dict.items():
+                if key in float_register_dict:
+                    float_register_dict[key].extend(value_floats)
+                else:
+                    float_register_dict[key] = value_floats
+            for key, value_complexes in tmp_complex_register_dict.items():
+                if key in complex_register_dict:
+                    complex_register_dict[key].extend(value_complexes)
+                else:
+                    complex_register_dict[key] = value_complexes
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
     def run_measurement_registers(
@@ -415,10 +435,21 @@ class BraketBackend:
                     tmp_float_register_dict,
                     tmp_complex_register_dict,
                 ) = self.run_circuit(run_circuit)
-
-                output_bit_register_dict.update(tmp_bit_register_dict)
-                output_float_register_dict.update(tmp_float_register_dict)
-                output_complex_register_dict.update(tmp_complex_register_dict)
+                for key, value_bools in tmp_bit_register_dict.items():
+                    if key in output_bit_register_dict:
+                        output_bit_register_dict[key].extend(value_bools)
+                    else:
+                        output_bit_register_dict[key] = value_bools
+                for key, value_floats in tmp_float_register_dict.items():
+                    if key in output_float_register_dict:
+                        output_float_register_dict[key].extend(value_floats)
+                    else:
+                        output_float_register_dict[key] = value_floats
+                for key, value_complexes in tmp_complex_register_dict.items():
+                    if key in output_complex_register_dict:
+                        output_complex_register_dict[key].extend(value_complexes)
+                    else:
+                        output_complex_register_dict[key] = value_complexes
 
         return (
             output_bit_register_dict,
