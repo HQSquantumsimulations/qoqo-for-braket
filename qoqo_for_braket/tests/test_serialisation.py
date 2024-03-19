@@ -368,6 +368,7 @@ def test_serialization_program_overwrite():
 
 
 def test_serialisation_run_program():
+    """Test run_program_queued."""
     backend = BraketBackend()
 
     init_circuit = Circuit()
@@ -432,6 +433,78 @@ def test_serialisation_run_program():
 
         serialised = queued.to_json()
         deserialised = QueuedProgramRun.from_json(serialised)
+
+        results = queued.poll_result()
+        results_queued = deserialised.poll_result()
+
+        assert len(results) == len(results_queued) == 1
+        assert results["<H>"]
+
+
+@pytest.mark.skip()
+def test_serialisation_run_program_hybrid_async():
+    """Test run_program_queued for QueuedHybridRun for an async job. """
+    aws_session = AwsSession()
+    backend = BraketBackend(
+        aws_session=aws_session,
+        # device="arn:aws:braket:::device/quantum-simulator/amazon/sv1",
+    )
+    backend.change_max_shots(2)
+
+    init_circuit = Circuit()
+    init_circuit += ops.RotateX(0, "angle_0")
+    init_circuit += ops.RotateY(0, "angle_1")
+
+    z_circuit = Circuit()
+    z_circuit += ops.DefinitionBit("ro_z", 1, is_output=True)
+    z_circuit += ops.PragmaRepeatedMeasurement("ro_z", 1000, None)
+
+    x_circuit = Circuit()
+    x_circuit += ops.DefinitionBit("ro_x", 1, is_output=True)
+    x_circuit += ops.Hadamard(0)
+    x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
+
+    measurement_input = measurements.PauliZProductInput(1, False)
+    z_basis_index = measurement_input.add_pauliz_product(
+        "ro_z",
+        [
+            0,
+        ],
+    )
+    x_basis_index = measurement_input.add_pauliz_product(
+        "ro_x",
+        [
+            0,
+        ],
+    )
+    measurement_input.add_linear_exp_val(
+        "<H>",
+        {x_basis_index: 0.1, z_basis_index: 0.2},
+    )
+
+    measurement = measurements.PauliZProduct(
+        constant_circuit=init_circuit,
+        circuits=[z_circuit, x_circuit],
+        input=measurement_input,
+    )
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    queued_jobs = backend.run_program_queued(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]], hybrid=True
+    )
+
+    assert len(queued_jobs) == 3
+
+    for queued in queued_jobs:
+        i = 0
+        while queued.poll_result() is None:
+            i += 1
+            if i > 50:
+                raise RuntimeError("Timed out waiting for job to complete")
+
+        serialised = queued.to_json()
+        deserialised = QueuedHybridRun.from_json(serialised)
 
         results = queued.poll_result()
         results_queued = deserialised.poll_result()

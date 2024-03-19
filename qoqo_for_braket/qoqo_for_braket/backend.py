@@ -512,9 +512,7 @@ class BraketBackend:
                 Should be False when using queued runs.
 
         Returns:
-            Tuple[Dict[str, List[List[bool]]],
-                  Dict[str, List[List[float]]],
-                  Dict[str, List[List[complex]]]]
+            AwsQuantumJob
         """
         # get path of this file
         file_path = os.path.dirname(os.path.realpath(__file__))
@@ -683,30 +681,38 @@ class BraketBackend:
         return QueuedProgramRun(measurement, queued_circuits)
 
     def run_program_queued(
-        self, program: QuantumProgram, params_values: List[List[float]]
-    ) -> List[QueuedProgramRun]:
+        self, program: QuantumProgram, params_values: List[List[float]], hybrid: bool = False
+    ) -> List[Union[QueuedProgramRun, QueuedHybridRun]]:
         """Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.
 
         This effectively performs the same operations as `run_program` but returns
         queued results.
 
+        The hybrid parameter can specify whether to run the program in hybrid mode or not.
+
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
             params_values (List[List[float]]): the parameters values to pass to the quantum
                 program.
+            hybrid (bool): whether to run the program in hybrid mode.
 
         Raises:
             ValueError: incorrect length of params_values compared to program's input
                 parameter names.
 
         Returns:
-            List[QueuedProgramRun]
+            List[Union[QueuedProgramRun, QueuedHybridRun]]
         """
-        queued_programs = []
+        queued_runs = []
         input_parameter_names = program.input_parameter_names()
 
         if not params_values:
-            queued_programs.append(self.run_measurement_queued(program.measurement()))
+            if hybrid:
+                queued_runs.append(
+                    self.run_measurement_registers_hybrid_queued(program.measurement())
+                )
+            else:
+                queued_runs.append(self.run_measurement_queued(program.measurement()))
         for params in params_values:
             if len(params) != len(input_parameter_names):
                 raise ValueError(
@@ -715,6 +721,9 @@ class BraketBackend:
                 )
             substituted_parameters = dict(zip(input_parameter_names, params))
             measurement = program.measurement().substitute_parameters(substituted_parameters)
-            queued_programs.append(self.run_measurement_queued(measurement))
+            if hybrid:
+                queued_runs.append(self.run_measurement_registers_hybrid_queued(measurement))
+            else:
+                queued_runs.append(self.run_measurement_queued(measurement))
 
-        return queued_programs
+        return queued_runs
