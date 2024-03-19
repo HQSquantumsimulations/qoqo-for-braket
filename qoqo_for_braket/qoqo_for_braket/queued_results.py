@@ -184,6 +184,12 @@ class QueuedProgramRun:
             Dict[str, List[List[float]]],
             Dict[str, List[List[complex]]],
         ] = ({}, {}, {})
+        self._queued_circuits_finished = [False] * len(self._queued_circuits)
+        # necessary because for a local run the result may be already ready
+        #  when this QPR is instantiated
+        for i, queued_circuit in enumerate(self._queued_circuits):
+            if queued_circuit.poll_result() is not None:
+                self._queued_circuits_finished[i] = True
         for circuit in self._queued_circuits:
             if circuit._results is not None:
                 for key, value_bools in circuit._results[0].items():
@@ -231,38 +237,39 @@ class QueuedProgramRun:
         Raises:
             RuntimeError: job failed or cancelled
         """
-        if self._registers is not None:
+        # If all are finished, returned the saved results
+        if all(self._queued_circuits_finished):
             if isinstance(self._measurement, measurements.ClassicalRegister):
                 return self._registers
             else:
                 return self._measurement.evaluate(
                     self._registers[0], self._registers[1], self._registers[2]
                 )
-        all_finished = [False] * len(self._queued_circuits)
         for i, queued_circuit in enumerate(self._queued_circuits):
-            res = queued_circuit.poll_result()
-            if res is not None:
-                # add results to bit registers
-                for key, value_bools in res[0].items():
-                    if key in self._registers[0]:
-                        self._registers[0][key].extend(copy.deepcopy(value_bools))
-                    else:
-                        self._registers[0][key] = copy.deepcopy(value_bools)
-                # add results to float registers
-                for key, value_floats in res[1].items():
-                    if key in self._registers[1]:
-                        self._registers[1][key].extend(copy.deepcopy(value_floats))
-                    else:
-                        self._registers[1][key] = copy.deepcopy(value_floats)
-                # add results to complex registers
-                for key, value_complexes in res[2].items():
-                    if key in self._registers[2]:
-                        self._registers[2][key].extend(copy.deepcopy(value_complexes))
-                    else:
-                        self._registers[2][key] = copy.deepcopy(value_complexes)
-                all_finished[i] = True
+            if not self._queued_circuits_finished[i]:
+                res = queued_circuit.poll_result()
+                if res is not None:
+                    # add results to bit registers
+                    for key, value_bools in res[0].items():
+                        if key in self._registers[0]:
+                            self._registers[0][key].extend(copy.deepcopy(value_bools))
+                        else:
+                            self._registers[0][key] = copy.deepcopy(value_bools)
+                    # add results to float registers
+                    for key, value_floats in res[1].items():
+                        if key in self._registers[1]:
+                            self._registers[1][key].extend(copy.deepcopy(value_floats))
+                        else:
+                            self._registers[1][key] = copy.deepcopy(value_floats)
+                    # add results to complex registers
+                    for key, value_complexes in res[2].items():
+                        if key in self._registers[2]:
+                            self._registers[2][key].extend(copy.deepcopy(value_complexes))
+                        else:
+                            self._registers[2][key] = copy.deepcopy(value_complexes)
+                    self._queued_circuits_finished[i] = True
 
-        if not all(all_finished):
+        if not all(self._queued_circuits_finished):
             return None
         else:
             if isinstance(self._measurement, measurements.ClassicalRegister):
