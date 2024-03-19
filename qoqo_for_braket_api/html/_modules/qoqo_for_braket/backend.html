@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.4.1 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=bdd5de88"></script>
+        <script src="../../_static/documentation_options.js?v=5821f1fd"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -35,7 +35,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.4.1
+                0.4.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -89,29 +89,30 @@
 
 <span class="sd">&quot;&quot;&quot;Provides the BraketBackend class.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span>
-<span class="kn">from</span> <span class="nn">braket.circuits</span> <span class="kn">import</span> <span class="n">Circuit</span> <span class="k">as</span> <span class="n">BraketCircuit</span>
-<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">qoqo_qasm</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">rigetti_verbatim_interface</span><span class="p">,</span>
-    <span class="n">ionq_verbatim_interface</span><span class="p">,</span>
-    <span class="n">oqc_verbatim_interface</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span><span class="p">,</span> <span class="n">QueuedHybridRun</span>
-<span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span><span class="p">,</span> <span class="n">AwsQuantumJob</span>
-<span class="kn">from</span> <span class="nn">braket.jobs.local</span> <span class="kn">import</span> <span class="n">LocalQuantumJob</span>
+<span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">,</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
+<span class="kn">from</span> <span class="nn">braket.aws.aws_session</span> <span class="kn">import</span> <span class="n">AwsSession</span>
+<span class="kn">from</span> <span class="nn">braket.circuits</span> <span class="kn">import</span> <span class="n">Circuit</span> <span class="k">as</span> <span class="n">BraketCircuit</span>
 <span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
 <span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
-<span class="kn">from</span> <span class="nn">braket.aws.aws_session</span> <span class="kn">import</span> <span class="n">AwsSession</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">braket.jobs.local</span> <span class="kn">import</span> <span class="n">LocalQuantumJob</span>
+<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span>
+<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
 
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ionq_verbatim_interface</span><span class="p">,</span>
+    <span class="n">oqc_verbatim_interface</span><span class="p">,</span>
+    <span class="n">rigetti_verbatim_interface</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
+<span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedHybridRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span>
 
 <span class="n">LOCAL_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;braket_sv&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_dm&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_ahs&quot;</span><span class="p">]</span>
 <span class="n">REMOTE_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -482,9 +483,21 @@
                 <span class="n">tmp_float_register_dict</span><span class="p">,</span>
                 <span class="n">tmp_complex_register_dict</span><span class="p">,</span>
             <span class="p">)</span> <span class="o">=</span> <span class="n">_post_process_circuit_result</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
-            <span class="n">bool_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_bool_register_dict</span><span class="p">)</span>
-            <span class="n">float_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_float_register_dict</span><span class="p">)</span>
-            <span class="n">complex_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_complex_register_dict</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_bools</span> <span class="ow">in</span> <span class="n">tmp_bool_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">bool_register_dict</span><span class="p">:</span>
+                    <span class="n">bool_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_bools</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bool_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_bools</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_floats</span> <span class="ow">in</span> <span class="n">tmp_float_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">float_register_dict</span><span class="p">:</span>
+                    <span class="n">float_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_floats</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">float_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_floats</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_complexes</span> <span class="ow">in</span> <span class="n">tmp_complex_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">complex_register_dict</span><span class="p">:</span>
+                    <span class="n">complex_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_complexes</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">complex_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_complexes</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">bool_register_dict</span><span class="p">,</span> <span class="n">float_register_dict</span><span class="p">,</span> <span class="n">complex_register_dict</span><span class="p">)</span></div>
 
 
@@ -528,10 +541,21 @@
                     <span class="n">tmp_float_register_dict</span><span class="p">,</span>
                     <span class="n">tmp_complex_register_dict</span><span class="p">,</span>
                 <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_circuit</span><span class="p">(</span><span class="n">run_circuit</span><span class="p">)</span>
-
-                <span class="n">output_bit_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_bit_register_dict</span><span class="p">)</span>
-                <span class="n">output_float_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_float_register_dict</span><span class="p">)</span>
-                <span class="n">output_complex_register_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tmp_complex_register_dict</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_bools</span> <span class="ow">in</span> <span class="n">tmp_bit_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">output_bit_register_dict</span><span class="p">:</span>
+                        <span class="n">output_bit_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_bools</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output_bit_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_bools</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_floats</span> <span class="ow">in</span> <span class="n">tmp_float_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">output_float_register_dict</span><span class="p">:</span>
+                        <span class="n">output_float_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_floats</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output_float_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_floats</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_complexes</span> <span class="ow">in</span> <span class="n">tmp_complex_register_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">output_complex_register_dict</span><span class="p">:</span>
+                        <span class="n">output_complex_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value_complexes</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">output_complex_register_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_complexes</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">output_bit_register_dict</span><span class="p">,</span>
