@@ -376,10 +376,13 @@ class QueuedHybridRun:
         """
         self._job: QuantumJob = job
         self._results: Optional[
-            Tuple[
-                Dict[str, List[List[bool]]],
-                Dict[str, List[List[float]]],
-                Dict[str, List[List[complex]]],
+            Union[
+                Tuple[
+                    Dict[str, List[List[bool]]],
+                    Dict[str, List[List[float]]],
+                    Dict[str, List[List[complex]]],
+                ],
+                Dict[str, float],
             ]
         ] = None
         self.session = session
