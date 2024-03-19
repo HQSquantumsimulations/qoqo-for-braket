@@ -593,12 +593,15 @@ class BraketBackend:
             ]
         ]
     ]:
-        """Run a qoqo quantum program on a AWS backend.
+        """Run a qoqo quantum program on a AWS backend multiple times.
 
         It can handle QuantumProgram instances containing any kind of measurement. The list of
         lists of parameters will be used to call `program.run(self, params)` or
-        `program.run_registers(self, params)`as many times as the number of sublists.
+        `program.run_registers(self, params)` as many times as the number of sublists.
         The return type will change accordingly.
+
+        If no parameters values are provided, a normal call `program.run(self, [])` call
+        will be executed.
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
@@ -679,26 +682,39 @@ class BraketBackend:
             queued_circuits.append(self.run_circuit_queued(run_circuit))
         return QueuedProgramRun(measurement, queued_circuits)
 
-    # def run_program_queued(
-    #     self, program: QuantumProgram, params_values: List[List[float]]
-    # ) -> List[QueuedProgramRun]:
-    #     """Run a qoqo quantum program on a AWS backend and return a list of queued Job Results.
+    def run_program_queued(
+        self, program: QuantumProgram, params_values: List[List[float]]
+    ) -> List[QueuedProgramRun]:
+        """Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.
 
-    #     The list of lists of parameters will be used to call `program.run()` as many
-    #     times as the number of sublists.
+        This effectively performs the same operations as `run_program` but returns
+        queued results.
 
-    #     Args:
-    #         program (QuantumProgram): the qoqo quantum program to run.
-    #         params_values (List[List[float]]): the parameters values to pass to the quantum
-    #             program.
+        Args:
+            program (QuantumProgram): the qoqo quantum program to run.
+            params_values (List[List[float]]): the parameters values to pass to the quantum
+                program.
 
-    #     Returns:
-    #         List[QueuedProgramRun]
-    #     """
-    #     # NO
-    #     queued_programs = []
+        Raises:
+            ValueError: incorrect length of params_values compared to program's input
+                parameter names.
 
-    #     for params in params_values:
-    #         queued_programs.append(self.run_measurement_queued(program.measurement, params))
+        Returns:
+            List[QueuedProgramRun]
+        """
+        queued_programs = []
+        input_parameter_names = program.input_parameter_names()
 
-    #     return queued_programs
+        if not params_values:
+            queued_programs.append(self.run_measurement_queued(program.measurement(), []))
+        for params in params_values:
+            if len(params) != len(input_parameter_names):
+                raise ValueError(
+                    "Incorrect length of params_values compared to program's input parameter"
+                    " names."
+                )
+            substituted_parameters = dict(zip(input_parameter_names, params))
+            measurement = program.measurement().substitute_parameters(substituted_parameters)
+            queued_programs.append(self.run_measurement_queued(measurement))
+
+        return queued_programs
