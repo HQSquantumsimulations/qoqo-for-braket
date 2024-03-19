@@ -703,7 +703,7 @@ class BraketBackend:
         Returns:
             List[Union[QueuedProgramRun, QueuedHybridRun]]
         """
-        queued_runs = []
+        queued_runs: List[Union[QueuedProgramRun, QueuedHybridRun]] = []
         input_parameter_names = program.input_parameter_names()
 
         if not params_values:
