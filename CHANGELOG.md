@@ -6,7 +6,7 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## 0.5.0
 
-* Added `BraketBackend.run_program()` allowing for multiple runs in one call thanks to a list of lists of parameter values
+* Added `BraketBackend.run_program()`, `BraketBackend.run_program_queued()` allowing for multiple runs in one call thanks to a list of lists of parameter values
 
 ## 0.4.3
 
