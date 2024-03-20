@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.4.3 documentation</title>
+  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5821f1fd"></script>
+        <script src="../_static/documentation_options.js?v=5e5be09d"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -37,7 +37,7 @@
             qoqo_for_braket
           </a>
               <div class="version">
-                0.4.3
+                0.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -74,6 +74,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_registers"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_registers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_registers_hybrid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_measurement_registers_hybrid_queued()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_program"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_program()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.run_program_queued"><code class="docutils literal notranslate"><span class="pre">BraketBackend.run_program_queued()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun"><code class="docutils literal notranslate"><span class="pre">QueuedCircuitRun</span></code></a><ul>
@@ -296,12 +298,7 @@ registers are not supported.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple[Dict[str, List[List[bool]]],</dt><dd><p>Dict[str, List[List[float]]],
-Dict[str, List[List[complex]]]]</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>AwsQuantumJob</p>
 </dd>
 </dl>
 </dd></dl>
@@ -479,7 +476,7 @@ Dict[str, List[List[complex]]]]</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid">
-<span class="sig-name descname"><span class="pre">run_measurement_registers_hybrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_measurement_registers_hybrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_measurement_registers_hybrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_measurement_registers_hybrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid" title="Link to this definition"></a></dt>
 <dd><p>Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.</p>
 <p>Using hybrid jobs allows us to naturally group the circuits from a measurement.</p>
 <dl class="field-list simple">
@@ -487,11 +484,18 @@ Dict[str, List[List[complex]]]]</p>
 <dd class="field-odd"><p><strong>measurement</strong> -- The measurement that is run.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Tuple[Dict[str, List[List[bool]]],</dt><dd><p>Dict[str, List[List[float]]],
-Dict[str, List[List[complex]]]]</p>
+<dd class="field-even"><p><dl>
+<dt>Union[</dt><dd><dl class="simple">
+<dt>Tuple[</dt><dd><p>Dict[str, List[List[bool]]],
+Dict[str, List[List[float]]],
+Dict[str, List[List[complex]]],</p>
 </dd>
 </dl>
+<p>],
+Dict[str, float],</p>
+</dd>
+</dl>
+<p>]</p>
 </p>
 </dd>
 </dl>
@@ -507,7 +511,78 @@ Dict[str, List[List[complex]]]]</p>
 <dd class="field-odd"><p><strong>measurement</strong> -- The measurement that is run.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>QueuedQuantumProgramHybrid</p>
+<dd class="field-even"><p>QueuedHybridRun</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_program">
+<span class="sig-name descname"><span class="pre">run_program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">program</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumProgram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">complex</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_program"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_program" title="Link to this definition"></a></dt>
+<dd><p>Run a qoqo quantum program on a AWS backend multiple times.</p>
+<p>It can handle QuantumProgram instances containing any kind of measurement. The list of
+lists of parameters will be used to call <cite>program.run(self, params)</cite> or
+<cite>program.run_registers(self, params)</cite> as many times as the number of sublists.
+The return type will change accordingly.</p>
+<p>If no parameters values are provided, a normal call <cite>program.run(self, [])</cite> call
+will be executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>program</strong> (<em>QuantumProgram</em>) -- the qoqo quantum program to run.</p></li>
+<li><p><strong>params_values</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>float</em><em>]</em><em>]</em>) -- the parameters values to pass to the quantum
+program.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl>
+<dt>Optional[</dt><dd><dl>
+<dt>List[</dt><dd><dl>
+<dt>Union[</dt><dd><dl class="simple">
+<dt>Tuple[</dt><dd><p>Dict[str, List[List[bool]]],
+Dict[str, List[List[float]]],
+Dict[str, List[List[complex]]],</p>
+</dd>
+</dl>
+<p>],
+Dict[str, float],</p>
+</dd>
+</dl>
+<p>]</p>
+</dd>
+</dl>
+<p>]</p>
+</dd>
+<dt>]: list of dictionaries (or tuples of dictionaries) containing the</dt><dd><p>run results.</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.run_program_queued">
+<span class="sig-name descname"><span class="pre">run_program_queued</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">program</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumProgram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hybrid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.queued_results.QueuedProgramRun"><span class="pre">QueuedProgramRun</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun" title="qoqo_for_braket.queued_results.QueuedHybridRun"><span class="pre">QueuedHybridRun</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend.run_program_queued"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend.run_program_queued" title="Link to this definition"></a></dt>
+<dd><p>Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.</p>
+<p>This effectively performs the same operations as <cite>run_program</cite> but returns
+queued results.</p>
+<p>The hybrid parameter can specify whether to run the program in hybrid mode or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>program</strong> (<em>QuantumProgram</em>) -- the qoqo quantum program to run.</p></li>
+<li><p><strong>params_values</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>float</em><em>]</em><em>]</em>) -- the parameters values to pass to the quantum
+program.</p></li>
+<li><p><strong>hybrid</strong> (<em>bool</em>) -- whether to run the program in hybrid mode.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- incorrect length of params_values compared to program's input
+    parameter names.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Union[QueuedProgramRun, QueuedHybridRun]]</p>
 </dd>
 </dl>
 </dd></dl>
