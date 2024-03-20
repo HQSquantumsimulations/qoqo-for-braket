@@ -464,7 +464,7 @@ dependencies = [
 
 [[package]]
 name = "qoqo_for_braket_devices"
-version = "0.4.3"
+version = "0.5.0"
 dependencies = [
  "bincode",
  "ndarray",
@@ -580,7 +580,7 @@ dependencies = [
 
 [[package]]
 name = "roqoqo_for_braket_devices"
-version = "0.4.3"
+version = "0.5.0"
 dependencies = [
  "itertools",
  "ndarray",

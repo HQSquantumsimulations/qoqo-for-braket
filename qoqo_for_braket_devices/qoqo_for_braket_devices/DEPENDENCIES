@@ -10131,7 +10131,7 @@ LICENSE:
 
 
 ====================================================
-qoqo_for_braket_devices 0.4.3
+qoqo_for_braket_devices 0.5.0
 https://github.com/HQSquantumsimulations/qoqo_for_braket
 by HQS Quantum Simulations <info@quantumsimulations.de>
 AWS's Braket devices interface for qoqo python quantum computing toolkit
@@ -12176,7 +12176,7 @@ LICENSE:
 
 
 ====================================================
-roqoqo_for_braket_devices 0.4.3
+roqoqo_for_braket_devices 0.5.0
 https://github.com/HQSquantumsimulations/qoqo_for_braket
 by HQS Quantum Simulations <info@quantumsimulations.de>
 AWS's Braket devices interface for roqoqo rust quantum computing toolkit
