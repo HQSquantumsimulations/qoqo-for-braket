@@ -26,7 +26,7 @@ use pyo3::prelude::*;
 
 /// AWS Devices
 #[pymodule]
-pub fn aws_devices(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn aws_devices(_py: Python, m: &Bound<PyModule>) -> PyResult<()> {
     m.add_class::<IonQAria1DeviceWrapper>()?;
     m.add_class::<IonQHarmonyDeviceWrapper>()?;
     m.add_class::<OQCLucyDeviceWrapper>()?;

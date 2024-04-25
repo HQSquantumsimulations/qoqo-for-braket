@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.6.0
+
+* Updated to pyo3 0.21
+
 ## 0.5.0
 
 * Modified `run_measurement_registers_hybrid()` to handle non-ClassicalRegister measurements

@@ -1,8 +1,5 @@
 [workspace]
-members = [
-    "roqoqo_for_braket_devices",
-    "qoqo_for_braket_devices",
-]
+members = ["roqoqo_for_braket_devices", "qoqo_for_braket_devices"]
 
 resolver = "2"
 
