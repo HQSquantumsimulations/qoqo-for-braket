@@ -216,10 +216,10 @@ impl OQCLucyDeviceWrapper {
     fn qubit_decoherence_rates(&self, qubit: usize) -> Py<PyArray2<f64>> {
         Python::with_gil(|py| -> Py<PyArray2<f64>> {
             match self.internal.qubit_decoherence_rates(&qubit) {
-                Some(matrix) => matrix.to_pyarray(py).to_owned(),
+                Some(matrix) => matrix.to_pyarray_bound(py).unbind().to_owned(),
                 None => {
                     let matrix = Array2::<f64>::zeros((3, 3));
-                    matrix.to_pyarray(py).to_owned()
+                    matrix.to_pyarray_bound(py).unbind().to_owned()
                 }
             }
         })
@@ -333,7 +333,7 @@ impl OQCLucyDeviceWrapper {
     /// Fallible conversion of generic python object...
     pub fn from_pyany(input: Py<PyAny>) -> PyResult<OQCLucyDevice> {
         Python::with_gil(|py| -> PyResult<OQCLucyDevice> {
-            let input = input.as_ref(py);
+            let input = input.bind(py);
             if let Ok(try_downcast) = input.extract::<OQCLucyDeviceWrapper>() {
                 Ok(try_downcast.internal)
             } else {
