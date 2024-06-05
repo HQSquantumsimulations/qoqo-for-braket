@@ -11,8 +11,8 @@
 # the License.
 """Test running local operation with qasm backend."""
 from qoqo_for_braket import BraketBackend
-from qoqo import Circuit
-from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct
+from qoqo import Circuit, QuantumProgram
+from qoqo.measurements import ClassicalRegister, PauliZProductInput, PauliZProduct  # type:ignore
 from qoqo import operations as ops
 from typing import List, Any, Optional
 import pytest
@@ -81,6 +81,39 @@ def test_measurement_register_classicalregister(operations: List[Any]):
     assert not output[1]
     assert not output[2]
 
+def test_measurement_overwrite():
+    backend = BraketBackend()
+
+    circuit_1 = Circuit()
+    circuit_1 += ops.DefinitionBit("same", 1, True)
+    circuit_1 += ops.PauliX(0)
+    circuit_1 += ops.MeasureQubit(0, "same", 0)
+    circuit_1 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+    circuit_2 = Circuit()
+    circuit_2 += ops.DefinitionBit("same", 1, True)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.PauliX(0)
+    circuit_2 += ops.MeasureQubit(0, "same", 0)
+    circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
+
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
+
+    try:
+        output = backend.run_measurement_registers(measurement=measurement)
+    except Exception:
+        assert False
+
+    # output should look like ({'same': [[True], [True], [False], [False]]}, {}, {})
+    assert len(output[0]["same"]) == 4
+    assert output[0]["same"][0][0]
+    assert output[0]["same"][1][0]
+    assert not output[0]["same"][2][0]
+    assert not output[0]["same"][3][0]
+    assert not output[1]
+    assert not output[2]
+
 
 @pytest.mark.parametrize("operations", list_of_operations)
 def test_measurement(operations: List[Any]):
@@ -140,6 +173,57 @@ def test_batch_measurement():
 
     assert "0Z_2" in result.keys()
     assert result["0Z_2"] == -1.0
+
+def test_quantum_program():
+    backend = BraketBackend()
+
+    init_circuit = Circuit()
+    init_circuit += ops.RotateX(0, "angle_0")
+    init_circuit += ops.RotateY(0, "angle_1")
+
+    z_circuit = Circuit()
+    z_circuit += ops.DefinitionBit("ro_z", 1, is_output=True)
+    z_circuit += ops.PragmaRepeatedMeasurement("ro_z", 1000, None)
+
+    x_circuit = Circuit()
+    x_circuit += ops.DefinitionBit("ro_x", 1, is_output=True)
+    x_circuit += ops.Hadamard(0)
+    x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
+
+    measurement_input = PauliZProductInput(1, False)
+    z_basis_index = measurement_input.add_pauliz_product("ro_z", [0,])
+    x_basis_index = measurement_input.add_pauliz_product("ro_x", [0,])
+    measurement_input.add_linear_exp_val(
+        "<H>", {x_basis_index: 0.1, z_basis_index: 0.2},
+    )
+
+    measurement = PauliZProduct(
+        constant_circuit=init_circuit,
+        circuits=[z_circuit, x_circuit],
+        input=measurement_input,
+    )
+
+    program = QuantumProgram(
+        measurement=measurement,
+        input_parameter_names=["angle_0", "angle_1"],
+    )
+
+    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+
+    assert len(res) == 3
+    for el in res:
+        assert float(el['<H>'])
+
+    measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
+
+    program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
+
+    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+
+    assert len(res) == 3
+    assert res[0][0]
+    assert not res[0][1]
+    assert not res[0][2]
 
 
 if __name__ == "__main__":

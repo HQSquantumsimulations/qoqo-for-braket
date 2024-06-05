@@ -4,9 +4,15 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.5.0
+
+* Modified `run_measurement_registers_hybrid()` to handle non-ClassicalRegister measurements
+* Added `run_program()`, `run_program_queued()` allowing for multiple runs in one call thanks to a list of lists of parameter values
+
 ## 0.4.3
 
-* Bugfix for is_output=false issue in register definition
+* Fixed overwriting registers bug
+* Fixed missing registers checks from QueuedProgramRun.poll_results()
 
 ## 0.4.2
 

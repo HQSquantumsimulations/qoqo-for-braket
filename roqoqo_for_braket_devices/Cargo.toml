@@ -1,6 +1,6 @@
 [package]
 name = "roqoqo_for_braket_devices"
-version = "0.4.3"
+version = "0.5.0"
 authors = ["HQS Quantum Simulations <info@quantumsimulations.de>"]
 license = "Apache-2.0"
 edition = "2021"
@@ -18,7 +18,7 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-roqoqo = {version = "1.9", features = ["unstable_qoqo_devices"]}
+roqoqo = {version = "~1.11", features = ["unstable_qoqo_devices"]}
 ndarray = "0.15"
 itertools = "0.12"
 serde = {version = "1.0", features = ["derive"]}
