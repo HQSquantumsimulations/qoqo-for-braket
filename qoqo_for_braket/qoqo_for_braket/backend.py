@@ -31,6 +31,7 @@ from qoqo.measurements import ClassicalRegister  # type:ignore
 
 from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
+    iqm_verbatim_interface,
     oqc_verbatim_interface,
     rigetti_verbatim_interface,
 )
@@ -87,6 +88,7 @@ class BraketBackend:
         self.__use_actual_hardware = False
         self.__force_rigetti_verbatim = False
         self.__force_ionq_verbatim = False
+        self.__force_iqm_verbatim = False
         self.__force_oqc_verbatim = False
         self.__max_circuit_length = 100
         self.__max_number_shots = 100
@@ -103,6 +105,7 @@ class BraketBackend:
             "force_rigetti_verbatim": self.__force_rigetti_verbatim,
             "force_oqc_verbatim": self.__force_oqc_verbatim,
             "force_ionq_verbatim": self.__force_ionq_verbatim,
+            "force_iqm_verbatim": self.__force_iqm_verbatim,
             "batch_mode": self.batch_mode,
         }
 
@@ -115,6 +118,7 @@ class BraketBackend:
         self.__force_rigetti_verbatim = config["force_rigetti_verbatim"]
         self.__force_oqc_verbatim = config["force_oqc_verbatim"]
         self.__force_ionq_verbatim = config["force_ionq_verbatim"]
+        self.__force_iqm_verbatim = config["force_iqm_verbatim"]
         self.batch_mode = config["batch_mode"]
 
     def allow_use_actual_hardware(self) -> None:
@@ -133,6 +137,11 @@ class BraketBackend:
     def force_ionq_verbatim(self) -> None:
         """Force the use of ionq verbatim. Mostly used for testing purposes."""
         self.__force_ionq_verbatim = True
+        self.verbatim_mode = True
+
+    def force_iqm_verbatim(self) -> None:
+        """Force the use of iqm verbatim. Mostly used for testing purposes."""
+        self.__force_iqm_verbatim = True
         self.verbatim_mode = True
 
     def force_oqc_verbatim(self) -> None:
@@ -315,6 +324,8 @@ class BraketBackend:
             task_specification = rigetti_verbatim_interface.call_circuit(circuit)
         elif "ionq" in self.device or self.__force_ionq_verbatim:
             task_specification = ionq_verbatim_interface.call_circuit(circuit)
+        elif "Garnet" in self.device or self.__force_iqm_verbatim:
+            task_specification = iqm_verbatim_interface.call_circuit(circuit)
 
         elif "Lucy" in self.device or self.__force_oqc_verbatim:
             task_specification = oqc_verbatim_interface.call_circuit(circuit)
@@ -322,6 +333,7 @@ class BraketBackend:
         if (
             self.__use_actual_hardware
             or self.__force_ionq_verbatim
+            or self.__force_iqm_verbatim
             or self.__force_oqc_verbatim
             or self.__force_rigetti_verbatim
         ):

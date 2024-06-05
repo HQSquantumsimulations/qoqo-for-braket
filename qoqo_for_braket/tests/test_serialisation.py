@@ -443,7 +443,7 @@ def test_serialisation_run_program():
 
 @pytest.mark.skip()
 def test_serialisation_run_program_hybrid_async():
-    """Test run_program_queued for QueuedHybridRun for an async job. """
+    """Test run_program_queued for QueuedHybridRun for an async job."""
     aws_session = AwsSession()
     backend = BraketBackend(
         aws_session=aws_session,
@@ -491,7 +491,9 @@ def test_serialisation_run_program_hybrid_async():
     program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
 
     queued_jobs = backend.run_program_queued(
-        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]], hybrid=True
+        program=program,
+        params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]],
+        hybrid=True,
     )
 
     assert len(queued_jobs) == 3
