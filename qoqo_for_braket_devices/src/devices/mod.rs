@@ -22,7 +22,7 @@ pub use oqc_lucy::*;
 mod rigetti_aspenm3;
 pub use rigetti_aspenm3::*;
 
-// use qoqo_iqm::GarnetDeviceWrapper;
+use qoqo_iqm::GarnetDeviceWrapper;
 
 use pyo3::prelude::*;
 
@@ -33,6 +33,6 @@ pub fn aws_devices(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<IonQHarmonyDeviceWrapper>()?;
     m.add_class::<OQCLucyDeviceWrapper>()?;
     m.add_class::<RigettiAspenM3DeviceWrapper>()?;
-    // m.add_class::<GarnetDeviceWrapper>()?;
+    m.add_class::<GarnetDeviceWrapper>()?;
     Ok(())
 }
