@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "pydantic",
-    "qoqo>=1.11,<1.2",
+    "qoqo>=1.11,<1.12",
     "qoqo_qasm>=0.8",
     "amazon-braket-sdk>=1.5.9"
 ]
