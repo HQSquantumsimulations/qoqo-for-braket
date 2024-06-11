@@ -348,9 +348,6 @@ class BraketBackend:
         return (task_specification, shots, readout)
 
     def _set_up_registers(self, circuit: Circuit) -> Tuple[
-        Dict[str, List[bool]],
-        Dict[str, List[float]],
-        Dict[str, List[complex]],
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
