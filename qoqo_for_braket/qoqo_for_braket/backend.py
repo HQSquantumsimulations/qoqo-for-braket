@@ -599,7 +599,7 @@ class BraketBackend:
         shutil.copyfile(
             helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
         )
-        requirement_lines = ["qoqo >= 1.9\n", "qoqo-for-braket >= 0.4"]
+        requirement_lines = ["qoqo >= 1.11\n", "qoqo-for-braket >= 0.5"]
         with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
             # write each line from requirement_lines to separate lines in file
             f.writelines(requirement_lines)
