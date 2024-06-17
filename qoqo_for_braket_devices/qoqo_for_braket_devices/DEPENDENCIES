@@ -949,7 +949,7 @@ limitations under the License.
 
 
 ====================================================
-backtrace 0.3.72
+backtrace 0.3.73
 https://github.com/rust-lang/backtrace-rs
 by The Rust Project Developers
 A library to acquire a stack trace (backtrace) at runtime in a Rust program.
@@ -8919,7 +8919,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 ====================================================
-httparse 1.9.2
+httparse 1.9.3
 https://github.com/seanmonstar/httparse
 by Sean McArthur <sean@seanmonstar.com>
 A tiny, safe, speedy, zero-copy HTTP/1.x parser.
@@ -13763,7 +13763,7 @@ limitations under the License.
 
 
 ====================================================
-memchr 2.7.2
+memchr 2.7.4
 https://github.com/BurntSushi/memchr
 by Andrew Gallant <jamslam@gmail.com>, bluss
 Provides extremely fast (uses SIMD on x86_64, aarch64 and wasm32) routines for
@@ -14380,7 +14380,7 @@ THE SOFTWARE.
 
 
 ====================================================
-nalgebra 0.32.5
+nalgebra 0.32.6
 https://nalgebra.org
 by Sébastien Crozet <developer@crozet.re>
 General-purpose linear algebra library with transformations and statically-sized or dynamically-sized matrices.
@@ -16078,7 +16078,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ====================================================
-object 0.35.0
+object 0.36.0
 https://github.com/gimli-rs/object
 by 
 A unified interface for reading and writing object file formats.
@@ -23682,7 +23682,7 @@ limitations under the License.
 
 
 ====================================================
-redox_syscall 0.5.1
+redox_syscall 0.5.2
 https://gitlab.redox-os.org/redox-os/syscall
 by Jeremy Soller <jackpot51@gmail.com>
 A Rust library to access raw Redox system calls
@@ -26229,7 +26229,7 @@ END OF TERMS AND CONDITIONS
 
 
 ====================================================
-safe_arch 0.7.1
+safe_arch 0.7.2
 https://github.com/Lokathor/safe_arch
 by Lokathor <zefria@gmail.com>
 Crate that exposes `core::arch` safely via `#[cfg()]`.
