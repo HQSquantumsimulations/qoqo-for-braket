@@ -196,7 +196,7 @@ class BraketBackend:
     def _run_circuit(
         self,
         circuit: Circuit,
-    ) -> Tuple[AwsQuantumTask, Dict[Any, Any]]:
+    ) -> Tuple[AwsQuantumTask, Dict[str, Any]]:
         """Simulate a Circuit on a AWS backend.
 
         The default number of shots for the simulation is 100.
@@ -209,7 +209,7 @@ class BraketBackend:
             circuit (Circuit): the Circuit to simulate.
 
         Returns:
-            (AwsQuantumTask, {readout})
+            (AwsQuantumTask, {readout, output_registers})
 
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
@@ -236,7 +236,7 @@ class BraketBackend:
     def _run_circuits_batch(
         self,
         circuits: List[Circuit],
-    ) -> Tuple[AwsQuantumTaskBatch, List[Dict[Any, Any]]]:
+    ) -> Tuple[AwsQuantumTaskBatch, List[Dict[str, Any]]]:
         """Run a list of Circuits on a AWS backend in batch mode.
 
         The default number of shots for the simulation is 100.
@@ -249,7 +249,7 @@ class BraketBackend:
             circuits (List[Circuit]): the Circuits to simulate.
 
         Returns:
-            (AwsQuantumTaskBatch, {readout})
+            (AwsQuantumTaskBatch, {readout, output_registers})
 
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
@@ -352,13 +352,14 @@ class BraketBackend:
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
     ]:
-        """Prepares a braket circuit for running on braket.
+        """Sets up the output registers for a circuit running on braket.
 
         Args:
-            circuit (Circuit): The qoqo Circuit that should be run.
+            circuit (Circuit): The qoqo Circuit for which to prepare the registers.
 
         Returns:
-            (BraketCircuit, int, str): The braket circuit, the number of shots and the readout.
+            (Dict[str, List[List[bool]]], Dict[str, List[List[float]]], Dict[str, List[List[complex]]]): The
+                output bit register, float register and complex register.
         """
         output_bit_register_dict: Dict[str, List[List[bool]]] = {}
         output_float_register_dict: Dict[str, List[List[float]]] = {}
