@@ -17,6 +17,7 @@ qoqo\_for\_braket\_devices.devices
 
    .. autosummary::
    
+      GarnetDevice
       IonQAria1Device
       IonQHarmonyDevice
       OQCLucyDevice

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket_devices.devices &mdash; qoqo_for_braket_devices 0.5.0 documentation</title>
+  <title>qoqo_for_braket_devices.devices &mdash; qoqo_for_braket_devices 0.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -15,8 +15,8 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=5e5be09d"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/documentation_options.js?v=db0e1f0c"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -37,7 +37,7 @@
             qoqo_for_braket_devices
           </a>
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -50,6 +50,21 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../qoqo_for_braket_devices.html">qoqo_for_braket_devices</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">qoqo_for_braket_devices.devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice"><code class="docutils literal notranslate"><span class="pre">GarnetDevice</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.__copy__"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.__copy__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.__deepcopy__"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.__deepcopy__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.__new__"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.__new__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.from_bincode"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.from_bincode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.multi_qubit_gate_time"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.multi_qubit_gate_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.number_qubits"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.number_qubits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.remote_host"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.remote_host()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.set_endpoint_url"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.set_endpoint_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.single_qubit_gate_time"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.single_qubit_gate_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.to_bincode"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.to_bincode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_edges"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.two_qubit_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_gate_time"><code class="docutils literal notranslate"><span class="pre">GarnetDevice.two_qubit_gate_time()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQAria1Device"><code class="docutils literal notranslate"><span class="pre">IonQAria1Device</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQAria1Device.__new__"><code class="docutils literal notranslate"><span class="pre">IonQAria1Device.__new__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQAria1Device.add_damping"><code class="docutils literal notranslate"><span class="pre">IonQAria1Device.add_damping()</span></code></a></li>
@@ -179,20 +194,235 @@
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQAria1Device" title="qoqo_for_braket_devices.devices.IonQAria1Device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IonQAria1Device</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice" title="qoqo_for_braket_devices.devices.GarnetDevice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GarnetDevice</span></code></a>()</p></td>
+<td><p>IQM Garnet device</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQAria1Device" title="qoqo_for_braket_devices.devices.IonQAria1Device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IonQAria1Device</span></code></a>()</p></td>
 <td><p>AWS IonQ Aria1 device</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQHarmonyDevice" title="qoqo_for_braket_devices.devices.IonQHarmonyDevice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IonQHarmonyDevice</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.IonQHarmonyDevice" title="qoqo_for_braket_devices.devices.IonQHarmonyDevice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IonQHarmonyDevice</span></code></a>()</p></td>
 <td><p>AWS IonQ Harmony device</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.OQCLucyDevice" title="qoqo_for_braket_devices.devices.OQCLucyDevice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OQCLucyDevice</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.OQCLucyDevice" title="qoqo_for_braket_devices.devices.OQCLucyDevice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OQCLucyDevice</span></code></a>()</p></td>
 <td><p>AWS OQC Lucy device</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.RigettiAspenM3Device" title="qoqo_for_braket_devices.devices.RigettiAspenM3Device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RigettiAspenM3Device</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.RigettiAspenM3Device" title="qoqo_for_braket_devices.devices.RigettiAspenM3Device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RigettiAspenM3Device</span></code></a>()</p></td>
 <td><p>AWS Rigetti Aspen M3 device</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket_devices.devices.</span></span><span class="sig-name descname"><span class="pre">GarnetDevice</span></span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice" title="Link to this definition"></a></dt>
+<dd><p>IQM Garnet device</p>
+<p>A hardware device composed of six qubits each coupled to a central resonator.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.__copy__">
+<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.__copy__" title="Link to this definition"></a></dt>
+<dd><p>Return a copy of the GarnetDevice (copy here produces a deepcopy).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A deep copy of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice" title="qoqo_for_braket_devices.devices.GarnetDevice">GarnetDevice</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.__deepcopy__">
+<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_memodict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.__deepcopy__" title="Link to this definition"></a></dt>
+<dd><p>Return a deep copy of the GarnetDevice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A deep copy of self.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice" title="qoqo_for_braket_devices.devices.GarnetDevice">GarnetDevice</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.__new__">
+<span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.__new__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.from_bincode">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bincode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.from_bincode" title="Link to this definition"></a></dt>
+<dd><p>Convert the bincode representation of the GarnetDevice to a GarnetDevice using the [bincode] crate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input</strong> (<em>ByteArray</em>) -- The serialized GarnetDevice (in [bincode] form).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The deserialized GarnetDevice.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qoqo_for_braket_devices.devices.GarnetDevice" title="qoqo_for_braket_devices.devices.GarnetDevice">GarnetDevice</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> -- Input cannot be converted to byte array.</p></li>
+<li><p><strong>ValueError</strong> -- Input cannot be deserialized to GarnetDevice.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.multi_qubit_gate_time">
+<span class="sig-name descname"><span class="pre">multi_qubit_gate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hqslang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.multi_qubit_gate_time" title="Link to this definition"></a></dt>
+<dd><p>Return the gate time of a multi-qubit operation on this device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hqslang</strong> (<em>str</em>) -- The name of the operation in hqslang format.</p></li>
+<li><p><strong>qubits</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) -- The qubits on which the operation is performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The gate time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>f64</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- The gate is not available in the device.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.number_qubits">
+<span class="sig-name descname"><span class="pre">number_qubits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.number_qubits" title="Link to this definition"></a></dt>
+<dd><p>Return number of qubits simulated by GarnetDevice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of qubits.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.remote_host">
+<span class="sig-name descname"><span class="pre">remote_host</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.remote_host" title="Link to this definition"></a></dt>
+<dd><p>Return the URL of the API endpoint for the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The URL of the remote host executing the Circuits.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.set_endpoint_url">
+<span class="sig-name descname"><span class="pre">set_endpoint_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.set_endpoint_url" title="Link to this definition"></a></dt>
+<dd><p>Change API endpoint URL of the device</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_url</strong> (<em>str</em>) -- The new URL to set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.single_qubit_gate_time">
+<span class="sig-name descname"><span class="pre">single_qubit_gate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hqslang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.single_qubit_gate_time" title="Link to this definition"></a></dt>
+<dd><p>Return the gate time of a single-qubit operation on this device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hqslang</strong> (<em>str</em>) -- The name of the operation in hqslang format.</p></li>
+<li><p><strong>qubit</strong> (<em>int</em>) -- The qubit on which the operation is performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The gate time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>f64</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- The gate is not available in the device.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.to_bincode">
+<span class="sig-name descname"><span class="pre">to_bincode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.to_bincode" title="Link to this definition"></a></dt>
+<dd><p>Return the bincode representation of the GarnetDevice using the [bincode] crate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The serialized GarnetDevice (in [bincode] form).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ByteArray</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- Cannot serialize GarnetDevice to bytes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_edges">
+<span class="sig-name descname"><span class="pre">two_qubit_edges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_edges" title="Link to this definition"></a></dt>
+<dd><p>Return the list of pairs of qubits linked by a native two-qubit-gate in the device.</p>
+<p>A pair of qubits is considered linked by a native two-qubit-gate if the device
+can implement a two-qubit-gate between the two qubits without decomposing it
+into a sequence of gates that involves a third qubit of the device.
+The two-qubit-gate also has to form a universal set together with the available
+single qubit gates.</p>
+<p>The returned vector is a simple, graph-library independent, representation of
+the undirected connectivity graph of the device.
+It can be used to construct the connectivity graph in a graph library of the user's
+choice from a list of edges and can be used for applications like routing in quantum algorithms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The list of two qubit edges.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_gate_time">
+<span class="sig-name descname"><span class="pre">two_qubit_gate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hqslang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qoqo_for_braket_devices.devices.GarnetDevice.two_qubit_gate_time" title="Link to this definition"></a></dt>
+<dd><p>Return the gate time of a two-qubit operation on this device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hqslang</strong> (<em>str</em>) -- The name of the operation in hqslang format.</p></li>
+<li><p><strong>control</strong> (<em>int</em>) -- The control qubit on which the operation is performed.</p></li>
+<li><p><strong>target</strong> (<em>int</em>) -- The target qubit on which the operation is performed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The gate time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>f64</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- The gate is not available in the device.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket_devices.devices.IonQAria1Device">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket_devices.devices.</span></span><span class="sig-name descname"><span class="pre">IonQAria1Device</span></span><a class="headerlink" href="#qoqo_for_braket_devices.devices.IonQAria1Device" title="Link to this definition"></a></dt>
