@@ -358,8 +358,9 @@ class BraketBackend:
             circuit (Circuit): The qoqo Circuit for which to prepare the registers.
 
         Returns:
-            (Dict[str, List[List[bool]]], Dict[str, List[List[float]]], Dict[str, List[List[complex]]]): The
-                output bit register, float register and complex register.
+            (Dict[str, List[List[bool]]], Dict[str, List[List[float]]],
+             Dict[str, List[List[complex]]]): The output bit register, float
+                                              register and complex register.
         """
         output_bit_register_dict: Dict[str, List[List[bool]]] = {}
         output_float_register_dict: Dict[str, List[List[float]]] = {}
