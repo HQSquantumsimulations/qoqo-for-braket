@@ -32,8 +32,11 @@ def _post_process_circuit_result(results: Any, metadata: Dict[Any, Any]) -> Tupl
               Dict[str, List[List[float]]],
               Dict[str, List[List[complex]]]: processed results
     """
-    bit_results = {}
+    bit_results = metadata["output_registers"][0]
+    float_results = metadata["output_registers"][1]
+    complex_results = metadata["output_registers"][2]
     measurements = results.measurements
     bit_field = measurements > 0
     bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
-    return (bit_results, {}, {})
+
+    return (bit_results, float_results, complex_results)

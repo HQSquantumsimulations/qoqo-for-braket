@@ -81,6 +81,7 @@ def test_measurement_register_classicalregister(operations: List[Any]):
     assert not output[1]
     assert not output[2]
 
+
 def test_measurement_overwrite():
     backend = BraketBackend()
 
@@ -96,7 +97,6 @@ def test_measurement_overwrite():
     circuit_2 += ops.PauliX(0)
     circuit_2 += ops.MeasureQubit(0, "same", 0)
     circuit_2 += ops.PragmaSetNumberOfMeasurements(2, "same")
-
 
     measurement = ClassicalRegister(constant_circuit=None, circuits=[circuit_1, circuit_2])
 
@@ -174,6 +174,7 @@ def test_batch_measurement():
     assert "0Z_2" in result.keys()
     assert result["0Z_2"] == -1.0
 
+
 def test_quantum_program():
     backend = BraketBackend()
 
@@ -191,10 +192,21 @@ def test_quantum_program():
     x_circuit += ops.PragmaRepeatedMeasurement("ro_x", 1000, None)
 
     measurement_input = PauliZProductInput(1, False)
-    z_basis_index = measurement_input.add_pauliz_product("ro_z", [0,])
-    x_basis_index = measurement_input.add_pauliz_product("ro_x", [0,])
+    z_basis_index = measurement_input.add_pauliz_product(
+        "ro_z",
+        [
+            0,
+        ],
+    )
+    x_basis_index = measurement_input.add_pauliz_product(
+        "ro_x",
+        [
+            0,
+        ],
+    )
     measurement_input.add_linear_exp_val(
-        "<H>", {x_basis_index: 0.1, z_basis_index: 0.2},
+        "<H>",
+        {x_basis_index: 0.1, z_basis_index: 0.2},
     )
 
     measurement = PauliZProduct(
@@ -208,17 +220,21 @@ def test_quantum_program():
         input_parameter_names=["angle_0", "angle_1"],
     )
 
-    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+    res = backend.run_program(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
 
     assert len(res) == 3
     for el in res:
-        assert float(el['<H>'])
+        assert float(el["<H>"])
 
     measurement = ClassicalRegister(constant_circuit=None, circuits=[init_circuit, init_circuit])
 
     program = QuantumProgram(measurement=measurement, input_parameter_names=["angle_0", "angle_1"])
 
-    res = backend.run_program(program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]])
+    res = backend.run_program(
+        program=program, params_values=[[0.785, 0.238], [0.234, 0.653], [0.875, 0.612]]
+    )
 
     assert len(res) == 3
     assert res[0][0]

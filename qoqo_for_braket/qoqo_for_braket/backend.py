@@ -16,8 +16,7 @@ import json
 import os
 import shutil
 import tempfile
-from typing import Any, Dict, List, Optional, Tuple, Union
-
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import numpy as np
 import qoqo_qasm
 from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
@@ -32,6 +31,7 @@ from qoqo.measurements import ClassicalRegister  # type:ignore
 
 from qoqo_for_braket.interface import (
     ionq_verbatim_interface,
+    iqm_verbatim_interface,
     oqc_verbatim_interface,
     rigetti_verbatim_interface,
 )
@@ -88,6 +88,7 @@ class BraketBackend:
         self.__use_actual_hardware = False
         self.__force_rigetti_verbatim = False
         self.__force_ionq_verbatim = False
+        self.__force_iqm_verbatim = False
         self.__force_oqc_verbatim = False
         self.__max_circuit_length = 100
         self.__max_number_shots = 100
@@ -104,6 +105,7 @@ class BraketBackend:
             "force_rigetti_verbatim": self.__force_rigetti_verbatim,
             "force_oqc_verbatim": self.__force_oqc_verbatim,
             "force_ionq_verbatim": self.__force_ionq_verbatim,
+            "force_iqm_verbatim": self.__force_iqm_verbatim,
             "batch_mode": self.batch_mode,
         }
 
@@ -116,6 +118,7 @@ class BraketBackend:
         self.__force_rigetti_verbatim = config["force_rigetti_verbatim"]
         self.__force_oqc_verbatim = config["force_oqc_verbatim"]
         self.__force_ionq_verbatim = config["force_ionq_verbatim"]
+        self.__force_iqm_verbatim = config["force_iqm_verbatim"]
         self.batch_mode = config["batch_mode"]
 
     def allow_use_actual_hardware(self) -> None:
@@ -134,6 +137,11 @@ class BraketBackend:
     def force_ionq_verbatim(self) -> None:
         """Force the use of ionq verbatim. Mostly used for testing purposes."""
         self.__force_ionq_verbatim = True
+        self.verbatim_mode = True
+
+    def force_iqm_verbatim(self) -> None:
+        """Force the use of iqm verbatim. Mostly used for testing purposes."""
+        self.__force_iqm_verbatim = True
         self.verbatim_mode = True
 
     def force_oqc_verbatim(self) -> None:
@@ -188,7 +196,7 @@ class BraketBackend:
     def _run_circuit(
         self,
         circuit: Circuit,
-    ) -> Tuple[AwsQuantumTask, Dict[Any, Any]]:
+    ) -> Tuple[AwsQuantumTask, Dict[str, Any]]:
         """Simulate a Circuit on a AWS backend.
 
         The default number of shots for the simulation is 100.
@@ -201,22 +209,34 @@ class BraketBackend:
             circuit (Circuit): the Circuit to simulate.
 
         Returns:
-            (AwsQuantumTask, {readout})
+            (AwsQuantumTask, {readout, output_registers})
 
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
         """
+        (
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        ) = self._set_up_registers(circuit)
         (task_specification, shots, readout) = self._prepare_circuit_for_run(circuit)
         return (
             self.__create_device().run(task_specification, shots=shots),
-            {"readout_name": readout},
+            {
+                "readout_name": readout,
+                "output_registers": (
+                    output_bit_register_dict,
+                    output_float_register_dict,
+                    output_complex_register_dict,
+                ),
+            },
         )
 
     # runs a circuit internally and can be used to produce sync and async results
     def _run_circuits_batch(
         self,
         circuits: List[Circuit],
-    ) -> Tuple[AwsQuantumTaskBatch, List[Dict[Any, Any]]]:
+    ) -> Tuple[AwsQuantumTaskBatch, List[Dict[str, Any]]]:
         """Run a list of Circuits on a AWS backend in batch mode.
 
         The default number of shots for the simulation is 100.
@@ -229,19 +249,33 @@ class BraketBackend:
             circuits (List[Circuit]): the Circuits to simulate.
 
         Returns:
-            (AwsQuantumTaskBatch, {readout})
+            (AwsQuantumTaskBatch, {readout, output_registers})
 
         Raises:
             ValueError: Circuit contains multiple ways to set the number of measurements
         """
         task_specifications: List[BraketCircuit] = []
         shots_list = []
-        readouts = []
+        metadata = []
         for circuit in circuits:
             (task_specification, shots, readout) = self._prepare_circuit_for_run(circuit)
+            (
+                output_bit_register_dict,
+                output_float_register_dict,
+                output_complex_register_dict,
+            ) = self._set_up_registers(circuit)
             task_specifications.append(task_specification)
             shots_list.append(shots)
-            readouts.append({"readout_name": readout})
+            metadata.append(
+                {
+                    "readout_name": readout,
+                    "output_registers": (
+                        output_bit_register_dict,
+                        output_float_register_dict,
+                        output_complex_register_dict,
+                    ),
+                }
+            )
         unique_shots = np.unique(shots_list)
         if len(unique_shots) > 1:
             raise ValueError("Circuits contains multiple ways to set the number of measurements")
@@ -249,7 +283,7 @@ class BraketBackend:
             shots = unique_shots[0]
         return (
             self.__create_device().run_batch(task_specifications, shots=int(shots)),
-            readouts,
+            metadata,
         )
 
     def _prepare_circuit_for_run(self, circuit: Circuit) -> Tuple[BraketCircuit, int, str]:
@@ -290,6 +324,8 @@ class BraketBackend:
             task_specification = rigetti_verbatim_interface.call_circuit(circuit)
         elif "ionq" in self.device or self.__force_ionq_verbatim:
             task_specification = ionq_verbatim_interface.call_circuit(circuit)
+        elif "Garnet" in self.device or self.__force_iqm_verbatim:
+            task_specification = iqm_verbatim_interface.call_circuit(circuit)
 
         elif "Lucy" in self.device or self.__force_oqc_verbatim:
             task_specification = oqc_verbatim_interface.call_circuit(circuit)
@@ -297,6 +333,7 @@ class BraketBackend:
         if (
             self.__use_actual_hardware
             or self.__force_ionq_verbatim
+            or self.__force_iqm_verbatim
             or self.__force_oqc_verbatim
             or self.__force_rigetti_verbatim
         ):
@@ -309,6 +346,43 @@ class BraketBackend:
                     "Circuit generated is longer that the max circuit length allowed for hardware"
                 )
         return (task_specification, shots, readout)
+
+    def _set_up_registers(self, circuit: Circuit) -> Tuple[
+        Dict[str, List[List[bool]]],
+        Dict[str, List[List[float]]],
+        Dict[str, List[List[complex]]],
+    ]:
+        """Sets up the output registers for a circuit running on braket.
+
+        Args:
+            circuit (Circuit): The qoqo Circuit for which to prepare the registers.
+
+        Returns:
+            (Dict[str, List[List[bool]]], Dict[str, List[List[float]]],
+             Dict[str, List[List[complex]]]): The output bit register, float
+                                              register and complex register.
+        """
+        output_bit_register_dict: Dict[str, List[List[bool]]] = {}
+        output_float_register_dict: Dict[str, List[List[float]]] = {}
+        output_complex_register_dict: Dict[str, List[List[complex]]] = {}
+
+        for bit_def in circuit.filter_by_tag("DefinitionBit"):
+            # if bit_def.is_output():
+            output_bit_register_dict[bit_def.name()] = []
+
+        for float_def in circuit.filter_by_tag("DefinitionFloat"):
+            # if float_def.is_output():
+            output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
+
+        for complex_def in circuit.filter_by_tag("DefinitionComplex"):
+            # if complex_def.is_output():
+            output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
+
+        return (
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
 
     def run_circuit(self, circuit: Circuit) -> Tuple[
         Dict[str, List[List[bool]]],
@@ -333,7 +407,11 @@ class BraketBackend:
         """
         (quantum_task, metadata) = self._run_circuit(circuit)
         results = quantum_task.result()
-        return _post_process_circuit_result(results, metadata)
+        (output_bit_register_dict, output_float_register_dict, output_complex_register_dict) = (
+            _post_process_circuit_result(results, metadata)
+        )
+
+        return (output_bit_register_dict, output_float_register_dict, output_complex_register_dict)
 
     def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
         Dict[str, List[List[bool]]],
@@ -523,7 +601,7 @@ class BraketBackend:
         shutil.copyfile(
             helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
         )
-        requirement_lines = ["qoqo >= 1.9\n", "qoqo-for-braket >= 0.4"]
+        requirement_lines = ["qoqo >= 1.11\n", "qoqo-for-braket >= 0.5"]
         with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
             # write each line from requirement_lines to separate lines in file
             f.writelines(requirement_lines)

@@ -42,18 +42,6 @@ jobs:
       build_for_arm: true
     secrets: inherit
 
-# Build macos wheels and upload them to PyPi
-  build_maturin_builds_macos:
-    name: maturin_build-macos
-    needs: deploy_cratesio
-    uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_maturin_macos.yml@main
-    with: 
-      py_interface_folder: "qoqo_for_braket_devices"
-      # Try to build python wheels with universal2 for arm and x86
-      universal2: true
-      deploy: true
-    secrets: inherit
-
 # Build windows wheels and upload them to PyPi
   build_maturin_builds_windows:
     name: maturin_build-windows
@@ -63,3 +51,60 @@ jobs:
       py_interface_folder: "qoqo_for_braket_devices"
       deploy: true
     secrets: inherit
+
+  build_maturin_builds_macos:
+    name: maturin_build-macos-${{ matrix.python.interpreter }}
+    runs-on: 'macOS-13'
+    strategy:
+      matrix:
+        python: [
+            {py: '3.9', interpreter: "python3.9"},
+            {py: '3.10', interpreter: "python3.10"},
+            {py: '3.11', interpreter: "python3.11"},
+        ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: "aarch64-apple-darwin"
+          default: true
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python.py }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip pytest numpy twine
+          python -m pip install maturin
+      - name: macos wheels
+        run: |
+          RUSTFLAGS="-C link-arg=-undefined -C link-arg=dynamic_lookup" maturin build -i ${{ matrix.python.interpreter }} --out wheels  -m ${{inputs.py_interface_folder}}/Cargo.toml --release --locked
+      - name: universal wheels
+        run: |
+          RUSTFLAGS="-C link-arg=-undefined -C link-arg=dynamic_lookup" maturin build -i ${{ matrix.python.interpreter }} --out wheels  -m ${{inputs.py_interface_folder}}/Cargo.toml --release --locked --target x86_64-apple-darwin
+          RUSTFLAGS="-C link-arg=-undefined -C link-arg=dynamic_lookup" maturin build -i ${{ matrix.python.interpreter }} --out wheels  -m ${{inputs.py_interface_folder}}/Cargo.toml --release --locked --target aarch64-apple-darwin
+      - name: store artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: wheels
+    
+  deploy_macos:
+    needs: build_maturin_builds_macos
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+    - uses: actions/download-artifact@v3
+      with:
+        name: wheels
+    - name: Publish
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine
+        python -m twine upload --skip-existing *
