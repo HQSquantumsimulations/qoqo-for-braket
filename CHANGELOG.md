@@ -4,9 +4,14 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
-## 0.6.0
+## 0.7.0
 
 * Updated to pyo3 0.21
+
+## 0.6.0
+
+* Added iqm_verbatim interface to qoqo_for_braket
+* Added import of the `GarnetDevice` from qoqo_iqm to qoqo_for_braket_devices
 
 ## 0.5.0
 

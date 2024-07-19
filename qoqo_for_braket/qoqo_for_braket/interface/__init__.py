@@ -13,4 +13,5 @@
 
 import qoqo_for_braket.interface.rigetti_verbatim_interface
 import qoqo_for_braket.interface.ionq_verbatim_interface
+import qoqo_for_braket.interface.iqm_verbatim_interface
 import qoqo_for_braket.interface.oqc_verbatim_interface
