@@ -13,7 +13,9 @@
 from typing import Dict, List, Tuple, Any
 
 
-def _post_process_circuit_result(results: Any, metadata: Dict[Any, Any]) -> Tuple[
+def _post_process_circuit_result(
+    results: Any, metadata: Dict[Any, Any], input_bit_circuit
+) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
     Dict[str, List[List[complex]]],
@@ -37,6 +39,30 @@ def _post_process_circuit_result(results: Any, metadata: Dict[Any, Any]) -> Tupl
     complex_results = metadata["output_registers"][2]
     measurements = results.measurements
     bit_field = measurements > 0
+    # dictionary of all mearusement results that might be shorter than the output lenght
     bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
+    # create final
+    bit_results_final = {}
+    # Extension bits to fill in additional bits not measured because they do not correspont to measured qubits
+    extension_bits = [
+        False for _ in range(metadata["output_register_lengths"][0][metadata["readout_name"]])
+    ]
+    # Write input bit circuit values to extension bits
+    for op in input_bit_circuit:
+        extension_bits[op.index()] = op.value()
+    # Shorten extension bits to only the bits exceeding measurement
+    extension_bits = [
+        extension_bits[index]
+        for index in range(
+            len(bit_results[metadata["readout_name"]][0]),
+            metadata["output_register_lengths"][0][metadata["readout_name"]],
+        )
+    ]
+
+    # Appending extension bits to each measured result
+    for key, value in bit_results.items():
+        bit_results_final[key] = []
+        for val in value:
+            bit_results_final[key].append(val.extend(extension_bits))
 
     return (bit_results, float_results, complex_results)
