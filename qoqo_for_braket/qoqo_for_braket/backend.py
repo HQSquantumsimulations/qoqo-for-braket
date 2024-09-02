@@ -384,9 +384,7 @@ class BraketBackend:
                 )
         return (task_specification, shots, readout, input_bit_circuit)
 
-    def _set_up_registers(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def _set_up_registers(self, circuit: Circuit) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -435,9 +433,7 @@ class BraketBackend:
             output_complex_register_lengths,
         )
 
-    def run_circuit(
-        self, circuit: Circuit
-    ) -> Tuple[
+    def run_circuit(self, circuit: Circuit) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -468,9 +464,7 @@ class BraketBackend:
 
         return (output_bit_register_dict, output_float_register_dict, output_complex_register_dict)
 
-    def run_circuits_batch(
-        self, circuits: List[Circuit]
-    ) -> Tuple[
+    def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -521,9 +515,7 @@ class BraketBackend:
                     complex_register_dict[key] = value_complexes
         return (bool_register_dict, float_register_dict, complex_register_dict)
 
-    def run_measurement_registers(
-        self, measurement: Any
-    ) -> Tuple[
+    def run_measurement_registers(self, measurement: Any) -> Tuple[
         Dict[str, List[List[bool]]],
         Dict[str, List[List[float]]],
         Dict[str, List[List[complex]]],
@@ -583,9 +575,7 @@ class BraketBackend:
             output_complex_register_dict,
         )
 
-    def run_measurement_registers_hybrid(
-        self, measurement: Any
-    ) -> Union[
+    def run_measurement_registers_hybrid(self, measurement: Any) -> Union[
         Tuple[
             Dict[str, List[List[bool]]],
             Dict[str, List[List[float]]],
