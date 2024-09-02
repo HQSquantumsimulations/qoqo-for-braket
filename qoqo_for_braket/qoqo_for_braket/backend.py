@@ -270,10 +270,13 @@ class BraketBackend:
         metadata = []
         for circuit in circuits:
             (
-                task_specification,
-                shots,
-                readout,
-            ), input_bit_circuit = self._prepare_circuit_for_run(circuit)
+                (
+                    task_specification,
+                    shots,
+                    readout,
+                ),
+                input_bit_circuit,
+            ) = self._prepare_circuit_for_run(circuit)
             (
                 output_bit_register_dict,
                 output_float_register_dict,
@@ -746,8 +749,8 @@ class BraketBackend:
 
         Args:
             program (QuantumProgram): the qoqo quantum program to run.
-            params_values (List[List[float]]): the parameters values to pass to the quantum
-                program.
+            params_values (Union[List[float], List[List[float]]]): the parameters values to pass
+            to the quantum program.
 
         Returns:
             Optional[
