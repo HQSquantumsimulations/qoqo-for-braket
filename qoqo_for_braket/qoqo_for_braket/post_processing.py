@@ -10,11 +10,14 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Post processing helper function."""
-from typing import Dict, List, Tuple, Any
+
+from typing import Any, Dict, List, Tuple, Optional
+
+from qoqo import Circuit
 
 
 def _post_process_circuit_result(
-    results: Any, metadata: Dict[Any, Any], input_bit_circuit
+    results: Any, metadata: Dict[Any, Any], input_bit_circuit: Optional[Circuit]
 ) -> Tuple[
     Dict[str, List[List[bool]]],
     Dict[str, List[List[float]]],
@@ -28,6 +31,7 @@ def _post_process_circuit_result(
     Args:
         results: results to be processed
         metadata: associated metadata of the job
+        input_bit_circuit: the circuit containing InputBit operations
 
     Returns:
         Tuple[Dict[str, List[List[bool]]],
@@ -41,28 +45,32 @@ def _post_process_circuit_result(
     bit_field = measurements > 0
     # dictionary of all mearusement results that might be shorter than the output lenght
     bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
-    # create final
-    bit_results_final = {}
-    # Extension bits to fill in additional bits not measured because they do not correspont to measured qubits
-    extension_bits = [
-        False for _ in range(metadata["output_register_lengths"][0][metadata["readout_name"]])
-    ]
-    # Write input bit circuit values to extension bits
-    for op in input_bit_circuit:
-        extension_bits[op.index()] = op.value()
-    # Shorten extension bits to only the bits exceeding measurement
-    extension_bits = [
-        extension_bits[index]
-        for index in range(
-            len(bit_results[metadata["readout_name"]][0]),
-            metadata["output_register_lengths"][0][metadata["readout_name"]],
-        )
-    ]
+    if input_bit_circuit:
+        # create final
+        bit_results_final = {}
+        # Extension bits to fill in additional bits not measured because they do not correspont to
+        #  measured qubits
+        extension_bits = [
+            False for _ in range(metadata["output_register_lengths"][0][metadata["readout_name"]])
+        ]
+        # Write input bit circuit values to extension bits
+        for op in input_bit_circuit:
+            extension_bits[op.index()] = op.value()
+        # Shorten extension bits to only the bits exceeding measurement
+        extension_bits = [
+            extension_bits[index]
+            for index in range(
+                len(bit_results[metadata["readout_name"]][0]),
+                metadata["output_register_lengths"][0][metadata["readout_name"]],
+            )
+        ]
 
-    # Appending extension bits to each measured result
-    for key, value in bit_results.items():
-        bit_results_final[key] = []
-        for val in value:
-            bit_results_final[key].append(val.extend(extension_bits))
+        # Appending extension bits to each measured result
+        for key, value in bit_results.items():
+            bit_results_final[key] = []
+            for val in value:
+                bit_results_final[key].append(val + extension_bits)
+
+        bit_results = bit_results_final
 
     return (bit_results, float_results, complex_results)
