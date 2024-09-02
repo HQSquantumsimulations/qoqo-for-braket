@@ -17,6 +17,7 @@ import os
 import shutil
 import tempfile
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
+
 import numpy as np
 import qoqo_qasm
 from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
@@ -269,14 +270,9 @@ class BraketBackend:
         shots_list = []
         metadata = []
         for circuit in circuits:
-            (
-                (
-                    task_specification,
-                    shots,
-                    readout,
-                ),
-                input_bit_circuit,
-            ) = self._prepare_circuit_for_run(circuit)
+            (task_specification, shots, readout, input_bit_circuit) = (
+                self._prepare_circuit_for_run(circuit)
+            )
             (
                 output_bit_register_dict,
                 output_float_register_dict,
@@ -322,7 +318,8 @@ class BraketBackend:
             circuit (Circuit): The qoqo Circuit that should be run.
 
         Returns:
-            (BraketCircuit, int, str): The braket circuit, the number of shots and the readout.
+            (BraketCircuit, int, str, Circuit): The braket circuit, the number of shots,
+            the readout and the InputBit circuit.
         """
         measurement_vector: List[ops.Operation] = [
             item
@@ -803,7 +800,7 @@ class BraketBackend:
         Returns:
             QueuedCircuitRun
         """
-        (quantum_task, metadata) = self._run_circuit(circuit)
+        (quantum_task, metadata, _input_bit_circuit) = self._run_circuit(circuit)
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
     def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
