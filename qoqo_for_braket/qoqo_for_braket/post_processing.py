@@ -47,7 +47,7 @@ def _post_process_circuit_result(
     bit_results[metadata["readout_name"]] = [res.tolist() for res in bit_field]
     if input_bit_circuit:
         # create final
-        bit_results_final = {}
+        bit_results_final: dict = {}
         # Extension bits to fill in additional bits not measured because they do not correspont to
         #  measured qubits
         extension_bits = [

@@ -155,7 +155,7 @@ class QueuedCircuitRun:
                     }
                     broadcast_event(_TaskCompletionEvent(**task_event))
                     processed_results = _post_process_circuit_result(
-                        formatted_result, self.internal_metadata
+                        formatted_result, self.internal_metadata, None
                     )
                     self._results = processed_results
                 elif state == "FAILED":
