@@ -14,7 +14,7 @@ dependencies = [
     "pydantic",
     "qoqo>=1.11,<1.12",
     "qoqo_qasm>=0.8",
-    "amazon-braket-sdk>=1.5.9"
+    "amazon-braket-sdk>=1.78.0"  # for `prx` support
 ]
 
 [project.optional-dependencies]
