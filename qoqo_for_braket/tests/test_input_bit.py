@@ -47,6 +47,20 @@ def test_running_with_input_bit() -> None:
     assert len(registers[0]) == 2
     assert registers[0] == [True, True]
 
+    circuit = Circuit()
+    circuit += ops.DefinitionBit("ro", 2, True)
+    circuit += ops.InputBit("ro", 1, True)
+    circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
+
+    backend = BraketBackend()
+    (bit_res, _, _) = backend.run_circuit(circuit)
+    assert "ro" in bit_res.keys()
+    registers = bit_res["ro"]
+
+    assert len(registers) == 2
+    assert len(registers[0]) == 2
+    assert registers[0] == [False, True]
+
 
 def test_quantum_program():
     backend = BraketBackend()
