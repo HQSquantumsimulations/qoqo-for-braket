@@ -4,15 +4,6 @@
 .. automodule:: qoqo_for_braket
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -22,11 +13,3 @@
       QueuedHybridRun
       QueuedProgramRun
    
-   
-
-   
-   
-   
-
-
-

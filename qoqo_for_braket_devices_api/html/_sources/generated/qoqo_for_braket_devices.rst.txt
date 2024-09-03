@@ -4,20 +4,3 @@
 .. automodule:: qoqo_for_braket_devices
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

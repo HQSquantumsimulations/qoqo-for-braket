@@ -4,15 +4,6 @@ qoqo\_for\_braket\_devices.devices
 .. automodule:: qoqo_for_braket_devices.devices
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -23,11 +14,3 @@ qoqo\_for\_braket\_devices.devices
       OQCLucyDevice
       RigettiAspenM3Device
    
-   
-
-   
-   
-   
-
-
-
