@@ -57,7 +57,7 @@ class QueuedCircuitRun:
             self.aws_metadata = None
         if isinstance(self._task, LocalQuantumTask):
             results = self._task.result()
-            processed_results = _post_process_circuit_result(results, self.internal_metadata)
+            processed_results = _post_process_circuit_result(results, self.internal_metadata, None)
             self._results = processed_results
 
     def to_json(self) -> str:
@@ -155,7 +155,7 @@ class QueuedCircuitRun:
                     }
                     broadcast_event(_TaskCompletionEvent(**task_event))
                     processed_results = _post_process_circuit_result(
-                        formatted_result, self.internal_metadata
+                        formatted_result, self.internal_metadata, None
                     )
                     self._results = processed_results
                 elif state == "FAILED":

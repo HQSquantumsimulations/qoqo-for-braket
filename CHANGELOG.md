@@ -4,6 +4,12 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.6.1
+
+* Fixed missing support for using InputBit to add bit register entries that are not measured from quantum register
+* Fixed not being able to run `.run_program` with a single set of parameters
+* Fixed `amazon-braket-sdk` dependency version for `prx` support
+
 ## 0.6.0
 
 * Added iqm_verbatim interface to qoqo_for_braket
