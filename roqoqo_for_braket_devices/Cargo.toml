@@ -18,7 +18,7 @@ doctest = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-roqoqo = { version = "~1.14", features = ["unstable_qoqo_devices"] }
+roqoqo = { version = "~1.15", features = ["unstable_qoqo_devices"] }
 ndarray = "0.15"
 itertools = "0.13"
 serde = { version = "1.0", features = ["derive"] }
