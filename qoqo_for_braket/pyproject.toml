@@ -1,34 +1,25 @@
 [project]
 name = "qoqo_for_braket"
-version = "0.6.1"
-license = {file="LICENSE"}
+version = "0.7.0"
+license = { file = "LICENSE" }
 authors = [
-    {name="HQS Quantum Simulation GmbH", email="info@quantumsimulations.de"}
+    { name = "HQS Quantum Simulation GmbH", email = "info@quantumsimulations.de" },
 ]
 maintainers = [
-    {name="Kirsten Bark", email="kirsten.bark@quantumsimulations.de"}
+    { name = "Kirsten Bark", email = "kirsten.bark@quantumsimulations.de" },
 ]
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "pydantic",
-    "qoqo>=1.11,<1.12",
-    "qoqo_qasm>=0.8",
-    "amazon-braket-sdk>=1.78.0"  # for `prx` support
+    "qoqo>=1.15, <1.16",
+    "qoqo_qasm>=0.12.1",
+    "amazon-braket-sdk>=1.5.9",
 ]
 
 [project.optional-dependencies]
-tests = [
-  'pytest-cov',
-  'pytest'
-]
-dev = [
-    'ruff',
-    'darglint',
-    'bandit',
-    'mypy',
-    'black'
-]
+tests = ['pytest-cov', 'pytest']
+dev = ['ruff', 'darglint', 'bandit', 'mypy', 'black']
 docs = [
     "sphinx >= 2.1",
     "nbsphinx",
@@ -36,36 +27,36 @@ docs = [
     "recommonmark",
     "myst_parser",
     "sphinx_rtd_theme",
-    "tomli"
+    "tomli",
 ]
 
 [build-system]
-requires = ["setuptools"]#, "setuptools-scm"]
+requires = ["setuptools"]               #, "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.ruff]
-line-length = 99  # same as black
+line-length = 99        # same as black
 target-version = "py39"
 show-fixes = true
 output-format = "full"
 # activate the following checks
 select = [
-    "A",  # builtins
-    "ANN",  # annotations
-    "ARG",  # unused arguments
-    "B",  # bugbear
-    "C",  # comprehensions
-    "C90",  # mccabe complexity
-    "D",  # pydocstyle
-    "E",  # pycodestyle
-    "ERA",  # remove commented out code
-    "F",  # pyflakes
-    "NPY",  # numpy
+    "A",   # builtins
+    "ANN", # annotations
+    "ARG", # unused arguments
+    "B",   # bugbear
+    "C",   # comprehensions
+    "C90", # mccabe complexity
+    "D",   # pydocstyle
+    "E",   # pycodestyle
+    "ERA", # remove commented out code
+    "F",   # pyflakes
+    "NPY", # numpy
     "PL",  # pylint
-    "RUF",  # ruff
-    "S",  # bandit
-    "TCH",  # type checking
-    "W",  # Warnings
+    "RUF", # ruff
+    "S",   # bandit
+    "TCH", # type checking
+    "W",   # Warnings
 ]
 # ignore specific violations
 ignore = [
@@ -83,10 +74,50 @@ ignore = [
 ]
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = [
-    "A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W",
-    "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT",
-    "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI",
-    "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "I",
+    "N",
+    "Q",
+    "S",
+    "T",
+    "W",
+    "ANN",
+    "ARG",
+    "BLE",
+    "COM",
+    "DJ",
+    "DTZ",
+    "EM",
+    "ERA",
+    "EXE",
+    "FBT",
+    "ICN",
+    "INP",
+    "ISC",
+    "NPY",
+    "PD",
+    "PGH",
+    "PIE",
+    "PL",
+    "PT",
+    "PTH",
+    "PYI",
+    "RET",
+    "RSE",
+    "RUF",
+    "SIM",
+    "SLF",
+    "TCH",
+    "TID",
+    "TRY",
+    "UP",
+    "YTT",
 ]
 unfixable = []
 # exclude the following patterns from linting
@@ -97,11 +128,11 @@ exclude = [
     "old",
     "build",
     "dist",
-    "test_*"
+    "test_*",
 ]
 
 [tool.ruff.mccabe]
-max-complexity = 20  # 5 higher than sonarqube
+max-complexity = 20 # 5 higher than sonarqube
 
 [tool.ruff.pydocstyle]
 convention = "google"

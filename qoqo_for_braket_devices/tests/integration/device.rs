@@ -23,11 +23,13 @@ use test_case::test_case;
 fn new_device(device: AWSDevice) -> Py<PyAny> {
     pyo3::prepare_freethreaded_python();
     Python::with_gil(|py| -> Py<PyAny> {
-        let device_type: &PyType = match device {
-            AWSDevice::IonQAria1Device(_) => py.get_type::<IonQAria1DeviceWrapper>(),
-            AWSDevice::IonQHarmonyDevice(_) => py.get_type::<IonQHarmonyDeviceWrapper>(),
-            AWSDevice::OQCLucyDevice(_) => py.get_type::<OQCLucyDeviceWrapper>(),
-            AWSDevice::RigettiAspenM3Device(_) => py.get_type::<RigettiAspenM3DeviceWrapper>(),
+        let device_type: Bound<PyType> = match device {
+            AWSDevice::IonQAria1Device(_) => py.get_type_bound::<IonQAria1DeviceWrapper>(),
+            AWSDevice::IonQHarmonyDevice(_) => py.get_type_bound::<IonQHarmonyDeviceWrapper>(),
+            AWSDevice::OQCLucyDevice(_) => py.get_type_bound::<OQCLucyDeviceWrapper>(),
+            AWSDevice::RigettiAspenM3Device(_) => {
+                py.get_type_bound::<RigettiAspenM3DeviceWrapper>()
+            }
         };
         device_type.call0().unwrap().into()
     })
