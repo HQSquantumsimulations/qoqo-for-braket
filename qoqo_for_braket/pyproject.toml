@@ -1,6 +1,6 @@
 [project]
 name = "qoqo_for_braket"
-version = "0.7.0"
+version = "0.7.1"
 license = { file = "LICENSE" }
 authors = [
     { name = "HQS Quantum Simulation GmbH", email = "info@quantumsimulations.de" },
@@ -12,7 +12,7 @@ readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
     "pydantic",
-    "qoqo>=1.15, <1.16",
+    "qoqo>=1.15, <2.0",
     "qoqo_qasm>=0.12.1",
     "amazon-braket-sdk>=1.5.9",
 ]
