@@ -9,7 +9,7 @@ maintainers = [
     { name = "Kirsten Bark", email = "kirsten.bark@quantumsimulations.de" },
 ]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "pydantic",
     "qoqo>=1.15, <2.0",
