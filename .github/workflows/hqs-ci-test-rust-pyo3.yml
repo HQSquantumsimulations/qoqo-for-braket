@@ -18,6 +18,7 @@ jobs:
             {py: '3.9', interpreter: "python3.9"},
             {py: '3.10', interpreter: "python3.10"},
             {py: '3.11', interpreter: "python3.11"},
+            {py: '3.12', interpreter: "python3.12"},
         ]
     steps:
       - uses: actions/checkout@v3
@@ -43,6 +44,7 @@ jobs:
             {py: '3.9', interpreter: "python3.9"},
             {py: '3.10', interpreter: "python3.10"},
             {py: '3.11', interpreter: "python3.11"},
+            {py: '3.12', interpreter: "python3.12"},
         ]
     steps:
       - uses: actions/checkout@v3
@@ -68,6 +70,7 @@ jobs:
             {py: '3.9', interpreter: "python3.9"},
             {py: '3.10', interpreter: "python3.10"},
             {py: '3.11', interpreter: "python3.11"},
+            {py: '3.12', interpreter: "python3.12"},
         ]
     steps:
       - uses: actions/checkout@v3
@@ -104,6 +107,8 @@ jobs:
   build_tests:
     uses: HQSquantumsimulations/reusable_workflows/.github/workflows/reusable_build_tests_rust_pyo3.yml@main
     with: 
+      # Whether to build for python 3.13. To remove after updating to pyo3 0.22
+      python_3_13: false
       # Run tests also on windows runners
       windows: true
       # Run tests also on macos runners

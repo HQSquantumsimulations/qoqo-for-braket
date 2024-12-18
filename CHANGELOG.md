@@ -4,6 +4,11 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.7.1
+
+* Updated dependencies and added a minimum rust version.
+* Updated to maturin 1.0.
+
 ## 0.7.0
 
 * Updated to pyo3 0.21
