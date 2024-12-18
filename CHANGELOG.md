@@ -7,6 +7,7 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 ## 0.7.1
 
 * Updated dependencies and added a minimum rust version.
+* Updated to maturin 1.0.
 
 ## 0.7.0
 
