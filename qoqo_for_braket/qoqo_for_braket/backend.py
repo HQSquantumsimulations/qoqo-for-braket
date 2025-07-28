@@ -416,12 +416,12 @@ class BraketBackend:
 
         for float_def in circuit.filter_by_tag("DefinitionFloat"):
             # if float_def.is_output():
-            output_float_register_dict[float_def.name()] = cast(List[List[float]], [])
+            output_float_register_dict[float_def.name()] = cast("List[List[float]]", [])
             output_float_register_lengths[float_def.name()] = float_def.length()
 
         for complex_def in circuit.filter_by_tag("DefinitionComplex"):
             # if complex_def.is_output():
-            output_complex_register_dict[complex_def.name()] = cast(List[List[complex]], [])
+            output_complex_register_dict[complex_def.name()] = cast("List[List[complex]]", [])
             output_complex_register_lengths[complex_def.name()] = complex_def.length()
 
         return (
