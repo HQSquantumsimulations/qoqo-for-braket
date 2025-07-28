@@ -2,7 +2,7 @@
 
 # qoqo_for_braket_devices
 
-Braket devices interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
+Braket devices interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de). The API documentation is available [here](https://hqsquantumsimulations.github.io/qoqo-for-braket/qoqo_for_braket_devices_api/html/generated/generated/qoqo_for_braket_devices.devices.html#module-qoqo_for_braket_devices.devices).
 
 In order to make the update a device instance with Braket's information possible, the user has to run the following code before using this package:
 ```python

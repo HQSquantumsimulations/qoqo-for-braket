@@ -179,10 +179,7 @@ impl IonQHarmonyDevice {
             .any(|&(a, b)| (a, b) == (control, target) || (a, b) == (target, control))
         {
             return Err(RoqoqoError::GenericError {
-                msg: format!(
-                    "Qubits {} and {} are not connected in the device",
-                    control, target
-                ),
+                msg: format!("Qubits {control} and {target} are not connected in the device",),
             });
         }
 
@@ -440,7 +437,7 @@ impl QoqoDevice for IonQHarmonyDevice {
     /// # Returns
     ///
     /// * `Vec<(usize, usize)>` - A list of pairs of qubits linked with a native two-qubit-gate in
-    ///                           the device.
+    ///   the device.
     ///
     fn two_qubit_edges(&self) -> Vec<(usize, usize)> {
         let edges: Vec<(usize, usize)> = (0..self.number_qubits)

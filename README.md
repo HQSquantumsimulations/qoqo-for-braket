@@ -1,7 +1,7 @@
 <img src="qoqo_Logo_vertical_color.png" alt="qoqo logo" width="300" />
 
 # qoqo-for-braket
-A braket backend for the qoqo quantum computing toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
+A braket backend for the qoqo quantum computing toolkit by [HQS Quantum Simulations](https://quantumsimulations.de). The API documentation is available [here](https://hqsquantumsimulations.github.io/qoqo-for-braket/qoqo_for_braket_api/html/generated/qoqo_for_braket.html).
 
 ## Usage on AWS
 

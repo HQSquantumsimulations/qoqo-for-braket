@@ -90,7 +90,7 @@ impl IonQHarmonyDeviceWrapper {
     ) -> PyResult<()> {
         self.internal
             .set_single_qubit_gate_time(gate, qubit, gate_time)
-            .map_err(|err| PyValueError::new_err(format!("{:?}", err)))
+            .map_err(|err| PyValueError::new_err(format!("{err:?}")))
     }
 
     /// Returns the names of a single qubit operations available on the device.
@@ -140,7 +140,7 @@ impl IonQHarmonyDeviceWrapper {
     ) -> PyResult<()> {
         self.internal
             .set_two_qubit_gate_time(gate, control, target, gate_time)
-            .map_err(|err| PyValueError::new_err(format!("{:?}", err)))
+            .map_err(|err| PyValueError::new_err(format!("{err:?}")))
     }
 
     /// Returns the names of a two qubit operations available on the device.
@@ -237,7 +237,7 @@ impl IonQHarmonyDeviceWrapper {
     pub fn add_damping(&mut self, qubit: usize, damping: f64) -> PyResult<()> {
         self.internal
             .add_damping(qubit, damping)
-            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {}", err)))
+            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {err}")))
     }
 
     /// Adds single qubit dephasing to noise rates.
@@ -252,7 +252,7 @@ impl IonQHarmonyDeviceWrapper {
     pub fn add_dephasing(&mut self, qubit: usize, dephasing: f64) -> PyResult<()> {
         self.internal
             .add_dephasing(qubit, dephasing)
-            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {}", err)))
+            .map_err(|err| PyValueError::new_err(format!("Cannot add decoherence: {err}")))
     }
 
     /// Return number of qubits in device.
@@ -323,7 +323,7 @@ impl IonQHarmonyDeviceWrapper {
         let aws_device: AWSDevice = self.internal.clone().into();
         Ok(GenericDeviceWrapper {
             internal: aws_device.to_generic_device().map_err(|err| {
-                PyValueError::new_err(format!("Cannot convert device to generic device: {}", err))
+                PyValueError::new_err(format!("Cannot convert device to generic device: {err}"))
             })?,
         })
     }
@@ -340,10 +340,7 @@ impl IonQHarmonyDeviceWrapper {
                 let get_bytes = input.call_method0("to_bincode")?;
                 let bytes = get_bytes.extract::<Vec<u8>>()?;
                 deserialize(&bytes[..]).map_err(|err| {
-                    PyValueError::new_err(format!(
-                        "Cannot treat input as IonQHarmonyDevice: {}",
-                        err
-                    ))
+                    PyValueError::new_err(format!("Cannot treat input as IonQHarmonyDevice: {err}"))
                 })
             }
         })

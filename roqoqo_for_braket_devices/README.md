@@ -2,7 +2,7 @@
 
 # roqoqo_for_braket_devices
 
-Braket devices interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de).
+Braket devices interface for the qoqo quantum toolkit by [HQS Quantum Simulations](https://quantumsimulations.de). The API documentation is available [here](https://hqsquantumsimulations.github.io/qoqo-for-braket/roqoqo_for_braket_devices_api/roqoqo_for_braket_devices/index.html).
 
 ### Installation
 

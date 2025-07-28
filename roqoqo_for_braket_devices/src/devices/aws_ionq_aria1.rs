@@ -179,10 +179,7 @@ impl IonQAria1Device {
             .any(|&(a, b)| (a, b) == (control, target) || (a, b) == (target, control))
         {
             return Err(RoqoqoError::GenericError {
-                msg: format!(
-                    "Qubits {} and {} are not connected in the device",
-                    control, target
-                ),
+                msg: format!("Qubits {control} and {target} are not connected in the device",),
             });
         }
 
