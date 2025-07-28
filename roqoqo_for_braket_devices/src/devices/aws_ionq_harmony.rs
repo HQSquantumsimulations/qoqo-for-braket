@@ -180,8 +180,7 @@ impl IonQHarmonyDevice {
         {
             return Err(RoqoqoError::GenericError {
                 msg: format!(
-                    "Qubits {} and {} are not connected in the device",
-                    control, target
+                    "Qubits {control} and {target} are not connected in the device",
                 ),
             });
         }
