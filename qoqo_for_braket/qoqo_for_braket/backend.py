@@ -17,7 +17,7 @@ import os
 import shutil
 import tempfile
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
-
+import importlib.metadata
 import numpy as np
 import qoqo_qasm
 from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
@@ -37,7 +37,11 @@ from qoqo_for_braket.interface import (
     rigetti_verbatim_interface,
 )
 from qoqo_for_braket.post_processing import _post_process_circuit_result
-from qoqo_for_braket.queued_results import QueuedCircuitRun, QueuedHybridRun, QueuedProgramRun
+from qoqo_for_braket.queued_results import (
+    QueuedCircuitRun,
+    QueuedHybridRun,
+    QueuedProgramRun,
+)
 
 LOCAL_SIMULATORS_LIST: List[str] = ["braket_sv", "braket_dm", "braket_ahs"]
 REMOTE_SIMULATORS_LIST: List[str] = [
@@ -95,6 +99,12 @@ class BraketBackend:
         self.__max_number_shots = 100
         self.batch_mode = batch_mode
         self.use_hybrid_jobs = use_hybrid_jobs
+
+        if self.aws_session is not None:
+            version = importlib.metadata.version("qoqo-for-braket")
+            self.aws_session.add_braket_user_agent(
+                "APN/HQS Quantum Simulations/qoqo-for-braket/" + str(version)
+            )
 
     def _create_config(self) -> Dict[str, Any]:
         return {
@@ -462,7 +472,11 @@ class BraketBackend:
             output_complex_register_dict,
         ) = _post_process_circuit_result(results, metadata, input_bit_circuit)
 
-        return (output_bit_register_dict, output_float_register_dict, output_complex_register_dict)
+        return (
+            output_bit_register_dict,
+            output_float_register_dict,
+            output_complex_register_dict,
+        )
 
     def run_circuits_batch(self, circuits: List[Circuit]) -> Tuple[
         Dict[str, List[List[bool]]],
@@ -652,7 +666,8 @@ class BraketBackend:
         # create named temporary directory with tempfile
         os.mkdir("_tmp_hybrid_helper")
         shutil.copyfile(
-            helper_file_path, os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py")
+            helper_file_path,
+            os.path.join("_tmp_hybrid_helper", "qoqo_hybrid_helper.py"),
         )
         requirement_lines = ["qoqo >= 1.11\n", "qoqo-for-braket >= 0.5"]
         with open(os.path.join("_tmp_hybrid_helper", "requirements.txt"), "w") as f:
@@ -711,7 +726,9 @@ class BraketBackend:
         )
 
     def run_program(
-        self, program: QuantumProgram, params_values: Union[List[float], List[List[float]]]
+        self,
+        program: QuantumProgram,
+        params_values: Union[List[float], List[List[float]]],
     ) -> Optional[
         List[
             Union[
@@ -820,7 +837,10 @@ class BraketBackend:
         return QueuedProgramRun(measurement, queued_circuits)
 
     def run_program_queued(
-        self, program: QuantumProgram, params_values: List[List[float]], hybrid: bool = False
+        self,
+        program: QuantumProgram,
+        params_values: List[List[float]],
+        hybrid: bool = False,
     ) -> List[Union[QueuedProgramRun, QueuedHybridRun]]:
         """Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.
 

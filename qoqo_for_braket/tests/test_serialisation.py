@@ -20,7 +20,12 @@ from braket.aws.aws_session import AwsSession
 from qoqo import Circuit, QuantumProgram, measurements
 from qoqo import operations as ops
 
-from qoqo_for_braket import BraketBackend, QueuedCircuitRun, QueuedHybridRun, QueuedProgramRun
+from qoqo_for_braket import (
+    BraketBackend,
+    QueuedCircuitRun,
+    QueuedHybridRun,
+    QueuedProgramRun,
+)
 
 
 def test_serialisation_circuit() -> None:
