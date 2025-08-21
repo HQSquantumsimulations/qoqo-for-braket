@@ -103,7 +103,7 @@ class BraketBackend:
         if self.aws_session is not None:
             version = importlib.metadata.version("qoqo-for-braket")
             self.aws_session.add_braket_user_agent(
-                "APN/HQS Quantum Simulations/qoqo-for-braket/" + str(version)
+                "APN/1.0 HQS Quantum Simulations/1.0 qoqo-for-braket/" + str(version)
             )
 
     def _create_config(self) -> Dict[str, Any]:
