@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.7.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=38802119"></script>
+      <script src="../../_static/documentation_options.js?v=5a53be95"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -84,32 +84,36 @@
 
 <span class="sd">&quot;&quot;&quot;Provides the BraketBackend class.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qoqo_qasm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">,</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws.aws_session</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsSession</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.circuits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span> <span class="k">as</span> <span class="n">BraketCircuit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalSimulator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.ir</span><span class="w"> </span><span class="kn">import</span> <span class="n">openqasm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">braket.jobs.local</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalQuantumJob</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">QuantumProgram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassicalRegister</span>  <span class="c1"># type:ignore</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">qoqo_qasm</span>
-<span class="kn">from</span> <span class="nn">braket.aws</span> <span class="kn">import</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">,</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
-<span class="kn">from</span> <span class="nn">braket.aws.aws_session</span> <span class="kn">import</span> <span class="n">AwsSession</span>
-<span class="kn">from</span> <span class="nn">braket.circuits</span> <span class="kn">import</span> <span class="n">Circuit</span> <span class="k">as</span> <span class="n">BraketCircuit</span>
-<span class="kn">from</span> <span class="nn">braket.devices</span> <span class="kn">import</span> <span class="n">LocalSimulator</span>
-<span class="kn">from</span> <span class="nn">braket.ir</span> <span class="kn">import</span> <span class="n">openqasm</span>
-<span class="kn">from</span> <span class="nn">braket.jobs.local</span> <span class="kn">import</span> <span class="n">LocalQuantumJob</span>
-<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">QuantumProgram</span>
-<span class="kn">from</span> <span class="nn">qoqo</span> <span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
-<span class="kn">from</span> <span class="nn">qoqo.measurements</span> <span class="kn">import</span> <span class="n">ClassicalRegister</span>  <span class="c1"># type:ignore</span>
-
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.interface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_for_braket.interface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ionq_verbatim_interface</span><span class="p">,</span>
     <span class="n">iqm_verbatim_interface</span><span class="p">,</span>
     <span class="n">oqc_verbatim_interface</span><span class="p">,</span>
     <span class="n">rigetti_verbatim_interface</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.post_processing</span> <span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
-<span class="kn">from</span> <span class="nn">qoqo_for_braket.queued_results</span> <span class="kn">import</span> <span class="n">QueuedCircuitRun</span><span class="p">,</span> <span class="n">QueuedHybridRun</span><span class="p">,</span> <span class="n">QueuedProgramRun</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_for_braket.post_processing</span><span class="w"> </span><span class="kn">import</span> <span class="n">_post_process_circuit_result</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_for_braket.queued_results</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">QueuedCircuitRun</span><span class="p">,</span>
+    <span class="n">QueuedHybridRun</span><span class="p">,</span>
+    <span class="n">QueuedProgramRun</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">LOCAL_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;braket_sv&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_dm&quot;</span><span class="p">,</span> <span class="s2">&quot;braket_ahs&quot;</span><span class="p">]</span>
 <span class="n">REMOTE_SIMULATORS_LIST</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
@@ -121,7 +125,7 @@
 
 <div class="viewcode-block" id="BraketBackend">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend">[docs]</a>
-<span class="k">class</span> <span class="nc">BraketBackend</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BraketBackend</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Qoqo backend execution qoqo objects on AWS braket.</span>
 
 <span class="sd">    Args:</span>
@@ -138,7 +142,7 @@
 
 <div class="viewcode-block" id="BraketBackend.__init__">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">aws_session</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">AwsSession</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -170,10 +174,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">batch_mode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_hybrid_jobs</span> <span class="o">=</span> <span class="n">use_hybrid_jobs</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_hybrid_jobs</span> <span class="o">=</span> <span class="n">use_hybrid_jobs</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;qoqo-for-braket&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="o">.</span><span class="n">add_braket_user_agent</span><span class="p">(</span>
+                <span class="s2">&quot;APN/1.0 HQS Quantum Simulations/1.0 qoqo-for-braket/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+            <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
             <span class="s2">&quot;verbatim_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span><span class="p">,</span>
@@ -187,7 +197,7 @@
             <span class="s2">&quot;batch_mode&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">_load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;verbatim_mode&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;max_shots&quot;</span><span class="p">]</span>
@@ -201,21 +211,21 @@
 
 <div class="viewcode-block" id="BraketBackend.allow_use_actual_hardware">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.allow_use_actual_hardware">[docs]</a>
-    <span class="k">def</span> <span class="nf">allow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">allow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allow the use of actual hardware - will cost money.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend.disallow_use_actual_hardware">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.disallow_use_actual_hardware">[docs]</a>
-    <span class="k">def</span> <span class="nf">disallow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disallow_use_actual_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Disallow the use of actual hardware.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend.force_rigetti_verbatim">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_rigetti_verbatim">[docs]</a>
-    <span class="k">def</span> <span class="nf">force_rigetti_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force_rigetti_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of rigetti verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_rigetti_verbatim</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -223,7 +233,7 @@
 
 <div class="viewcode-block" id="BraketBackend.force_ionq_verbatim">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_ionq_verbatim">[docs]</a>
-    <span class="k">def</span> <span class="nf">force_ionq_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force_ionq_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of ionq verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_ionq_verbatim</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -231,7 +241,7 @@
 
 <div class="viewcode-block" id="BraketBackend.force_iqm_verbatim">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_iqm_verbatim">[docs]</a>
-    <span class="k">def</span> <span class="nf">force_iqm_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force_iqm_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of iqm verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_iqm_verbatim</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -239,7 +249,7 @@
 
 <div class="viewcode-block" id="BraketBackend.force_oqc_verbatim">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.force_oqc_verbatim">[docs]</a>
-    <span class="k">def</span> <span class="nf">force_oqc_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force_oqc_verbatim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Force the use of oqc verbatim. Mostly used for testing purposes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__force_oqc_verbatim</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbatim_mode</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -247,7 +257,7 @@
 
 <div class="viewcode-block" id="BraketBackend.change_max_shots">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.change_max_shots">[docs]</a>
-    <span class="k">def</span> <span class="nf">change_max_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">change_max_shots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the maximum number of shots allowed.</span>
 
 <span class="sd">        Args:</span>
@@ -258,7 +268,7 @@
 
 <div class="viewcode-block" id="BraketBackend.change_max_circuit_length">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.change_max_circuit_length">[docs]</a>
-    <span class="k">def</span> <span class="nf">change_max_circuit_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">change_max_circuit_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the maximum circuit length allowed.</span>
 
 <span class="sd">        Args:</span>
@@ -267,7 +277,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="n">length</span></div>
 
 
-    <span class="k">def</span> <span class="nf">__create_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LocalSimulator</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__create_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LocalSimulator</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates the device and returns it.</span>
 
 <span class="sd">        Returns:</span>
@@ -297,7 +307,7 @@
     <span class="c1"># runs a circuit internally and can be used to produce sync and async results</span>
 <div class="viewcode-block" id="BraketBackend._run_circuit">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._run_circuit">[docs]</a>
-    <span class="k">def</span> <span class="nf">_run_circuit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_circuit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Circuit</span><span class="p">]:</span>
@@ -351,7 +361,7 @@
     <span class="c1"># runs a circuit internally and can be used to produce sync and async results</span>
 <div class="viewcode-block" id="BraketBackend._run_circuits_batch">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._run_circuits_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">_run_circuits_batch</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_circuits_batch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">AwsQuantumTaskBatch</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Circuit</span><span class="p">]:</span>
@@ -418,7 +428,7 @@
 
 <div class="viewcode-block" id="BraketBackend._prepare_circuit_for_run">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._prepare_circuit_for_run">[docs]</a>
-    <span class="k">def</span> <span class="nf">_prepare_circuit_for_run</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_circuit_for_run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">BraketCircuit</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Circuit</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares a braket circuit for running on braket.</span>
@@ -496,7 +506,7 @@
 
 <div class="viewcode-block" id="BraketBackend._set_up_registers">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._set_up_registers">[docs]</a>
-    <span class="k">def</span> <span class="nf">_set_up_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_up_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]],</span>
@@ -528,12 +538,12 @@
 
         <span class="k">for</span> <span class="n">float_def</span> <span class="ow">in</span> <span class="n">circuit</span><span class="o">.</span><span class="n">filter_by_tag</span><span class="p">(</span><span class="s2">&quot;DefinitionFloat&quot;</span><span class="p">):</span>
             <span class="c1"># if float_def.is_output():</span>
-            <span class="n">output_float_register_dict</span><span class="p">[</span><span class="n">float_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="p">[])</span>
+            <span class="n">output_float_register_dict</span><span class="p">[</span><span class="n">float_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;List[List[float]]&quot;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">output_float_register_lengths</span><span class="p">[</span><span class="n">float_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">float_def</span><span class="o">.</span><span class="n">length</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">complex_def</span> <span class="ow">in</span> <span class="n">circuit</span><span class="o">.</span><span class="n">filter_by_tag</span><span class="p">(</span><span class="s2">&quot;DefinitionComplex&quot;</span><span class="p">):</span>
             <span class="c1"># if complex_def.is_output():</span>
-            <span class="n">output_complex_register_dict</span><span class="p">[</span><span class="n">complex_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]],</span> <span class="p">[])</span>
+            <span class="n">output_complex_register_dict</span><span class="p">[</span><span class="n">complex_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;List[List[complex]]&quot;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">output_complex_register_lengths</span><span class="p">[</span><span class="n">complex_def</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span> <span class="o">=</span> <span class="n">complex_def</span><span class="o">.</span><span class="n">length</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="p">(</span>
@@ -548,7 +558,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_circuit">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_circuit">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_circuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_circuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]],</span>
@@ -577,12 +587,16 @@
             <span class="n">output_complex_register_dict</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">=</span> <span class="n">_post_process_circuit_result</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">output_bit_register_dict</span><span class="p">,</span> <span class="n">output_float_register_dict</span><span class="p">,</span> <span class="n">output_complex_register_dict</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">output_bit_register_dict</span><span class="p">,</span>
+            <span class="n">output_float_register_dict</span><span class="p">,</span>
+            <span class="n">output_complex_register_dict</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BraketBackend.run_circuits_batch">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_circuits_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_circuits_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_circuits_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuits</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Circuit</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]],</span>
@@ -636,7 +650,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_measurement_registers">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_registers">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_measurement_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_measurement_registers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
         <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]],</span>
@@ -699,7 +713,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_measurement_registers_hybrid">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_measurement_registers_hybrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_measurement_registers_hybrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
         <span class="n">Tuple</span><span class="p">[</span>
             <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]],</span>
             <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
@@ -743,7 +757,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_measurement_registers_hybrid_queued">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_registers_hybrid_queued">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_measurement_registers_hybrid_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedHybridRun</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_measurement_registers_hybrid_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedHybridRun</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.</span>
 
 <span class="sd">        Using hybrid jobs allows us to naturally group the circuits from a measurement.</span>
@@ -760,7 +774,7 @@
 
 <div class="viewcode-block" id="BraketBackend._run_measurement_registers_hybrid">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._run_measurement_registers_hybrid">[docs]</a>
-    <span class="k">def</span> <span class="nf">_run_measurement_registers_hybrid</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_measurement_registers_hybrid</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">wait_until_complete</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AwsQuantumJob</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run all circuits of a measurement with the AWS Braket backend using hybrid jobs.</span>
@@ -782,7 +796,8 @@
         <span class="c1"># create named temporary directory with tempfile</span>
         <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">)</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
-            <span class="n">helper_file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo_hybrid_helper.py&quot;</span><span class="p">)</span>
+            <span class="n">helper_file_path</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo_hybrid_helper.py&quot;</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="n">requirement_lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qoqo &gt;= 1.11</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;qoqo-for-braket &gt;= 0.5&quot;</span><span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_tmp_hybrid_helper&quot;</span><span class="p">,</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -822,7 +837,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_measurement">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_measurement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a circuit with the AWS Braket backend.</span>
 
 <span class="sd">        Args:</span>
@@ -846,8 +861,10 @@
 
 <div class="viewcode-block" id="BraketBackend.run_program">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_program">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_program</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">:</span> <span class="n">QuantumProgram</span><span class="p">,</span> <span class="n">params_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_program</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">program</span><span class="p">:</span> <span class="n">QuantumProgram</span><span class="p">,</span>
+        <span class="n">params_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span>
         <span class="n">List</span><span class="p">[</span>
             <span class="n">Union</span><span class="p">[</span>
@@ -914,7 +931,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_circuit_queued">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_circuit_queued">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_circuit_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedCircuitRun</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_circuit_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedCircuitRun</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a Circuit on a AWS backend and return a queued Job Result.</span>
 
 <span class="sd">        The default number of shots for the simulation is 100.</span>
@@ -935,7 +952,7 @@
 
 <div class="viewcode-block" id="BraketBackend.run_measurement_queued">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_measurement_queued">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_measurement_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedProgramRun</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_measurement_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurement</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueuedProgramRun</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a qoqo measurement on a AWS backend and return a queued Job Result.</span>
 
 <span class="sd">        The default number of shots for the simulation is 100.</span>
@@ -964,8 +981,11 @@
 
 <div class="viewcode-block" id="BraketBackend.run_program_queued">
 <a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.run_program_queued">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_program_queued</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">program</span><span class="p">:</span> <span class="n">QuantumProgram</span><span class="p">,</span> <span class="n">params_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">hybrid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_program_queued</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">program</span><span class="p">:</span> <span class="n">QuantumProgram</span><span class="p">,</span>
+        <span class="n">params_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">hybrid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">QueuedProgramRun</span><span class="p">,</span> <span class="n">QueuedHybridRun</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a qoqo quantum program on a AWS backend multiple times return a list of queued Jobs.</span>
 
