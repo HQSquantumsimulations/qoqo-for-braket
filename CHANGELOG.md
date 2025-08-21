@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.8.0
+
+* Added user_agent to input AwsSessions in order to track on AWS when users use qoqo-for-braket.
+
 ## 0.7.1
 
 * Updated dependencies and added a minimum rust version.
