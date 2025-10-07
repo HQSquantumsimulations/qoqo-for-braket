@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.8.0 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5a53be95"></script>
+      <script src="../../_static/documentation_options.js?v=269f141a"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -99,8 +99,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.ir</span><span class="w"> </span><span class="kn">import</span> <span class="n">openqasm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.jobs.local</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalQuantumJob</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">QuantumProgram</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>  <span class="c1"># type:ignore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassicalRegister</span>  <span class="c1"># type:ignore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_calculator_pyo3</span><span class="w"> </span><span class="kn">import</span> <span class="n">CalculatorFloat</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_for_braket.interface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ionq_verbatim_interface</span><span class="p">,</span>
@@ -149,6 +150,7 @@
         <span class="n">verbatim_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">batch_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">use_hybrid_jobs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">virtual_z_replacement</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the BraketBackend class.</span>
 
@@ -160,6 +162,13 @@
 <span class="sd">            batch_mode: Run circuits in batch mode when running measurements. \</span>
 <span class="sd">                    Does not work when circuits define different numbers of shots.</span>
 <span class="sd">            use_hybrid_jobs: Uses hybrid jobs to run measurements and register measurements.</span>
+<span class="sd">            virtual_z_replacement:  On platforms where the RotateXY gate is available and the</span>
+<span class="sd">                natural two-qubit gate is diagonal in the Z-basis,</span>
+<span class="sd">                it is possible to replace RotateZ gates by virtual changes (rotations)</span>
+<span class="sd">                of the qubit basis in the XY-Plane. This is what we implement</span>
+<span class="sd">                here. Setting this to True/False will enable the virtual Z replacement with/without</span>
+<span class="sd">                the final rotation at the end of the circuit. Leaving this to its default (None) won&#39;t</span>
+<span class="sd">                use the virtual Z replacement.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="o">=</span> <span class="n">aws_session</span>
@@ -175,6 +184,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">batch_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_hybrid_jobs</span> <span class="o">=</span> <span class="n">use_hybrid_jobs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;qoqo-for-braket&quot;</span><span class="p">)</span>
@@ -275,6 +285,36 @@
 <span class="sd">            length: new maximum allowed length of circuit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_circuit_length</span> <span class="o">=</span> <span class="n">length</span></div>
+
+
+<div class="viewcode-block" id="BraketBackend.set_virtual_z_replacement">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.set_virtual_z_replacement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_virtual_z_replacement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replacement</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the virtual Z replacement mode.</span>
+
+<span class="sd">        On platforms where the RotateXY gate is available and the</span>
+<span class="sd">        natural two-qubit gate is diagonal in the Z-basis,</span>
+<span class="sd">        it is possible to replace RotateZ gates by virtual changes (rotations)</span>
+<span class="sd">        of the qubit basis in the XY-Plane. This is what we implement</span>
+<span class="sd">        here. Setting this to True/False will enable the virtual Z replacement with/without</span>
+<span class="sd">        the final rotation at the end of the circuit. Leaving this to its default (None) won&#39;t</span>
+<span class="sd">        use the virtual Z replacement.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            replacement (Optional[bool]): The virtual Z replacement mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="o">=</span> <span class="n">replacement</span></div>
+
+
+<div class="viewcode-block" id="BraketBackend.get_virtual_z_replacement">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend.get_virtual_z_replacement">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_virtual_z_replacement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the virtual Z replacement mode.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The virtual Z replacement mode (True or False)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__create_device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">LocalSimulator</span><span class="p">,</span> <span class="n">AwsDevice</span><span class="p">]:</span>
@@ -579,6 +619,8 @@
 <span class="sd">                  Dict[str, List[List[float]]],</span>
 <span class="sd">                  Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">circuit</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)</span>
         <span class="p">(</span><span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">quantum_task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
         <span class="p">(</span>
@@ -669,12 +711,29 @@
         <span class="n">output_bit_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">output_float_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">output_complex_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">():</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">constant_circuit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">run_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+                <span class="n">run_circuits</span> <span class="o">=</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">run_circuits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constant_circuit</span> <span class="o">+</span> <span class="n">circuit</span><span class="p">)</span>
+                <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[</span><span class="n">constant_circuit</span> <span class="o">+</span> <span class="n">circuit</span> <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">constant_circuit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">()</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_constant_circuit</span><span class="p">,</span> <span class="n">constant_rot_map</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span>
+                    <span class="n">constant_circuit</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span>
+                <span class="p">)</span>
+                <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">new_constant_circuit</span>
+                    <span class="o">+</span> <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">constant_rot_map</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)[</span>
+                        <span class="mi">0</span>
+                    <span class="p">]</span>
+                    <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">()</span>
+                <span class="p">]</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span><span class="p">:</span>
             <span class="p">(</span>
                 <span class="n">output_bit_register_dict</span><span class="p">,</span>
@@ -1033,6 +1092,165 @@
         <span class="k">return</span> <span class="n">queued_runs</span></div>
 </div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">virtual_z_replacement</span><span class="p">(</span>
+    <span class="n">circuit</span><span class="p">:</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">rotation_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CalculatorFloat</span><span class="p">],</span> <span class="n">apply_final_rz</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Circuit</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CalculatorFloat</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace the Z gate with the virtual Z gate in a quantum circuit.</span>
+
+<span class="sd">    It commutes the phase at the end of the circuit.</span>
+<span class="sd">    On platforms where the RotateXY gate is available and the</span>
+<span class="sd">    natural two-qubit gate is diagonal in the Z-basis,</span>
+<span class="sd">    it is possible to replace RotateZ gates by virtual changes (rotations)</span>
+<span class="sd">    of the qubit basis in the XY-Plane. This is what we implement</span>
+<span class="sd">    here.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        circuit (Circuit): the quantum circuit to replace the Z gate.</span>
+<span class="sd">        rotation_map (Dict[int, CalculatorFloat]): The current rotation map containing the phase</span>
+<span class="sd">            information of each qubit.</span>
+<span class="sd">        apply_final_rz (bool): whether to apply a final Rz gate after the virtual Z gate.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Circuit: the quantum circuit with the virtual Z gate replaced.</span>
+<span class="sd">        Dict[int, CalculatorFloat]: The updated rotation map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_circuit</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">circuit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;TwoQubitGateOperation&quot;</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">tags</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;ControlledPhaseShift&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ControlledPauliZ&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;PhaseShiftedControlledZ&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;PhaseShiftedControlledPhase&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;All two qubit gates need to be diagonal when virtualZ </span><span class="se">\</span>
+<span class="s2">                        replacement is used.</span><span class="se">\n</span><span class="s2">gate: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;SingleQubitGateOperation&quot;</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">tags</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RotateZ&quot;</span><span class="p">:</span>
+                <span class="n">update_phase_map</span><span class="p">(</span><span class="n">rotation_map</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PauliZ&quot;</span><span class="p">:</span>
+                <span class="n">update_phase_map</span><span class="p">(</span><span class="n">rotation_map</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RotateX&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">(),</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RotateY&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PauliX&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PauliY&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;SqrtPauliX&quot;</span><span class="p">,</span> <span class="s2">&quot;InvSqrtPauliX&quot;</span><span class="p">]:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PhaseShiftState1&quot;</span><span class="p">:</span>
+                <span class="n">update_phase_map</span><span class="p">(</span><span class="n">rotation_map</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PhaseShiftState0&quot;</span><span class="p">:</span>
+                <span class="n">update_phase_map</span><span class="p">(</span><span class="n">rotation_map</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="o">-</span><span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RotateXY&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateXY</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">phi</span><span class="p">()</span> <span class="o">+</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;All single qubit gates need to be special cases or RotateZ or RotateXY </span><span class="se">\</span>
+<span class="s2">                        when virtualZ replacement is used.</span><span class="se">\n</span><span class="s2">gate: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;MultiQubitGateOperation&quot;</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">tags</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;MultiQubitZZ&quot;</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;All multi qubit gates need to be diagonal when virtualZ replacement </span><span class="se">\</span>
+<span class="s2">                        is used.</span><span class="se">\n</span><span class="s2">gate: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;MeasureQubit&quot;</span><span class="p">:</span>
+                <span class="n">rotation_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">()]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaLoop&quot;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">n_rep</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">repetitions</span><span class="p">()</span><span class="o">.</span><span class="n">floor</span><span class="p">())</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rep</span><span class="p">):</span>
+                        <span class="n">new_inner_circuit</span><span class="p">,</span> <span class="n">new_map</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span>
+                            <span class="n">op</span><span class="o">.</span><span class="n">circuit</span><span class="p">(),</span> <span class="n">rotation_map</span><span class="p">,</span> <span class="kc">False</span>
+                        <span class="p">)</span>
+                        <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">new_inner_circuit</span>
+                        <span class="k">if</span> <span class="n">new_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s2">&quot;Unexpectedly did not obtain rotation map from virtual rotate </span><span class="se">\</span>
+<span class="s2">                                    z gate optimisation.&quot;</span>
+                            <span class="p">)</span>
+                        <span class="n">rotation_map</span> <span class="o">=</span> <span class="n">new_map</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+                    <span class="n">rotation_map</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">new_inner_circuit</span><span class="p">,</span> <span class="n">_new_map</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span>
+                        <span class="n">op</span><span class="o">.</span><span class="n">circuit</span><span class="p">(),</span> <span class="n">rotation_map</span><span class="p">,</span> <span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">PragmaLoop</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">repetitions</span><span class="p">(),</span> <span class="n">new_inner_circuit</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaActiveReset&quot;</span><span class="p">:</span>
+                <span class="n">rotation_map</span><span class="p">[</span><span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">()]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaConditional&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+                <span class="n">rotation_map</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_inner_circuit</span><span class="p">,</span> <span class="n">_new_map</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">circuit</span><span class="p">(),</span> <span class="n">rotation_map</span><span class="p">,</span> <span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">PragmaConditional</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">condition_register</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">condition_index</span><span class="p">(),</span> <span class="n">new_inner_circuit</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaRepeatedMeasurement&quot;</span><span class="p">:</span>
+                <span class="n">rotation_map</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaGetStateVector&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+                <span class="n">rotation_map</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;PragmaGetDensityMatrix&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+                <span class="n">rotation_map</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
+
+    <span class="k">if</span> <span class="n">apply_final_rz</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">ops</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">final_map</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">apply_final_rz</span> <span class="k">else</span> <span class="n">rotation_map</span>
+    <span class="k">return</span> <span class="n">new_circuit</span><span class="p">,</span> <span class="n">final_map</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">update_phase_map</span><span class="p">(</span>
+    <span class="n">rotation_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CalculatorFloat</span><span class="p">],</span> <span class="n">qubit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">CalculatorFloat</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Updates the rotation map for the given qubit by subtracting the given theta.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rotation_map (Dict[int, CalculatorFloat]): the map of rotation angles.</span>
+<span class="sd">        qubit (int): the qubit to update the map for.</span>
+<span class="sd">        theta (CalculatorFloat): the angle to subtract from the rotation map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">qubit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rotation_map</span><span class="p">:</span>
+        <span class="n">rotation_map</span><span class="p">[</span><span class="n">qubit</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">rotation_map</span><span class="p">[</span><span class="n">qubit</span><span class="p">]</span> <span class="o">-=</span> <span class="n">theta</span>
 </pre></div>
 
            </div>
