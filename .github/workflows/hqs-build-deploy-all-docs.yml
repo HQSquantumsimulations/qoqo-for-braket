@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip maturin
-        pip install qoqo_for_braket/[docs] qoqo_for_braket_devices/[docs]
+        pip install qoqo_for_braket/[docs]
     - uses: peaceiris/actions-mdbook@v1
       with:
         version: latest
@@ -33,14 +33,6 @@ jobs:
         python -m sphinx -T -E -b html . _build/html
         cd ../../
         cp -r ./qoqo_for_braket/docs/_build/html ./documentation/src/qoqo_for_braket_api
-        # qoqo_for_braket_devices
-        cd qoqo_for_braket_devices/docs
-        python -m sphinx -T -E -b html . _build/html
-        cd ../../
-        cp -r ./qoqo_for_braket_devices/docs/_build/html ./documentation/src/qoqo_for_braket_devices_api
-        # roqoqo_for_braket_devices
-        cargo doc --no-deps --package=roqoqo_for_braket_devices
-        cp -r ./target/doc/* ./documentation/src/roqoqo_for_braket_devices_api
         # Generating doc
         cd documentation/
         mdbook build

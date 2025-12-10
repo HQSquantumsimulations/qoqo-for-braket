@@ -4,6 +4,8 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+* Archived `qoqo_for_braket_devices` and `roqoqo_for_braket_devices` packages.
+
 # 0.9.0
 
 * Updated to qoqo 1.21 and pyo3 0.25.
