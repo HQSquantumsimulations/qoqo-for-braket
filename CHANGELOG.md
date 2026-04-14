@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.10.1
+
+* Fixed documentation building.
+
 ## 0.10.0
 
 * Added AWS Braket UAT and test.
