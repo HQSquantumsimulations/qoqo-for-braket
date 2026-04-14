@@ -18,7 +18,7 @@ def run_measurement_register() -> None:
     backend._load_config(config)
     backend.device = os.environ["AMZN_BRAKET_DEVICE_ARN"]
     backend.use_hybrid_jobs = False
-    (bit_registers, float_registers, complex_registers) = backend.run_measurement_registers(
+    bit_registers, float_registers, complex_registers = backend.run_measurement_registers(
         measurement=measurement
     )
 
