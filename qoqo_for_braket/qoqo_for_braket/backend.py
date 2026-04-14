@@ -237,10 +237,12 @@ class BraketBackend:
 
     def _create_uat_session(self) -> AwsSession:
         """Creates an AwsSession with the HQS partner UAT string in user_agent_extra.
+
         This ensures the APN tag is included in the User-Agent header of every
         Braket API call, following the standard partner UAT implementation approach.
+
         Returns:
-        AwsSession configured with the HQS partner UAT tag.
+            AwsSession configured with the HQS partner UAT tag.
         """
         version = importlib.metadata.version("qoqo-for-braket")
         session_config = botocore.config.Config(
