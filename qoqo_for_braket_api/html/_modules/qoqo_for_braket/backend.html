@@ -5,16 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.9.0 documentation</title>
+  <title>qoqo_for_braket.backend &mdash; qoqo_for_braket 0.10.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=269f141a"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=c86f77de"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -91,6 +91,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">botocore.config</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">qoqo_qasm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsQuantumJob</span><span class="p">,</span> <span class="n">AwsQuantumTask</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws.aws_session</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsSession</span>
@@ -99,8 +101,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.ir</span><span class="w"> </span><span class="kn">import</span> <span class="n">openqasm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">braket.jobs.local</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalQuantumJob</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span><span class="p">,</span> <span class="n">QuantumProgram</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>  <span class="c1"># type:ignore</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassicalRegister</span>  <span class="c1"># type:ignore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo</span><span class="w"> </span><span class="kn">import</span> <span class="n">operations</span> <span class="k">as</span> <span class="n">ops</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qoqo.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassicalRegister</span>  <span class="c1"># type: ignore</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_calculator_pyo3</span><span class="w"> </span><span class="kn">import</span> <span class="n">CalculatorFloat</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">qoqo_for_braket.interface</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -167,8 +169,8 @@
 <span class="sd">                it is possible to replace RotateZ gates by virtual changes (rotations)</span>
 <span class="sd">                of the qubit basis in the XY-Plane. This is what we implement</span>
 <span class="sd">                here. Setting this to True/False will enable the virtual Z replacement with/without</span>
-<span class="sd">                the final rotation at the end of the circuit. Leaving this to its default (None) won&#39;t</span>
-<span class="sd">                use the virtual Z replacement.</span>
+<span class="sd">                the final rotation at the end of the circuit. Leaving this to its default (None)</span>
+<span class="sd">                won&#39;t use the virtual Z replacement.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="o">=</span> <span class="n">aws_session</span>
@@ -184,13 +186,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_number_shots</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_mode</span> <span class="o">=</span> <span class="n">batch_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_hybrid_jobs</span> <span class="o">=</span> <span class="n">use_hybrid_jobs</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;qoqo-for-braket&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="o">.</span><span class="n">add_braket_user_agent</span><span class="p">(</span>
-                <span class="s2">&quot;APN/1.0 HQS Quantum Simulations/1.0 qoqo-for-braket/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
-            <span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -297,8 +293,8 @@
 <span class="sd">        it is possible to replace RotateZ gates by virtual changes (rotations)</span>
 <span class="sd">        of the qubit basis in the XY-Plane. This is what we implement</span>
 <span class="sd">        here. Setting this to True/False will enable the virtual Z replacement with/without</span>
-<span class="sd">        the final rotation at the end of the circuit. Leaving this to its default (None) won&#39;t</span>
-<span class="sd">        use the virtual Z replacement.</span>
+<span class="sd">        the final rotation at the end of the circuit. Leaving this to its default (None)</span>
+<span class="sd">        won&#39;t use the virtual Z replacement.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            replacement (Optional[bool]): The virtual Z replacement mode.</span>
@@ -321,7 +317,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates the device and returns it.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            The instanciated device (either an AwsDevice or a LocalSimulator)</span>
+<span class="sd">            The instantiated device (either an AwsDevice or a LocalSimulator)</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: Device specified isn&#39;t allowed. You can allow it by calling the</span>
@@ -331,11 +327,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;local:&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="ow">in</span> <span class="n">LOCAL_SIMULATORS_LIST</span><span class="p">:</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">LocalSimulator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="ow">in</span> <span class="n">REMOTE_SIMULATORS_LIST</span><span class="p">:</span>
-            <span class="n">device</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_uat_session</span><span class="p">()</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_actual_hardware</span><span class="p">:</span>
                 <span class="c1"># allow list simulator devices of AWS e.g. state vector simulator</span>
-                <span class="n">device</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_uat_session</span><span class="p">()</span>
+                <span class="n">device</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Device specified isn&#39;t allowed. You can allow it by calling the &quot;</span>
@@ -343,6 +341,30 @@
                     <span class="o">+</span> <span class="s2">&quot;this may incur significant monetary charges.&quot;</span>
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">device</span>
+
+<div class="viewcode-block" id="BraketBackend._create_uat_session">
+<a class="viewcode-back" href="../../generated/qoqo_for_braket.html#qoqo_for_braket.BraketBackend._create_uat_session">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_uat_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AwsSession</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an AwsSession with the HQS partner UAT string in user_agent_extra.</span>
+
+<span class="sd">        This ensures the APN tag is included in the User-Agent header of every</span>
+<span class="sd">        Braket API call, following the standard partner UAT implementation approach.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AwsSession configured with the HQS partner UAT tag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;qoqo-for-braket&quot;</span><span class="p">)</span>
+        <span class="n">session_config</span> <span class="o">=</span> <span class="n">botocore</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">Config</span><span class="p">(</span>
+            <span class="n">user_agent_extra</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;APN/1.0 HQS/1.0 qoqo-for-braket/</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">braket_client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="o">.</span><span class="n">boto_session</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;braket&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">session_config</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AwsSession</span><span class="p">(</span><span class="n">braket_client</span><span class="o">=</span><span class="n">braket_client</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boto_session</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+            <span class="n">braket_client</span> <span class="o">=</span> <span class="n">boto_session</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;braket&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">session_config</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AwsSession</span><span class="p">(</span><span class="n">boto_session</span><span class="o">=</span><span class="n">boto_session</span><span class="p">,</span> <span class="n">braket_client</span><span class="o">=</span><span class="n">braket_client</span><span class="p">)</span></div>
+
 
     <span class="c1"># runs a circuit internally and can be used to produce sync and async results</span>
 <div class="viewcode-block" id="BraketBackend._run_circuit">
@@ -376,7 +398,7 @@
             <span class="n">output_float_register_lengths</span><span class="p">,</span>
             <span class="n">output_complex_register_lengths</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_registers</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span>
+        <span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">,</span> <span class="n">input_bit_circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span>
             <span class="n">circuit</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
@@ -426,8 +448,8 @@
         <span class="n">shots_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">circuits</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+            <span class="n">task_specification</span><span class="p">,</span> <span class="n">shots</span><span class="p">,</span> <span class="n">readout</span><span class="p">,</span> <span class="n">input_bit_circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_circuit_for_run</span><span class="p">(</span>
+                <span class="n">circuit</span>
             <span class="p">)</span>
             <span class="p">(</span>
                 <span class="n">output_bit_register_dict</span><span class="p">,</span>
@@ -621,7 +643,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">circuit</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+        <span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">quantum_task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
         <span class="p">(</span>
             <span class="n">output_bit_register_dict</span><span class="p">,</span>
@@ -659,9 +681,7 @@
 <span class="sd">                  Dict[str, List[List[float]]],</span>
 <span class="sd">                  Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="p">(</span><span class="n">quantum_task_batch</span><span class="p">,</span> <span class="n">batch_metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuits_batch</span><span class="p">(</span>
-            <span class="n">circuits</span>
-        <span class="p">)</span>
+        <span class="n">quantum_task_batch</span><span class="p">,</span> <span class="n">batch_metadata</span><span class="p">,</span> <span class="n">input_bit_circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuits_batch</span><span class="p">(</span><span class="n">circuits</span><span class="p">)</span>
         <span class="n">bool_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">float_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">complex_register_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
@@ -726,11 +746,10 @@
                 <span class="n">new_constant_circuit</span><span class="p">,</span> <span class="n">constant_rot_map</span> <span class="o">=</span> <span class="n">virtual_z_replacement</span><span class="p">(</span>
                     <span class="n">constant_circuit</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span>
                 <span class="p">)</span>
+                <span class="n">rot_map</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">constant_rot_map</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">constant_rot_map</span>
                 <span class="n">run_circuits</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">new_constant_circuit</span>
-                    <span class="o">+</span> <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">constant_rot_map</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)[</span>
-                        <span class="mi">0</span>
-                    <span class="p">]</span>
+                    <span class="o">+</span> <span class="n">virtual_z_replacement</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">rot_map</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_z_replacement</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">for</span> <span class="n">circuit</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">circuits</span><span class="p">()</span>
                 <span class="p">]</span>
 
@@ -1005,7 +1024,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            QueuedCircuitRun</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="p">(</span><span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">_input_bit_circuit</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
+        <span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">_input_bit_circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_circuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">QueuedCircuitRun</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aws_session</span><span class="p">,</span> <span class="n">quantum_task</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
 
 
@@ -1127,10 +1146,8 @@
             <span class="p">]:</span>
                 <span class="n">new_circuit</span> <span class="o">+=</span> <span class="n">op</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;All two qubit gates need to be diagonal when virtualZ </span><span class="se">\</span>
-<span class="s2">                        replacement is used.</span><span class="se">\n</span><span class="s2">gate: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All two qubit gates need to be diagonal when virtualZ </span><span class="se">\</span>
+<span class="s2">                        replacement is used.</span><span class="se">\n</span><span class="s2">gate: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s2">&quot;SingleQubitGateOperation&quot;</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">tags</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">hqslang</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;RotateZ&quot;</span><span class="p">:</span>
                 <span class="n">update_phase_map</span><span class="p">(</span><span class="n">rotation_map</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">qubit</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">theta</span><span class="p">())</span>

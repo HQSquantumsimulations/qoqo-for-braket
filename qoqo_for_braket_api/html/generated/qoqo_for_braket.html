@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.9.0 documentation</title>
+  <title>qoqo_for_braket &mdash; qoqo_for_braket 0.10.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=269f141a"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/documentation_options.js?v=c86f77de"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -50,6 +50,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__create_device"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__create_device()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__init__"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend.__weakref__"><code class="docutils literal notranslate"><span class="pre">BraketBackend.__weakref__</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._create_uat_session"><code class="docutils literal notranslate"><span class="pre">BraketBackend._create_uat_session()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._prepare_circuit_for_run"><code class="docutils literal notranslate"><span class="pre">BraketBackend._prepare_circuit_for_run()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._run_circuit"><code class="docutils literal notranslate"><span class="pre">BraketBackend._run_circuit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#qoqo_for_braket.BraketBackend._run_circuits_batch"><code class="docutils literal notranslate"><span class="pre">BraketBackend._run_circuits_batch()</span></code></a></li>
@@ -155,7 +156,7 @@
 </table>
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">BraketBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_hybrid_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_z_replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">BraketBackend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbatim_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_hybrid_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">virtual_z_replacement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend" title="Link to this definition"></a></dt>
 <dd><p>Qoqo backend execution qoqo objects on AWS braket.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -186,8 +187,8 @@ natural two-qubit gate is diagonal in the Z-basis,
 it is possible to replace RotateZ gates by virtual changes (rotations)
 of the qubit basis in the XY-Plane. This is what we implement
 here. Setting this to True/False will enable the virtual Z replacement with/without
-the final rotation at the end of the circuit. Leaving this to its default (None) won't
-use the virtual Z replacement.</p></li>
+the final rotation at the end of the circuit. Leaving this to its default (None)
+won't use the virtual Z replacement.</p></li>
 </ul>
 </dd>
 </dl>
@@ -197,7 +198,7 @@ use the virtual Z replacement.</p></li>
 <dd><p>Creates the device and returns it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The instanciated device (either an AwsDevice or a LocalSimulator)</p>
+<dd class="field-odd"><p>The instantiated device (either an AwsDevice or a LocalSimulator)</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> -- Device specified isn't allowed. You can allow it by calling the
@@ -224,8 +225,8 @@ natural two-qubit gate is diagonal in the Z-basis,
 it is possible to replace RotateZ gates by virtual changes (rotations)
 of the qubit basis in the XY-Plane. This is what we implement
 here. Setting this to True/False will enable the virtual Z replacement with/without
-the final rotation at the end of the circuit. Leaving this to its default (None) won't
-use the virtual Z replacement.</p></li>
+the final rotation at the end of the circuit. Leaving this to its default (None)
+won't use the virtual Z replacement.</p></li>
 </ul>
 </dd>
 </dl>
@@ -235,6 +236,19 @@ use the virtual Z replacement.</p></li>
 <dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend.__weakref__">
 <span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#qoqo_for_braket.BraketBackend.__weakref__" title="Link to this definition"></a></dt>
 <dd><p>list of weak references to the object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qoqo_for_braket.BraketBackend._create_uat_session">
+<span class="sig-name descname"><span class="pre">_create_uat_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AwsSession</span></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/backend.html#BraketBackend._create_uat_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.BraketBackend._create_uat_session" title="Link to this definition"></a></dt>
+<dd><p>Creates an AwsSession with the HQS partner UAT string in user_agent_extra.</p>
+<p>This ensures the APN tag is included in the User-Agent header of every
+Braket API call, following the standard partner UAT implementation approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AwsSession configured with the HQS partner UAT tag.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -648,8 +662,8 @@ natural two-qubit gate is diagonal in the Z-basis,
 it is possible to replace RotateZ gates by virtual changes (rotations)
 of the qubit basis in the XY-Plane. This is what we implement
 here. Setting this to True/False will enable the virtual Z replacement with/without
-the final rotation at the end of the circuit. Leaving this to its default (None) won't
-use the virtual Z replacement.</p>
+the final rotation at the end of the circuit. Leaving this to its default (None)
+won't use the virtual Z replacement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>replacement</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) -- The virtual Z replacement mode.</p>
@@ -661,7 +675,7 @@ use the virtual Z replacement.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedCircuitRun">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedCircuitRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumTask</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedCircuitRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AwsSession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuantumTask</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun" title="Link to this definition"></a></dt>
 <dd><p>Queued Result of the circuit.</p>
 <p>Initialise the QueuedCircuitRun class.</p>
 <dl class="field-list simple">
@@ -696,7 +710,7 @@ use the virtual Z replacement.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedCircuitRun.from_json">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun.from_json" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedCircuitRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedCircuitRun.from_json" title="Link to this definition"></a></dt>
 <dd><p>Convert a json string to an instance of QueuedCircuitRun.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -748,7 +762,7 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedHybridRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">session:</span> <span class="pre">~braket.aws.aws_session.AwsSession,</span> <span class="pre">job:</span> <span class="pre">~braket.jobs.quantum_job.QuantumJob,</span> <span class="pre">metadata:</span> <span class="pre">~typing.Dict[~typing.Any,</span> <span class="pre">~typing.Any],</span> <span class="pre">measurement:</span> <span class="pre">&lt;module</span> <span class="pre">'measurements'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedHybridRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">session:</span> <span class="pre">~braket.aws.aws_session.AwsSession,</span> <span class="pre">job:</span> <span class="pre">~braket.jobs.quantum_job.QuantumJob,</span> <span class="pre">metadata:</span> <span class="pre">~typing.Dict[~typing.Any,</span> <span class="pre">~typing.Any],</span> <span class="pre">measurement:</span> <span class="pre">&lt;module</span> <span class="pre">'measurements'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun" title="Link to this definition"></a></dt>
 <dd><p>Queued Result of the running a QuantumProgram with a hybrid job.</p>
 <p>Initialise the QueuedCircuitRun class.</p>
 <dl class="field-list simple">
@@ -791,7 +805,7 @@ Dict[str, List[List[complex]]],]]: Result if task was successful.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedHybridRun.from_json">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun" title="qoqo_for_braket.queued_results.QueuedHybridRun"><span class="pre">QueuedHybridRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.from_json" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedHybridRun" title="qoqo_for_braket.queued_results.QueuedHybridRun"><span class="pre">QueuedHybridRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedHybridRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedHybridRun.from_json" title="Link to this definition"></a></dt>
 <dd><p>Convert a json string to an instance of QueuedHybridRun.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -854,7 +868,7 @@ Dict[str, float],</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedProgramRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queued_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qoqo_for_braket.</span></span><span class="sig-name descname"><span class="pre">QueuedProgramRun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurement</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queued_circuits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#qoqo_for_braket.QueuedCircuitRun" title="qoqo_for_braket.queued_results.QueuedCircuitRun"><span class="pre">QueuedCircuitRun</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun" title="Link to this definition"></a></dt>
 <dd><p>Queued Result of the measurement.</p>
 <p>Initialise the QueuedProgramRun class.</p>
 <dl class="field-list simple">
@@ -887,7 +901,7 @@ Dict[str, float],</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qoqo_for_braket.QueuedProgramRun.from_json">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.queued_results.QueuedProgramRun"><span class="pre">QueuedProgramRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.from_json" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qoqo_for_braket.QueuedProgramRun" title="qoqo_for_braket.queued_results.QueuedProgramRun"><span class="pre">QueuedProgramRun</span></a></span></span><a class="reference internal" href="../_modules/qoqo_for_braket/queued_results.html#QueuedProgramRun.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qoqo_for_braket.QueuedProgramRun.from_json" title="Link to this definition"></a></dt>
 <dd><p>Convert a json string to an instance of QueuedProgramRun.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

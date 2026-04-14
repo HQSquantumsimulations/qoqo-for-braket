@@ -1,9 +1,0 @@
-(function() {
-    var implementors = Object.fromEntries([["roqoqo_for_braket_devices",[["impl&lt;'de&gt; <a class=\"trait\" href=\"https://docs.rs/serde_core/1.0.228/serde_core/de/trait.Deserialize.html\" title=\"trait serde_core::de::Deserialize\">Deserialize</a>&lt;'de&gt; for <a class=\"struct\" href=\"roqoqo_for_braket_devices/devices/struct.IonQAria1Device.html\" title=\"struct roqoqo_for_braket_devices::devices::IonQAria1Device\">IonQAria1Device</a>"],["impl&lt;'de&gt; <a class=\"trait\" href=\"https://docs.rs/serde_core/1.0.228/serde_core/de/trait.Deserialize.html\" title=\"trait serde_core::de::Deserialize\">Deserialize</a>&lt;'de&gt; for <a class=\"struct\" href=\"roqoqo_for_braket_devices/devices/struct.IonQHarmonyDevice.html\" title=\"struct roqoqo_for_braket_devices::devices::IonQHarmonyDevice\">IonQHarmonyDevice</a>"],["impl&lt;'de&gt; <a class=\"trait\" href=\"https://docs.rs/serde_core/1.0.228/serde_core/de/trait.Deserialize.html\" title=\"trait serde_core::de::Deserialize\">Deserialize</a>&lt;'de&gt; for <a class=\"struct\" href=\"roqoqo_for_braket_devices/devices/struct.OQCLucyDevice.html\" title=\"struct roqoqo_for_braket_devices::devices::OQCLucyDevice\">OQCLucyDevice</a>"],["impl&lt;'de&gt; <a class=\"trait\" href=\"https://docs.rs/serde_core/1.0.228/serde_core/de/trait.Deserialize.html\" title=\"trait serde_core::de::Deserialize\">Deserialize</a>&lt;'de&gt; for <a class=\"struct\" href=\"roqoqo_for_braket_devices/devices/struct.RigettiAspenM3Device.html\" title=\"struct roqoqo_for_braket_devices::devices::RigettiAspenM3Device\">RigettiAspenM3Device</a>"]]]]);
-    if (window.register_implementors) {
-        window.register_implementors(implementors);
-    } else {
-        window.pending_implementors = implementors;
-    }
-})()
-//{"start":57,"fragment_lengths":[1546]}

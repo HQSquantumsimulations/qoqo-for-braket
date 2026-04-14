@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["AWSDevice"],"struct":["IonQAria1Device","IonQHarmonyDevice","OQCLucyDevice","RigettiAspenM3Device"]};
