@@ -16,7 +16,10 @@ from qoqo import operations as ops
 from braket.aws.aws_session import AwsSession
 from numpy import testing as npt
 
+import boto3
+import logging
 
+boto3.set_stream_logger('', logging.DEBUG)
 import os
 
 os.environ["AWS_REGION"] = "eu-west-2"
@@ -38,12 +41,12 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-# (bit_res, _, _) = backend.run_circuit(circuit)
-# assert "ro" in bit_res.keys()
-# registers = bit_res["ro"]
+(bit_res, _, _) = backend.run_circuit(circuit)
+assert "ro" in bit_res.keys()
+registers = bit_res["ro"]
 
-# assert len(registers) == 2
-# assert len(registers[0]) == 3
+assert len(registers) == 2
+assert len(registers[0]) == 3
 
-# for reg in registers:
-#     npt.assert_array_equal(reg, [True, True, True])
+for reg in registers:
+    npt.assert_array_equal(reg, [True, True, True])

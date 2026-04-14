@@ -19,6 +19,8 @@ import tempfile
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import importlib.metadata
 import numpy as np
+import boto3
+import botocore.config
 import qoqo_qasm
 from braket.aws import AwsDevice, AwsQuantumJob, AwsQuantumTask, AwsQuantumTaskBatch
 from braket.aws.aws_session import AwsSession
@@ -27,8 +29,8 @@ from braket.devices import LocalSimulator
 from braket.ir import openqasm
 from braket.jobs.local import LocalQuantumJob
 from qoqo import Circuit, QuantumProgram
-from qoqo import operations as ops  # type:ignore
-from qoqo.measurements import ClassicalRegister  # type:ignore
+from qoqo import operations as ops  # type: ignore
+from qoqo.measurements import ClassicalRegister  # type: ignore
 from qoqo_calculator_pyo3 import CalculatorFloat
 
 from qoqo_for_braket.interface import (
@@ -109,12 +111,6 @@ class BraketBackend:
         self.batch_mode = batch_mode
         self.use_hybrid_jobs = use_hybrid_jobs
         self.virtual_z_replacement = virtual_z_replacement
-
-        if self.aws_session is not None:
-            version = importlib.metadata.version("qoqo-for-braket")
-            self.aws_session.add_braket_user_agent(
-                "APN/1.0 HQS Quantum Simulations/1.0 qoqo-for-braket/" + str(version)
-            )
 
     def _create_config(self) -> Dict[str, Any]:
         return {
@@ -214,7 +210,7 @@ class BraketBackend:
         """Creates the device and returns it.
 
         Returns:
-            The instanciated device (either an AwsDevice or a LocalSimulator)
+            The instantiated device (either an AwsDevice or a LocalSimulator)
 
         Raises:
             ValueError: Device specified isn't allowed. You can allow it by calling the
@@ -224,11 +220,13 @@ class BraketBackend:
         if self.device.startswith("local:") or self.device in LOCAL_SIMULATORS_LIST:
             device = LocalSimulator(self.device)
         elif self.device in REMOTE_SIMULATORS_LIST:
-            device = AwsDevice(self.device)
+            session = self._create_uat_session()
+            device = AwsDevice(self.device, aws_session=session)
         else:
             if self.__use_actual_hardware:
                 # allow list simulator devices of AWS e.g. state vector simulator
-                device = AwsDevice(self.device)
+                session = self._create_uat_session()
+                device = AwsDevice(self.device, aws_session=session)
             else:
                 raise ValueError(
                     "Device specified isn't allowed. You can allow it by calling the "
@@ -236,6 +234,25 @@ class BraketBackend:
                     + "this may incur significant monetary charges."
                 )
         return device
+
+    def _create_uat_session(self) -> AwsSession:
+        """Creates an AwsSession with the HQS partner UAT string in user_agent_extra.
+        This ensures the APN tag is included in the User-Agent header of every
+        Braket API call, following the standard partner UAT implementation approach.
+        Returns:
+        AwsSession configured with the HQS partner UAT tag.
+        """
+        version = importlib.metadata.version("qoqo-for-braket")
+        session_config = botocore.config.Config(
+            user_agent_extra=f"APN/1.0 HQS/1.0 qoqo-for-braket/{version}"
+        )
+        if self.aws_session is not None:
+            braket_client = self.aws_session.boto_session.client("braket", config=session_config)
+            return AwsSession(braket_client=braket_client)
+        else:
+            boto_session = boto3.Session()
+            braket_client = boto_session.client("braket", config=session_config)
+            return AwsSession(boto_session=boto_session, braket_client=braket_client)
 
     # runs a circuit internally and can be used to produce sync and async results
     def _run_circuit(
@@ -267,7 +284,7 @@ class BraketBackend:
             output_float_register_lengths,
             output_complex_register_lengths,
         ) = self._set_up_registers(circuit)
-        (task_specification, shots, readout, input_bit_circuit) = self._prepare_circuit_for_run(
+        task_specification, shots, readout, input_bit_circuit = self._prepare_circuit_for_run(
             circuit
         )
         return (
@@ -314,8 +331,8 @@ class BraketBackend:
         shots_list = []
         metadata = []
         for circuit in circuits:
-            (task_specification, shots, readout, input_bit_circuit) = (
-                self._prepare_circuit_for_run(circuit)
+            task_specification, shots, readout, input_bit_circuit = self._prepare_circuit_for_run(
+                circuit
             )
             (
                 output_bit_register_dict,
@@ -500,7 +517,7 @@ class BraketBackend:
         """
         if self.virtual_z_replacement is not None:
             circuit, _ = virtual_z_replacement(circuit, {}, self.virtual_z_replacement)
-        (quantum_task, metadata, input_bit_circuit) = self._run_circuit(circuit)
+        quantum_task, metadata, input_bit_circuit = self._run_circuit(circuit)
         results = quantum_task.result()
         (
             output_bit_register_dict,
@@ -535,9 +552,7 @@ class BraketBackend:
                   Dict[str, List[List[float]]],
                   Dict[str, List[List[complex]]]]: bit, float and complex registers dictionaries.
         """
-        (quantum_task_batch, batch_metadata, input_bit_circuit) = self._run_circuits_batch(
-            circuits
-        )
+        quantum_task_batch, batch_metadata, input_bit_circuit = self._run_circuits_batch(circuits)
         bool_register_dict: Dict[str, List[List[bool]]] = {}
         float_register_dict: Dict[str, List[List[float]]] = {}
         complex_register_dict: Dict[str, List[List[complex]]] = {}
@@ -859,7 +874,7 @@ class BraketBackend:
         Returns:
             QueuedCircuitRun
         """
-        (quantum_task, metadata, _input_bit_circuit) = self._run_circuit(circuit)
+        quantum_task, metadata, _input_bit_circuit = self._run_circuit(circuit)
         return QueuedCircuitRun(self.aws_session, quantum_task, metadata)
 
     def run_measurement_queued(self, measurement: Any) -> QueuedProgramRun:
@@ -973,10 +988,8 @@ def virtual_z_replacement(
             ]:
                 new_circuit += op
             else:
-                raise ValueError(
-                    f"All two qubit gates need to be diagonal when virtualZ \
-                        replacement is used.\ngate: {op.hqslang()}"
-                )
+                raise ValueError(f"All two qubit gates need to be diagonal when virtualZ \
+                        replacement is used.\ngate: {op.hqslang()}")
         elif "SingleQubitGateOperation" in op.tags():
             if op.hqslang() == "RotateZ":
                 update_phase_map(rotation_map, op.qubit(), op.theta())
