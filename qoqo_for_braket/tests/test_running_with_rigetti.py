@@ -42,6 +42,7 @@ def test_rigetti_error() -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
     with pytest.raises(ValueError):
         backend.change_max_shots(2)
+        assert backend.max_shots == 2
         backend.run_circuit(circuit)
 
 

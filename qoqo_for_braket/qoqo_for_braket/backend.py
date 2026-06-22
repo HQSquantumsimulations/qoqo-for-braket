@@ -174,6 +174,12 @@ class BraketBackend:
         """
         self.__max_number_shots = shots
 
+    @property
+    def max_shots(self) -> int:
+        """Get the maximum number of shots allowed.
+        """
+        return self.__max_number_shots
+
     def change_max_circuit_length(self, length: int) -> None:
         """Change the maximum circuit length allowed.
 
