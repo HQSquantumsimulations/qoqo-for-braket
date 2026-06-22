@@ -10,13 +10,14 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import (
     ClassicalRegister,
     PauliZProductInput,
     PauliZProduct,
-)  # type:ignore
+)  # type: ignore
 from qoqo import operations as ops
 from typing import List, Any, Optional
 import pytest
@@ -41,6 +42,7 @@ list_of_operations = [
 def test_all_no_device(device: Optional[str]) -> None:
     """Test running simple program."""
     circuit = Circuit()
+    circuit += ops.DefinitionBit("ro", 10, True)
     circuit += ops.PauliX(0)
     circuit += ops.PauliX(2)
     circuit += ops.PauliX(2)
@@ -51,7 +53,7 @@ def test_all_no_device(device: Optional[str]) -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
     backend = BraketBackend(device)
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 
@@ -67,6 +69,7 @@ def test_measurement_register_classicalregister(operations: List[Any]):
     backend = BraketBackend()
 
     circuit = Circuit()
+    circuit += ops.DefinitionBit("ri", 10, True)
     involved_qubits = set()
     for op in operations:
         involved_qubits.update(op.involved_qubits())
@@ -124,6 +127,7 @@ def test_measurement(operations: List[Any]):
     backend = BraketBackend()
 
     circuit = Circuit()
+    circuit += ops.DefinitionBit("ri", 10, True)
     involved_qubits = set()
     for op in operations:
         involved_qubits.update(op.involved_qubits())

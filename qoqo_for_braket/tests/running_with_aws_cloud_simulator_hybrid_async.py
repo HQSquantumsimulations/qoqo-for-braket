@@ -10,6 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running a hybrid job."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
@@ -49,7 +50,7 @@ while queued.poll_result() is None:
     time.sleep(10)
     if i > 50:
         raise RuntimeError("Timed out waiting for job to complete")
-(bit_res, _, _) = queued.poll_result()
+bit_res, _, _ = queued.poll_result()
 queued.delete_tmp_folder()
 
 registers = bit_res["ro"]

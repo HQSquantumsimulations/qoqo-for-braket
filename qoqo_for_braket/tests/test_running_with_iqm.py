@@ -10,6 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo_for_braket.interface.iqm_verbatim_interface import call_circuit
 from qoqo import Circuit, QuantumProgram, PauliZProductInput, PauliZProduct
@@ -60,7 +61,7 @@ def test_iqm_all_gates() -> None:
     iqm_circuit += ops.MeasureQubit(1, "ro", 1)
     iqm_circuit += ops.MeasureQubit(2, "ro", 2)
     iqm_circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
-    (iqm_bit_res, _, _) = backend.run_circuit(iqm_circuit)
+    iqm_bit_res, _, _ = backend.run_circuit(iqm_circuit)
     assert "ro" in iqm_bit_res.keys()
     iqm_registers = iqm_bit_res["ro"]
     print(iqm_registers)
@@ -83,7 +84,7 @@ def test_running_with_virtual_z_replacement() -> None:
     backend = BraketBackend()
     backend.force_iqm_verbatim()
     backend.set_virtual_z_replacement(replacement=False)
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 

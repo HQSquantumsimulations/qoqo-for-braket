@@ -10,6 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 import boto3
 import logging
 import os
@@ -20,9 +21,8 @@ import sys
 import pytest
 import subprocess
 
-
 # Set default region
-os.environ["AWS_DEFAULT_REGION"] = "eu-west-2" # or your preferred region
+os.environ["AWS_DEFAULT_REGION"] = "eu-west-2"  # or your preferred region
 # Enable debug logging
 boto3.set_stream_logger("", logging.DEBUG)
 # Use SV1 simulator
@@ -37,7 +37,7 @@ circuit += ops.MeasureQubit(qubit=0, readout="ro", readout_index=0)
 circuit += ops.MeasureQubit(qubit=1, readout="ro", readout_index=1)
 circuit += ops.PragmaSetNumberOfMeasurements(number_measurements=10, readout="ro")
 
-(res, _, _) = backend.run_circuit(circuit)
+res, _, _ = backend.run_circuit(circuit)
 assert res
 
 # To ensure this runs, run the following. The last command should return a non-empty list
