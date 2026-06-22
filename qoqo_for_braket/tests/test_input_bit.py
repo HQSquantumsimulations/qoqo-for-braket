@@ -10,13 +10,14 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit, QuantumProgram
 from qoqo.measurements import (
     ClassicalRegister,
     PauliZProductInput,
     PauliZProduct,
-)  # type:ignore
+)  # type: ignore
 from qoqo import operations as ops
 import pytest
 import sys
@@ -43,7 +44,7 @@ def test_running_with_input_bit() -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
     backend = BraketBackend()
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 
@@ -57,7 +58,7 @@ def test_running_with_input_bit() -> None:
     circuit += ops.PragmaSetNumberOfMeasurements(2, "ro")
 
     backend = BraketBackend()
-    (bit_res, _, _) = backend.run_circuit(circuit)
+    bit_res, _, _ = backend.run_circuit(circuit)
     assert "ro" in bit_res.keys()
     registers = bit_res["ro"]
 

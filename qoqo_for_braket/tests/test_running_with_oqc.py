@@ -10,6 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
@@ -62,7 +63,7 @@ def test_oqc_all_gates() -> None:
     oqc_circuit += ops.MeasureQubit(2, "ro", 2)
     oqc_circuit += ops.MeasureQubit(3, "ro", 3)
     oqc_circuit += ops.PragmaSetNumberOfMeasurements(10, "ro")
-    (oqc_bit_res, _, _) = backend.run_circuit(oqc_circuit)
+    oqc_bit_res, _, _ = backend.run_circuit(oqc_circuit)
     assert "ro" in oqc_bit_res.keys()
     oqc_registers = oqc_bit_res["ro"]
     assert len(oqc_registers) == 10

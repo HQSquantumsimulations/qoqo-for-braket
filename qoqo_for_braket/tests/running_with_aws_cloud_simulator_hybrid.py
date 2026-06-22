@@ -42,7 +42,7 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-(bit_res, _, _) = backend.run_measurement_registers_hybrid(measurement)
+bit_res, _, _ = backend.run_measurement_registers_hybrid(measurement)
 assert "ro" in bit_res.keys()
 registers = bit_res["ro"]
 

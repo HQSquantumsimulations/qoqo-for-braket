@@ -4,6 +4,10 @@ This changelog track changes to the qoqo-for-braket project starting at version 
 
 ## Unpublished
 
+## 0.11.0
+
+* Added `max_shots` getter property for backend.
+
 ## 0.10.1
 
 * Fixed documentation building.

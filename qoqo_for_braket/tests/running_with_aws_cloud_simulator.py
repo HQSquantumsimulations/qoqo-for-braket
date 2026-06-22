@@ -10,6 +10,7 @@
 # or implied. See the License for the specific language governing permissions and limitations under
 # the License.
 """Test running local operation with qasm backend."""
+
 from qoqo_for_braket import BraketBackend
 from qoqo import Circuit
 from qoqo import operations as ops
@@ -19,7 +20,7 @@ from numpy import testing as npt
 import boto3
 import logging
 
-boto3.set_stream_logger('', logging.DEBUG)
+boto3.set_stream_logger("", logging.DEBUG)
 import os
 
 os.environ["AWS_REGION"] = "eu-west-2"
@@ -41,7 +42,7 @@ backend = BraketBackend(
 )
 backend.change_max_shots(2)
 
-(bit_res, _, _) = backend.run_circuit(circuit)
+bit_res, _, _ = backend.run_circuit(circuit)
 assert "ro" in bit_res.keys()
 registers = bit_res["ro"]
 
