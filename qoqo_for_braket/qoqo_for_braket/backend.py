@@ -177,6 +177,9 @@ class BraketBackend:
     @property
     def max_shots(self) -> int:
         """Get the maximum number of shots allowed.
+
+        Return:
+            int: the maxmimum number of shots specified for the backend.
         """
         return self.__max_number_shots
 
